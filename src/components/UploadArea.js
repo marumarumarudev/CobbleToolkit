@@ -274,7 +274,7 @@ export default function UploadArea() {
           rel="noopener noreferrer"
           className="text-blue-400 hover:underline"
         >
-          @moonBSIS
+          maru
         </a>{" "}
         • Open source on{" "}
         <a
@@ -287,7 +287,7 @@ export default function UploadArea() {
         </a>{" "}
         • Deployed on{" "}
         <a
-          href="https://cobblemon-datapack-spawn-scanner.vercel.app/"
+          href="https://vercel.com"
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-400 hover:underline"
