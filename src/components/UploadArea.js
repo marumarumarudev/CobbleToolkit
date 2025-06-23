@@ -100,7 +100,7 @@ export default function UploadArea() {
           rarities, biomes, structures, and more. This tool runs entirely in
           your browser — your files are never uploaded. Open source on{" "}
           <a
-            href="https://github.com/YOUR_GITHUB_REPO"
+            href="https://github.com/moonBSIS/Cobblemon-Datapack-Spawn-Scanner"
             className="text-blue-400 underline hover:text-blue-300"
             target="_blank"
             rel="noopener noreferrer"
@@ -256,7 +256,7 @@ export default function UploadArea() {
       <footer className="text-sm text-gray-500 text-center mt-12 mb-4">
         Built by{" "}
         <a
-          href="https://github.com/YOUR_GITHUB"
+          href="https://github.com/moonBSIS"
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-400 hover:underline"
@@ -265,7 +265,7 @@ export default function UploadArea() {
         </a>{" "}
         • Open source on{" "}
         <a
-          href="https://github.com/YOUR_GITHUB_REPO"
+          href="https://github.com/moonBSIS/Cobblemon-Datapack-Spawn-Scanner"
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-400 hover:underline"
@@ -274,7 +274,7 @@ export default function UploadArea() {
         </a>{" "}
         • Deployed on{" "}
         <a
-          href="https://vercel.com"
+          href="https://cobblemon-datapack-spawn-scanner.vercel.app/"
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-400 hover:underline"
