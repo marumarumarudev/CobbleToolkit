@@ -109,6 +109,19 @@ export default function UploadArea() {
           </a>
           .
         </p>
+        <br />
+        <p className="text-gray-300 text-sm text-center mt-2">
+          View spawn tags like <code>#cobblemon:is_arid</code> in the{" "}
+          <a
+            href="https://wiki.cobblemon.com/index.php/Pok%C3%A9mon/Spawning/Spawn_Definitions"
+            className="text-blue-400 underline hover:text-blue-300"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Cobblemon Spawn Definitions Wiki
+          </a>
+          .
+        </p>
       </header>
 
       {/* Upload Area */}
@@ -282,6 +295,10 @@ export default function UploadArea() {
           Vercel
         </a>
       </footer>
+      <p className="text-gray-300 text-sm text-center mt-2">
+        Made this for my own use and laziness out of boredom, but I thought it
+        might be useful for others.
+      </p>
     </div>
   );
 }
