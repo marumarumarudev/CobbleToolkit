@@ -26,7 +26,7 @@ A simple, open-source web tool to scan and analyze Cobblemon datapack `.zip` fil
 
 ## 🌐 Live Demo
 
-(coming soon)
+https://cobblemon-datapack-spawn-scanner.vercel.app/
 
 ## 🔓 License
 
@@ -34,7 +34,7 @@ This project is licensed under the [Do What The F\*ck You Want To Public License
 
 ## 👤 Author
 
-Built by [maru](https://github.com/moonBSIS) with a love for Pokémon and open tools.
+Built by [maru](https://github.com/moonBSIS) with a love for Pokémon, Cobblemon, Minecraft and open tools.
 
 ## 🤝 Contributing
 
