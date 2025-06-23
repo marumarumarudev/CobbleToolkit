@@ -31,17 +31,27 @@ export async function parseCobblemonZip(file) {
           const condition = entry.condition || {};
 
           results.push({
-            pokemon: entry.pokemon || entry.species || entry.id || "Unknown",
-            bucket: entry.bucket || "Unknown",
-            level: entry.level || "",
-            weight: entry.weight ?? "",
-            biomes: (condition.biomes || []).join(", "),
-            dimensions: (condition.dimensions || []).join(", "),
-            canSeeSky: condition.canSeeSky ?? "",
-            moonPhase: condition.moonPhase ?? "",
-            isRaining: condition.isRaining ?? "",
-            structures: (condition.structures || []).join(", "),
-            neededNearbyBlocks: (condition.neededNearbyBlocks || []).join(", "),
+            pokemon: String(
+              entry.pokemon || entry.species || entry.id || "Unknown"
+            ),
+            bucket: String(entry.bucket || "Unknown"),
+            level: String(entry.level ?? ""),
+            weight: String(entry.weight ?? ""),
+            biomes: Array.isArray(condition.biomes)
+              ? condition.biomes.join(", ")
+              : "",
+            dimensions: Array.isArray(condition.dimensions)
+              ? condition.dimensions.join(", ")
+              : "",
+            canSeeSky: String(condition.canSeeSky ?? ""),
+            moonPhase: String(condition.moonPhase ?? ""),
+            isRaining: String(condition.isRaining ?? ""),
+            structures: Array.isArray(condition.structures)
+              ? condition.structures.join(", ")
+              : "",
+            neededNearbyBlocks: Array.isArray(condition.neededNearbyBlocks)
+              ? condition.neededNearbyBlocks.join(", ")
+              : "",
           });
         }
       } catch (err) {

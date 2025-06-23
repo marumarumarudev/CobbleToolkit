@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { parseCobblemonZip } from "@/utils/parser";
 import { saveAs } from "file-saver";
+import toast from "react-hot-toast";
+import Image from "next/image";
 
 export default function UploadArea() {
   const [fileReports, setFileReports] = useState([]);
@@ -18,25 +20,58 @@ export default function UploadArea() {
   };
 
   const handleFiles = async (files) => {
-    setLoading(true);
-    const reports = [];
-
-    for (const file of files) {
-      const parsed = await parseCobblemonZip(file);
-      if (!parsed.length) {
-        reports.push({ name: file.name, error: "No valid spawn data found." });
-        continue;
-      }
-
-      reports.push({ name: file.name, data: parsed });
+    if (loading) {
+      toast("Please wait, still parsing previous files.", { icon: "⏳" });
+      return;
     }
 
-    setFileReports(reports);
+    setLoading(true);
+
+    const existingNames = new Set(fileReports.map((r) => r.name));
+    const newFiles = files.filter((f) => !existingNames.has(f.name));
+    const skippedCount = files.length - newFiles.length;
+
+    if (skippedCount > 0) {
+      toast(
+        `Skipped ${skippedCount} duplicate file${skippedCount > 1 ? "s" : ""}.`,
+        {
+          icon: "⚠️",
+        }
+      );
+    }
+
+    if (newFiles.length === 0) {
+      setLoading(false);
+      return;
+    }
+
+    const isBulk = newFiles.length > 1;
+    const parsedReports = await Promise.all(
+      newFiles.map(async (file) => {
+        const parsed = await parseCobblemonZip(file);
+        const hasData = parsed.length > 0;
+        return {
+          id: crypto.randomUUID(),
+          name: file.name,
+          data: parsed,
+          error: hasData ? null : "No valid spawn data found.",
+          expanded: !isBulk && hasData,
+        };
+      })
+    );
+
+    setFileReports((prev) => [...parsedReports, ...prev]);
     setLoading(false);
   };
 
   const handleInputChange = (e) => {
-    const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files).filter((file) =>
+      file.name.toLowerCase().endsWith(".zip")
+    );
+    if (files.length === 0) {
+      toast.error("Only valid .zip files are supported.");
+      return;
+    }
     handleFiles(files);
   };
 
@@ -89,6 +124,11 @@ export default function UploadArea() {
     saveAs(blob, `${base}.md`);
   };
 
+  const sortedReports = [
+    ...fileReports.filter((r) => !r.error),
+    ...fileReports.filter((r) => r.error),
+  ];
+
   return (
     <div className="min-h-screen bg-[#1e1e1e] text-white flex flex-col items-center px-6 py-10">
       <header className="text-center mb-10">
@@ -130,7 +170,13 @@ export default function UploadArea() {
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();
-          const files = Array.from(e.dataTransfer.files);
+          const files = Array.from(e.dataTransfer.files).filter((file) =>
+            file.name.endsWith(".zip")
+          );
+          if (files.length === 0) {
+            toast.error("Only .zip files are supported.");
+            return;
+          }
           handleFiles(files);
         }}
         onClick={() => document.getElementById("fileInput").click()}
@@ -162,12 +208,43 @@ export default function UploadArea() {
 
       {/* Reports */}
       <div className="w-full max-w-7xl">
-        {fileReports.map((report, i) => (
-          <div
-            key={i}
-            className="bg-[#2b2b2b] border border-gray-700 rounded p-4 mb-6 shadow-md"
+        {sortedReports.map((report, i) => (
+          <details
+            key={report.name}
+            open={report.expanded}
+            className="..."
+            onToggle={(e) => {
+              const open = e.target.open;
+              const id = report.id;
+              setFileReports((prev) =>
+                prev.map((r) => (r.id === id ? { ...r, expanded: open } : r))
+              );
+            }}
           >
-            <strong className="text-lg">{report.name}</strong>
+            <summary className="cursor-pointer flex justify-between items-center text-lg font-medium">
+              <span>
+                {report.name}
+                {!report.expanded && (
+                  <span className="text-sm text-gray-400 ml-2">
+                    {report.error
+                      ? report.error === "No valid spawn data found."
+                        ? "— no spawn_pool_folder"
+                        : `— ${report.error}`
+                      : `— ${report.data.length} entries`}
+                  </span>
+                )}
+              </span>
+              <button
+                className="text-gray-400 hover:text-red-500 text-xl font-bold ml-4"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setFileReports((prev) => prev.filter((_, idx) => idx !== i));
+                }}
+              >
+                ×
+              </button>
+            </summary>
+
             {report.error ? (
               <p className="text-red-400 mt-2">❌ {report.error}</p>
             ) : (
@@ -262,7 +339,7 @@ export default function UploadArea() {
                 </div>
               </>
             )}
-          </div>
+          </details>
         ))}
       </div>
 
@@ -295,11 +372,20 @@ export default function UploadArea() {
           Vercel
         </a>
       </footer>
+
       <p className="text-gray-500 text-sm text-center mt-2 max-w-2xl mx-auto">
         Made this for my own use and laziness out of boredom, but I thought it
-        might be useful for others. Feel free to contact me on discord if you
-        have any questions or feedback. Discord: <strong>zmoonmaru</strong>
+        might be useful for others. Feel free to contact me on Discord:
+        <strong> zmoonmaru</strong>
       </p>
+
+      <Image
+        src="/SoyPoint.png"
+        alt="Soyjak pointing"
+        width={128}
+        height={128}
+        className="fixed bottom-4 right-4 w-32 pointer-events-none select-none opacity-80 z-50"
+      />
     </div>
   );
 }

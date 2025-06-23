@@ -1,4 +1,7 @@
 import UploadArea from "@/components/UploadArea";
+import { Toaster } from "react-hot-toast";
+
+<Toaster position="top-right" reverseOrder={false} />;
 
 export default function HomePage() {
   return (
