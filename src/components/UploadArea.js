@@ -295,9 +295,10 @@ export default function UploadArea() {
           Vercel
         </a>
       </footer>
-      <p className="text-gray-300 text-sm text-center mt-2">
+      <p className="text-gray-500 text-sm text-center mt-2 max-w-2xl mx-auto">
         Made this for my own use and laziness out of boredom, but I thought it
-        might be useful for others.
+        might be useful for others. Feel free to contact me on discord if you
+        have any questions or feedback. Discord: <strong>zmoonmaru</strong>
       </p>
     </div>
   );
