@@ -5,6 +5,18 @@ import JSZip from "jszip";
  */
 export async function parseCobblemonZip(file) {
   const zip = await JSZip.loadAsync(file);
+
+  if (Object.keys(zip.files).length === 0) {
+    throw new Error("The archive is empty.");
+  }
+
+  const hasSpawnData = Object.keys(zip.files).some((name) =>
+    name.includes("/spawn_pool_world/")
+  );
+  if (!hasSpawnData) {
+    throw new Error("No spawn_pool_world folder found.");
+  }
+
   const results = [];
 
   const namespaces = Object.keys(zip.files)

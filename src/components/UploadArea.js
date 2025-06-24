@@ -5,12 +5,14 @@ import { parseCobblemonZip } from "@/utils/parser";
 import { saveAs } from "file-saver";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { ChevronDown, ChevronUp, ChevronsUpDown, X } from "lucide-react";
+import Spinner from "./Spinner";
 
 export default function UploadArea() {
   const [fileReports, setFileReports] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sort, setSort] = useState({ column: "pokemon", direction: "asc" });
+  const [sort, setSort] = useState({ column: "bucket", direction: "asc" });
 
   const rarityOrder = {
     common: 0,
@@ -21,7 +23,7 @@ export default function UploadArea() {
 
   const handleFiles = async (files) => {
     if (loading) {
-      toast("Please wait, still parsing previous files.", { icon: "⏳" });
+      toast.error("Please wait, still parsing previous files.");
       return;
     }
 
@@ -33,10 +35,7 @@ export default function UploadArea() {
 
     if (skippedCount > 0) {
       toast(
-        `Skipped ${skippedCount} duplicate file${skippedCount > 1 ? "s" : ""}.`,
-        {
-          icon: "⚠️",
-        }
+        `Skipped ${skippedCount} duplicate file${skippedCount > 1 ? "s" : ""}.`
       );
     }
 
@@ -48,25 +47,45 @@ export default function UploadArea() {
     const isBulk = newFiles.length > 1;
     const parsedReports = await Promise.all(
       newFiles.map(async (file) => {
-        const parsed = await parseCobblemonZip(file);
-        const hasData = parsed.length > 0;
-        return {
-          id: crypto.randomUUID(),
-          name: file.name,
-          data: parsed,
-          error: hasData ? null : "No valid spawn data found.",
-          expanded: !isBulk && hasData,
-        };
+        try {
+          const parsed = await parseCobblemonZip(file);
+          const hasData = parsed.length > 0;
+          return {
+            id: crypto.randomUUID(),
+            name: file.name,
+            data: parsed,
+            error: hasData ? null : "No valid spawn data found.",
+            expanded: !isBulk && hasData,
+          };
+        } catch (err) {
+          const message = err.message || "Failed to parse file.";
+
+          if (message.includes("spawn_pool_world")) {
+            toast.error(`${file.name}: No spawn_pool_world folder.`);
+            return null;
+          }
+
+          console.error(`❌ Failed to parse ${file.name}`, err);
+          return {
+            id: crypto.randomUUID(),
+            name: file.name,
+            data: [],
+            error: err.message || "Failed to parse file.",
+            expanded: false,
+          };
+        }
       })
     );
 
-    setFileReports((prev) => [...parsedReports, ...prev]);
+    setFileReports((prev) => [...parsedReports.filter(Boolean), ...prev]);
     setLoading(false);
   };
 
   const handleInputChange = (e) => {
-    const files = Array.from(e.target.files).filter((file) =>
-      file.name.toLowerCase().endsWith(".zip")
+    const files = Array.from(e.target.files).filter(
+      (file) =>
+        file.name.toLowerCase().endsWith(".zip") ||
+        file.name.toLowerCase().endsWith(".jar")
     );
     if (files.length === 0) {
       toast.error("Only valid .zip files are supported.");
@@ -133,12 +152,12 @@ export default function UploadArea() {
     <div className="min-h-screen bg-[#1e1e1e] text-white flex flex-col items-center px-6 py-10">
       <header className="text-center mb-10">
         <h1 className="text-3xl md:text-4xl font-bold mb-2">
-          Cobblemon Datapack Spawn Pool Scanner
+          Cobblemon Spawn Pool Scanner
         </h1>
         <p className="text-gray-300 max-w-2xl mx-auto">
-          Analyze Cobblemon datapack spawn pools (.zip) to view Pokémon
-          rarities, biomes, structures, and more. This tool runs entirely in
-          your browser — your files are never uploaded. Open source on{" "}
+          Analyze Cobblemon spawn pools (.zip & .jar) to view Pokémon rarities,
+          biomes, structures, and more. This tool runs entirely in your browser
+          — your files are never uploaded. Open source on{" "}
           <a
             href="https://github.com/moonBSIS/Cobblemon-Datapack-Spawn-Scanner"
             className="text-blue-400 underline hover:text-blue-300"
@@ -170,8 +189,8 @@ export default function UploadArea() {
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();
-          const files = Array.from(e.dataTransfer.files).filter((file) =>
-            file.name.endsWith(".zip")
+          const files = Array.from(e.dataTransfer.files).filter(
+            (file) => file.name.endsWith(".zip") || file.name.endsWith(".jar")
           );
           if (files.length === 0) {
             toast.error("Only .zip files are supported.");
@@ -189,13 +208,18 @@ export default function UploadArea() {
           id="fileInput"
           type="file"
           multiple
-          accept=".zip"
+          accept=".zip,.jar"
           onChange={handleInputChange}
           className="hidden"
         />
       </div>
 
-      {loading && <p className="mb-4 text-blue-400">🔄 Parsing files...</p>}
+      {loading && (
+        <div className="mb-4 flex items-center gap-2 text-blue-400">
+          <Spinner />
+          <span>Parsing files...</span>
+        </div>
+      )}
 
       {fileReports.length > 0 && (
         <button
@@ -235,13 +259,13 @@ export default function UploadArea() {
                 )}
               </span>
               <button
-                className="text-gray-400 hover:text-red-500 text-xl font-bold ml-4"
+                className="text-gray-400 hover:text-red-500 ml-4"
                 onClick={(e) => {
                   e.preventDefault();
                   setFileReports((prev) => prev.filter((_, idx) => idx !== i));
                 }}
               >
-                ×
+                <X size={18} />
               </button>
             </summary>
 
@@ -293,14 +317,34 @@ export default function UploadArea() {
                           ].map(({ key, label, className }) => (
                             <th
                               key={key}
+                              onClick={() => toggleSort(key)}
                               className={`p-2 border cursor-pointer hover:bg-[#333] ${
                                 className || ""
-                              }`}
-                              onClick={() => toggleSort(key)}
+                              } group`}
                             >
-                              {label}
-                              {sort.column === key &&
-                                (sort.direction === "asc" ? " ▲" : " ▼")}
+                              <div className="flex items-center justify-center gap-1">
+                                <span className="whitespace-nowrap">
+                                  {label}
+                                </span>
+                                {sort.column === key ? (
+                                  sort.direction === "asc" ? (
+                                    <ChevronUp
+                                      size={14}
+                                      className="text-white"
+                                    />
+                                  ) : (
+                                    <ChevronDown
+                                      size={14}
+                                      className="text-white"
+                                    />
+                                  )
+                                ) : (
+                                  <ChevronsUpDown
+                                    size={14}
+                                    className="text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                  />
+                                )}
+                              </div>
                             </th>
                           ))}
                         </tr>

@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Cobblemon Datapack Spawn Pool Scanner",
+  title: "Cobblemon Spawn Pool Scanner",
   description:
-    "Analyze the spawn data inside Cobblemon datapacks (.zip) to view Pokémon rarities, biomes, structures, and more. This tool runs 100% client-side — your files are never uploaded anywhere.",
+    "Analyze the spawn data inside Cobblemon (.zip & .jar) to view Pokémon rarities, biomes, structures, and more. This tool runs 100% client-side — your files are never uploaded anywhere.",
 };
 
 export default function RootLayout({ children }) {
