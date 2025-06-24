@@ -1,6 +1,8 @@
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import Image from "next/image";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,7 +26,29 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#1a1a1a] text-white`}
       >
+        {/* Navbar */}
+        <nav className="sticky top-0 z-50 bg-[#121212] border-b border-[#333] px-4 py-4 shadow-md">
+          <div className="max-w-6xl mx-auto flex justify-between items-center">
+            <Link
+              href="/"
+              className="font-mono text-lg font-semibold hover:text-yellow-400"
+            >
+              Cobblemon Toolkit
+            </Link>
+            <div className="flex space-x-6 text-sm font-mono">
+              <Link href="/spawn-scanner" className="hover:text-yellow-400">
+                Spawn Scanner
+              </Link>
+              <Link href="/species-scanner" className="hover:text-yellow-400">
+                Species Scanner
+              </Link>
+            </div>
+          </div>
+        </nav>
+
         {children}
+
+        {/* Toaster notifications */}
         <Toaster
           position="top-right"
           reverseOrder={false}
@@ -40,6 +64,23 @@ export default function RootLayout({ children }) {
               secondary: "#3b4cca",
             },
           }}
+        />
+
+        {/* Decorative Images */}
+        <Image
+          src="/gravoyle.png"
+          alt="soyle pointing"
+          width={128}
+          height={128}
+          className="fixed bottom-4 right-4 w-32 pointer-events-none select-none opacity-30 z-50"
+        />
+
+        <Image
+          src="/celebi.png"
+          alt="soyebi pointing"
+          width={128}
+          height={128}
+          className="fixed bottom-4 left-4 w-32 pointer-events-none select-none opacity-30 z-50"
         />
       </body>
     </html>

@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { parseCobblemonZip } from "@/utils/parser";
+import { parseCobblemonZip } from "@/utils/spawnParser";
 import { saveAs } from "file-saver";
 import toast from "react-hot-toast";
-import Image from "next/image";
 import { ChevronDown, ChevronUp, ChevronsUpDown, X } from "lucide-react";
 import Spinner from "./Spinner";
 
@@ -156,17 +155,7 @@ export default function UploadArea() {
         </h1>
         <p className="text-gray-300 max-w-2xl mx-auto">
           Analyze Cobblemon spawn pools (.zip & .jar) to view Pokémon rarities,
-          biomes, structures, and more. This tool runs entirely in your browser
-          — your files are never uploaded. Open source on{" "}
-          <a
-            href="https://github.com/moonBSIS/Cobblemon-Datapack-Spawn-Scanner"
-            className="text-blue-400 underline hover:text-blue-300"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            GitHub
-          </a>
-          .
+          biomes, structures, and more.
         </p>
         <br />
         <p className="text-gray-300 text-sm text-center mt-2">
@@ -386,50 +375,6 @@ export default function UploadArea() {
           </details>
         ))}
       </div>
-
-      <footer className="text-sm text-gray-500 text-center mt-12 mb-4">
-        Built by{" "}
-        <a
-          href="https://github.com/moonBSIS"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-400 hover:underline"
-        >
-          maru
-        </a>{" "}
-        • Open source on{" "}
-        <a
-          href="https://github.com/moonBSIS/Cobblemon-Datapack-Spawn-Scanner"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-400 hover:underline"
-        >
-          GitHub
-        </a>{" "}
-        • Deployed on{" "}
-        <a
-          href="https://vercel.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-400 hover:underline"
-        >
-          Vercel
-        </a>
-      </footer>
-
-      <p className="text-gray-500 text-sm text-center mt-2 max-w-2xl mx-auto">
-        Made this for my own use and laziness out of boredom, but I thought it
-        might be useful for others. Feel free to contact me on Discord:
-        <strong> zmoonmaru</strong>
-      </p>
-
-      <Image
-        src="/SoyPoint.png"
-        alt="Soyjak pointing"
-        width={128}
-        height={128}
-        className="fixed bottom-4 right-4 w-32 pointer-events-none select-none opacity-80 z-50"
-      />
     </div>
   );
 }
