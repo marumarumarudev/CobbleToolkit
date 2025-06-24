@@ -43,6 +43,10 @@ export default function SpeciesScanner() {
           expanded: files.length === 1 && parsed.length < 100,
           search: "",
           page: 1,
+          filters: {
+            types: [],
+            dropIncludes: "",
+          },
         });
       } catch (err) {
         console.error(`❌ Failed to parse ${file.name}`);
@@ -125,9 +129,37 @@ export default function SpeciesScanner() {
 
       <div className="w-full max-w-6xl space-y-6">
         {fileReports.map((report) => {
-          const filteredData = report.data.filter((p) =>
-            p.name.toLowerCase().includes(report.search.toLowerCase())
-          );
+          const searchLower = report.search.toLowerCase();
+
+          const filteredData = report.data.filter((p) => {
+            const haystacks = [
+              p.name,
+              p.namespace,
+              p.experienceGroup,
+              ...(p.types || []),
+              ...(p.eggGroups || []),
+              ...(p.abilities || []),
+              ...(p.moves?.levelUp || []).flatMap((val) =>
+                typeof val === "string" ? [val] : Object.values(val).flat()
+              ),
+              ...(p.moves?.tm || []),
+              ...(p.moves?.egg || []),
+              ...(p.moves?.tutor || []),
+              ...(p.drops || []).map((d) => d.item),
+              ...(p.evolutions || []).map((evo) => evo.to),
+              ...(p.baseStats
+                ? Object.entries(p.baseStats).map(([k, v]) => `${k}: ${v}`)
+                : []),
+              ...(p.evYield
+                ? Object.entries(p.evYield).map(([k, v]) => `${k}: ${v}`)
+                : []),
+            ];
+
+            return haystacks.some((text) =>
+              (text || "").toString().toLowerCase().includes(searchLower)
+            );
+          });
+
           const paginatedData = filteredData.slice(
             0,
             report.page * ITEMS_PER_PAGE
