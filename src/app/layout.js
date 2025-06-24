@@ -15,9 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Cobblemon Spawn Pool Scanner",
+  title: "CobbleToolkit",
   description:
-    "Analyze the spawn data inside Cobblemon (.zip & .jar) to view Pokémon rarities, biomes, structures, and more. This tool runs 100% client-side — your files are never uploaded anywhere.",
+    "A collection of browser-based tools for analyzing and understanding Cobblemon datapacks.",
 };
 
 export default function RootLayout({ children }) {
@@ -33,7 +33,7 @@ export default function RootLayout({ children }) {
               href="/"
               className="font-mono text-lg font-semibold hover:text-yellow-400"
             >
-              Cobblemon Toolkit
+              CobbleToolkit
             </Link>
             <div className="flex space-x-6 text-sm font-mono">
               <Link href="/spawn-scanner" className="hover:text-yellow-400">

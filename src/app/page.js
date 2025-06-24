@@ -12,9 +12,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-10 sm:px-6 sm:py-12 flex flex-col items-center">
       <div className="w-full max-w-4xl">
-        <h1 className="text-4xl font-bold mb-4 text-center">
-          Cobblemon Toolkit
-        </h1>
+        <h1 className="text-4xl font-bold mb-4 text-center">CobbleToolkit</h1>
         <p className="text-gray-300 text-center max-w-2xl mx-auto mb-8">
           A collection of browser-based tools for analyzing and understanding
           Cobblemon datapacks. This toolkit runs entirely in your browser — your
@@ -69,7 +67,7 @@ export default function HomePage() {
         <footer className="text-sm text-gray-500 text-center">
           Built by{" "}
           <a
-            href="https://github.com/moonBSIS"
+            href="https://github.com/moonBSIS/CobbleToolkit"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-400 hover:underline"

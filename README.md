@@ -1,41 +1,63 @@
-# Cobblemon Datapack Spawn Pool Scanner
+# 🧰 Cobblemon Toolkit
 
-A simple, open-source web tool to scan and analyze Cobblemon datapack `.zip` files and extract Pokémon spawn pool information.
+A growing suite of open-source, browser-based tools to analyze and inspect **Cobblemon datapacks**. Built for modders, server owners, and curious players. No backend — your files never leave your computer.
 
-## 🔍 What It Does
+## ⚙️ Current Tools
 
-- Parses Cobblemon datapacks and lists spawn data.
-- Displays results in a searchable, sortable table.
-- Allows downloading results as a Markdown table.
-- Supports drag-and-drop upload or file selection.
-- Dark mode UI, scrollable view, and responsive layout.
+### 📦 Spawn Pool Scanner
+
+- Parses Cobblemon datapacks (`.zip` or `.jar`) and extracts Pokémon spawn data.
+- Displays a searchable, sortable table of biomes, structures, and rarity.
+- Supports downloading results as Markdown.
+
+### 🧬 Species Scanner
+
+- Extracts detailed species metadata from Cobblemon datapacks.
+- Shows base stats, types, evolutions, moves, abilities, drops, and more.
+- Built-in pagination, search, and collapsible panels for performance.
+
+## 💡 Features
+
+- 🌙 Fully client-side (no upload required)
+- 🌑 Clean dark mode UI
+- 📁 Drag-and-drop or manual upload
+- 📱 Mobile and desktop responsive
+- ⚡ Fast parsing with visual feedback
 
 ## 🛠️ Technologies Used
 
-- [Next.js](https://nextjs.org/) with App Router
+- [Next.js](https://nextjs.org/) (App Router)
 - [React](https://reactjs.org/)
-- [Tailwind CSS](https://tailwindcss.com/) for styling
+- [Tailwind CSS](https://tailwindcss.com/)
+- [JSZip](https://stuk.github.io/jszip/) for parsing archives
 - [file-saver](https://www.npmjs.com/package/file-saver) for downloads
+
+## 🚀 Try It Live
+
+**https://cobble-toolkit.vercel.app/**
 
 ## 📦 How to Use
 
-1. Upload one or more `.zip` files containing Cobblemon datapacks.
-2. View parsed data in the table.
-3. Search Pokémon names, sort columns, and download as Markdown.
-4. Hit "Clear All" to reset.
+1. Visit the tool and upload one or more Cobblemon datapack `.zip` or `.jar` files.
+2. Explore data — sort, search, scroll, collapse, and expand.
+3. Download any results (Markdown export available in some tools).
+4. Use “Clear All” to reset and scan new files.
 
-## 🌐 Live Demo
+## ⚠️ Disclaimer
 
-https://cobblemon-datapack-spawn-scanner.vercel.app/
+This is a **personal passion project** and is **not affiliated** with the Cobblemon team.
+For official updates and help, please join the [Cobblemon Discord](https://discord.com/invite/cobblemon).
 
-## 🔓 License
+## 🧑‍💻 Author
 
-This project is licensed under the [Do What The F\*ck You Want To Public License (WTFPL)](http://www.wtfpl.net/about/). You can copy, modify, distribute — do whatever you want.
+Made with laziness and love by [maru](https://github.com/moonBSIS).
+Discord: `zmoonmaru`
 
-## 👤 Author
+## 🪪 License
 
-Built by [maru](https://github.com/moonBSIS) with a love for Pokémon, Cobblemon, Minecraft and open tools.
+Licensed under the [WTFPL](http://www.wtfpl.net/about/).
+Do whatever you want.
 
 ## 🤝 Contributing
 
-Feel free to fork and submit pull requests. All improvements are welcome!
+PRs, issues, and suggestions are welcome! Fork it, break it, improve it — have fun.
