@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { parseCobblemonZip } from "@/utils/spawnParser";
 import { saveAs } from "file-saver";
 import toast from "react-hot-toast";
@@ -12,6 +12,18 @@ export default function UploadArea() {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [sort, setSort] = useState({ column: "bucket", direction: "asc" });
+
+  useEffect(() => {
+    const saved = localStorage.getItem("spawn_reports");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) setFileReports(parsed);
+      } catch (err) {
+        console.error("Failed to load saved spawn reports:", err);
+      }
+    }
+  }, []);
 
   const rarityOrder = {
     common: 0,
@@ -76,7 +88,11 @@ export default function UploadArea() {
       })
     );
 
-    setFileReports((prev) => [...parsedReports.filter(Boolean), ...prev]);
+    setFileReports((prev) => {
+      const updated = [...parsedReports.filter(Boolean), ...prev];
+      localStorage.setItem("spawn_reports", JSON.stringify(updated));
+      return updated;
+    });
     setLoading(false);
   };
 
@@ -97,6 +113,7 @@ export default function UploadArea() {
     setFileReports([]);
     setSearchTerm("");
     setSort({ column: "pokemon", direction: "asc" });
+    localStorage.removeItem("spawn_reports");
   };
 
   const sortData = (rows) => {
@@ -251,7 +268,14 @@ export default function UploadArea() {
                 className="text-gray-400 hover:text-red-500 ml-4"
                 onClick={(e) => {
                   e.preventDefault();
-                  setFileReports((prev) => prev.filter((_, idx) => idx !== i));
+                  setFileReports((prev) => {
+                    const updated = prev.filter((_, idx) => idx !== i);
+                    localStorage.setItem(
+                      "spawn_reports",
+                      JSON.stringify(updated)
+                    );
+                    return updated;
+                  });
                 }}
               >
                 <X size={18} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import toast from "react-hot-toast";
 import { parseSpeciesFromZip } from "@/utils/speciesParser";
 import Spinner from "./Spinner";
@@ -12,6 +12,18 @@ export default function SpeciesScanner() {
   const [fileReports, setFileReports] = useState([]);
   const [loading, setLoading] = useState(false);
   const openMapRef = useRef({});
+
+  useEffect(() => {
+    const saved = localStorage.getItem("species_reports");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) setFileReports(parsed);
+      } catch (err) {
+        console.error("Failed to load saved species reports:", err);
+      }
+    }
+  }, []);
 
   const handleFiles = async (files) => {
     if (loading) {
@@ -54,7 +66,11 @@ export default function SpeciesScanner() {
       }
     }
 
-    setFileReports((prev) => [...newReports, ...prev]);
+    setFileReports((prev) => {
+      const updatedReports = [...newReports, ...prev];
+      localStorage.setItem("species_reports", JSON.stringify(updatedReports));
+      return updatedReports;
+    });
     setLoading(false);
   };
 
@@ -121,7 +137,10 @@ export default function SpeciesScanner() {
       {fileReports.length > 0 && (
         <button
           className="mb-6 px-4 py-2 bg-red-600 rounded hover:bg-red-700"
-          onClick={() => setFileReports([])}
+          onClick={() => {
+            setFileReports([]);
+            localStorage.removeItem("species_reports");
+          }}
         >
           Clear All
         </button>
@@ -178,9 +197,14 @@ export default function SpeciesScanner() {
                   className="text-gray-400 hover:text-red-500 ml-4"
                   onClick={(e) => {
                     e.preventDefault();
-                    setFileReports((prev) =>
-                      prev.filter((r) => r.id !== report.id)
-                    );
+                    setFileReports((prev) => {
+                      const updated = prev.filter((r) => r.id !== report.id);
+                      localStorage.setItem(
+                        "species_reports",
+                        JSON.stringify(updated)
+                      );
+                      return updated;
+                    });
                   }}
                 >
                   <X size={18} />
