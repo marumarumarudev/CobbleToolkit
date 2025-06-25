@@ -68,6 +68,7 @@ export default function UploadArea() {
             error: hasData ? null : "No valid spawn data found.",
             expanded: !isBulk && hasData,
             searchTerm: "",
+            showAll: false,
           };
         } catch (err) {
           const message = err.message || "Failed to parse file.";
@@ -165,7 +166,7 @@ export default function UploadArea() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#1e1e1e] text-white flex flex-col items-center px-6 py-10">
+    <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-8 flex flex-col items-center">
       <header className="text-center mb-10">
         <h1 className="text-3xl md:text-4xl font-bold mb-2">
           Cobblemon Spawn Pool Scanner
@@ -261,238 +262,273 @@ export default function UploadArea() {
         </div>
       )}
 
-      {/* Reports */}
-      <div className="flex flex-wrap -mx-3">
-        {[0, 1, 2].map((colIndex) => (
-          <div
-            key={colIndex}
-            className="w-full sm:w-1/2 xl:w-1/3 px-3 flex flex-col gap-6"
-          >
-            {sortedReports
-              .filter((_, i) => i % 3 === colIndex)
-              .map((report) => (
-                <div
-                  key={report.id}
-                  className="bg-[#2a2a2a] p-4 rounded-lg shadow-md w-full"
-                >
-                  <details
-                    open={report.expanded}
-                    onToggle={(e) => {
-                      const open = e.target.open;
+      <div className="w-full max-w-6xl mx-auto space-y-4">
+        {sortedReports.map((report) => {
+          const isLong = report.data.length > 25;
+          const displayCount =
+            report.expanded && report.showAll ? report.data.length : 25;
+
+          return (
+            <div
+              key={report.id}
+              className="bg-[#2a2a2a] p-4 rounded-lg shadow-md w-full overflow-hidden"
+            >
+              <details
+                open={report.expanded}
+                onToggle={(e) => {
+                  const open = e.target.open;
+                  setFileReports((prev) =>
+                    prev.map((r) =>
+                      r.id === report.id
+                        ? { ...r, expanded: open, showAll: false }
+                        : r
+                    )
+                  );
+                }}
+              >
+                <summary className="cursor-pointer flex justify-between items-center text-lg font-medium w-full truncate">
+                  <span className="break-all truncate block max-w-full">
+                    {report.name}
+                    {!report.expanded && (
+                      <span className="text-sm text-gray-400 ml-2">
+                        {report.error
+                          ? report.error === "No valid spawn data found."
+                            ? "— no spawn_pool_folder"
+                            : `— ${report.error}`
+                          : `— ${report.data.length} entries`}
+                      </span>
+                    )}
+                  </span>
+                  <button
+                    className="text-gray-400 hover:text-red-500 ml-4"
+                    onClick={(e) => {
+                      e.preventDefault();
                       setFileReports((prev) =>
-                        prev.map((r) =>
-                          r.id === report.id ? { ...r, expanded: open } : r
-                        )
+                        prev.filter((r) => r.id !== report.id)
                       );
                     }}
                   >
-                    <summary className="cursor-pointer flex justify-between items-center text-lg font-medium">
-                      <span>
-                        {report.name}
-                        {!report.expanded && (
-                          <span className="text-sm text-gray-400 ml-2">
-                            {report.error
-                              ? report.error === "No valid spawn data found."
-                                ? "— no spawn_pool_folder"
-                                : `— ${report.error}`
-                              : `— ${report.data.length} entries`}
-                          </span>
-                        )}
-                      </span>
-                      <button
-                        className="text-gray-400 hover:text-red-500 ml-4"
-                        onClick={(e) => {
-                          e.preventDefault();
+                    <X size={18} />
+                  </button>
+                </summary>
+
+                {report.error ? (
+                  <p className="text-red-400 mt-2">❌ {report.error}</p>
+                ) : (
+                  <>
+                    <p className="mt-2">
+                      ✅ Found {report.data.length} spawn entries
+                    </p>
+                    <button
+                      onClick={() => downloadMarkdown(report.name, report.data)}
+                      className="mt-2 px-3 py-1 bg-blue-600 rounded hover:bg-blue-700"
+                    >
+                      Download Markdown
+                    </button>
+
+                    <div className="mt-4">
+                      <input
+                        className="bg-[#222] border border-gray-600 text-white p-2 rounded w-full mb-4"
+                        placeholder="Search Pokémon name..."
+                        onChange={(e) =>
                           setFileReports((prev) =>
-                            prev.filter((r) => r.id !== report.id)
-                          );
-                        }}
-                      >
-                        <X size={18} />
-                      </button>
-                    </summary>
+                            prev.map((r) =>
+                              r.id === report.id
+                                ? { ...r, searchTerm: e.target.value }
+                                : r
+                            )
+                          )
+                        }
+                        value={report.searchTerm}
+                      />
 
-                    {report.error ? (
-                      <p className="text-red-400 mt-2">❌ {report.error}</p>
-                    ) : (
-                      <>
-                        <p className="mt-2">
-                          ✅ Found {report.data.length} spawn entries
-                        </p>
-                        <button
-                          onClick={() =>
-                            downloadMarkdown(report.name, report.data)
-                          }
-                          className="mt-2 px-3 py-1 bg-blue-600 rounded hover:bg-blue-700"
-                        >
-                          Download Markdown
-                        </button>
-
-                        <div className="mt-4">
-                          <input
-                            className="bg-[#222] border border-gray-600 text-white p-2 rounded w-full mb-4"
-                            placeholder="Search Pokémon name..."
-                            onChange={(e) =>
-                              setFileReports((prev) =>
-                                prev.map((r) =>
-                                  r.id === report.id
-                                    ? { ...r, searchTerm: e.target.value }
-                                    : r
-                                )
-                              )
-                            }
-                            value={report.searchTerm}
-                          />
-
-                          {/* Desktop Table */}
-                          <div className="hidden md:block overflow-x-auto">
-                            <table className="w-full text-sm table-auto border-collapse min-w-[900px]">
-                              <thead className="bg-[#1e1e1e] sticky top-0 z-10">
-                                <tr>
-                                  {[
-                                    { key: "pokemon", label: "Pokémon" },
-                                    { key: "bucket", label: "Rarity" },
-                                    { key: "level", label: "Level" },
-                                    { key: "weight", label: "Weight" },
-                                    { key: "biomes", label: "Biomes" },
-                                    { key: "dimensions", label: "Dimensions" },
-                                    { key: "canSeeSky", label: "Can See Sky" },
-                                    { key: "structures", label: "Structures" },
-                                    { key: "isRaining", label: "Raining" },
-                                    { key: "moonPhase", label: "Moon Phase" },
-                                    {
-                                      key: "neededNearbyBlocks",
-                                      label: "Nearby Blocks",
-                                    },
-                                  ].map(({ key, label }) => (
-                                    <th
-                                      key={key}
-                                      onClick={() => toggleSort(key)}
-                                      className="p-2 border cursor-pointer hover:bg-[#333] group"
-                                    >
-                                      <div className="flex items-center justify-center gap-1">
-                                        <span>{label}</span>
-                                        {sort.column === key ? (
-                                          sort.direction === "asc" ? (
-                                            <ChevronUp
-                                              size={14}
-                                              className="text-white"
-                                            />
-                                          ) : (
-                                            <ChevronDown
-                                              size={14}
-                                              className="text-white"
-                                            />
-                                          )
-                                        ) : (
-                                          <ChevronsUpDown
-                                            size={14}
-                                            className="text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                          />
-                                        )}
-                                      </div>
-                                    </th>
-                                  ))}
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {sortData(
-                                  report.data.filter((r) =>
-                                    r.pokemon
-                                      ?.toLowerCase()
-                                      .includes(report.searchTerm.toLowerCase())
-                                  )
-                                ).map((d, idx) => (
-                                  <tr key={idx} className="bg-[#222]">
-                                    <td className="p-2 border">{d.pokemon}</td>
-                                    <td className="p-2 border">{d.bucket}</td>
-                                    <td className="p-2 border">{d.level}</td>
-                                    <td className="p-2 border">{d.weight}</td>
-                                    <td className="p-2 border">{d.biomes}</td>
-                                    <td className="p-2 border">
-                                      {d.dimensions}
-                                    </td>
-                                    <td className="p-2 border">
-                                      {d.canSeeSky?.toString()}
-                                    </td>
-                                    <td className="p-2 border">
-                                      {d.structures}
-                                    </td>
-                                    <td className="p-2 border">
-                                      {d.isRaining?.toString()}
-                                    </td>
-                                    <td className="p-2 border">
-                                      {d.moonPhase}
-                                    </td>
-                                    <td className="p-2 border">
-                                      {d.neededNearbyBlocks}
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-
-                          {/* Mobile Card View */}
-                          <div className="md:hidden flex flex-col gap-4">
+                      {/* Desktop Table */}
+                      <div className="hidden md:block overflow-x-auto">
+                        <table className="w-full text-sm table-auto border-collapse min-w-[900px]">
+                          <thead className="bg-[#1e1e1e] sticky top-0 z-10">
+                            <tr>
+                              {[
+                                { key: "pokemon", label: "Pokémon" },
+                                { key: "bucket", label: "Rarity" },
+                                { key: "level", label: "Level" },
+                                { key: "weight", label: "Weight" },
+                                { key: "biomes", label: "Biomes" },
+                                { key: "dimensions", label: "Dimensions" },
+                                { key: "canSeeSky", label: "Can See Sky" },
+                                { key: "structures", label: "Structures" },
+                                { key: "isRaining", label: "Raining" },
+                                { key: "moonPhase", label: "Moon Phase" },
+                                {
+                                  key: "neededNearbyBlocks",
+                                  label: "Nearby Blocks",
+                                },
+                              ].map(({ key, label }) => (
+                                <th
+                                  key={key}
+                                  onClick={() => toggleSort(key)}
+                                  className="p-2 border cursor-pointer hover:bg-[#333] group"
+                                >
+                                  <div className="flex items-center justify-center gap-1">
+                                    <span>{label}</span>
+                                    {sort.column === key ? (
+                                      sort.direction === "asc" ? (
+                                        <ChevronUp
+                                          size={14}
+                                          className="text-white"
+                                        />
+                                      ) : (
+                                        <ChevronDown
+                                          size={14}
+                                          className="text-white"
+                                        />
+                                      )
+                                    ) : (
+                                      <ChevronsUpDown
+                                        size={14}
+                                        className="text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                      />
+                                    )}
+                                  </div>
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
                             {sortData(
-                              report.data.filter((r) =>
-                                r.pokemon
-                                  ?.toLowerCase()
-                                  .includes(report.searchTerm.toLowerCase())
-                              )
+                              report.data
+                                .filter((r) =>
+                                  r.pokemon
+                                    ?.toLowerCase()
+                                    .includes(report.searchTerm.toLowerCase())
+                                )
+                                .slice(0, displayCount)
                             ).map((d, idx) => (
-                              <div
-                                key={idx}
-                                className="bg-[#222] p-4 rounded border text-sm space-y-1"
-                              >
-                                <div>
-                                  <strong>Pokémon:</strong> {d.pokemon}
-                                </div>
-                                <div>
-                                  <strong>Rarity:</strong> {d.bucket}
-                                </div>
-                                <div>
-                                  <strong>Level:</strong> {d.level}
-                                </div>
-                                <div>
-                                  <strong>Weight:</strong> {d.weight}
-                                </div>
-                                <div>
-                                  <strong>Biomes:</strong> {d.biomes}
-                                </div>
-                                <div>
-                                  <strong>Dimensions:</strong> {d.dimensions}
-                                </div>
-                                <div>
-                                  <strong>Can See Sky:</strong>{" "}
+                              <tr key={idx} className="bg-[#222]">
+                                <td className="p-2 border">{d.pokemon}</td>
+                                <td className="p-2 border">{d.bucket}</td>
+                                <td className="p-2 border">{d.level}</td>
+                                <td className="p-2 border">{d.weight}</td>
+                                <td className="p-2 border">{d.biomes}</td>
+                                <td className="p-2 border">{d.dimensions}</td>
+                                <td className="p-2 border">
                                   {d.canSeeSky?.toString()}
-                                </div>
-                                <div>
-                                  <strong>Structures:</strong> {d.structures}
-                                </div>
-                                <div>
-                                  <strong>Raining:</strong>{" "}
+                                </td>
+                                <td className="p-2 border">{d.structures}</td>
+                                <td className="p-2 border">
                                   {d.isRaining?.toString()}
-                                </div>
-                                <div>
-                                  <strong>Moon Phase:</strong> {d.moonPhase}
-                                </div>
-                                <div>
-                                  <strong>Nearby Blocks:</strong>{" "}
+                                </td>
+                                <td className="p-2 border">{d.moonPhase}</td>
+                                <td className="p-2 border">
                                   {d.neededNearbyBlocks}
-                                </div>
-                              </div>
+                                </td>
+                              </tr>
                             ))}
+                            {isLong && !report.showAll && (
+                              <tr>
+                                <td colSpan={11} className="p-2 text-center">
+                                  <button
+                                    onClick={() =>
+                                      setFileReports((prev) =>
+                                        prev.map((r) =>
+                                          r.id === report.id
+                                            ? { ...r, showAll: true }
+                                            : r
+                                        )
+                                      )
+                                    }
+                                    className="mt-2 px-3 py-1 bg-gray-700 rounded hover:bg-gray-800"
+                                  >
+                                    Show more
+                                  </button>
+                                </td>
+                              </tr>
+                            )}
+
+                            {isLong && report.showAll && (
+                              <tr>
+                                <td colSpan={11} className="p-2 text-center">
+                                  <button
+                                    onClick={() =>
+                                      setFileReports((prev) =>
+                                        prev.map((r) =>
+                                          r.id === report.id
+                                            ? { ...r, showAll: false }
+                                            : r
+                                        )
+                                      )
+                                    }
+                                    className="mt-2 px-3 py-1 bg-gray-700 rounded hover:bg-gray-800"
+                                  >
+                                    Show less
+                                  </button>
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Mobile Card View */}
+                      <div className="md:hidden flex flex-col gap-4">
+                        {sortData(
+                          report.data
+                            .filter((r) =>
+                              r.pokemon
+                                ?.toLowerCase()
+                                .includes(report.searchTerm.toLowerCase())
+                            )
+                            .slice(0, displayCount)
+                        ).map((d, idx) => (
+                          <div
+                            key={idx}
+                            className="bg-[#222] p-4 rounded border text-sm space-y-1"
+                          >
+                            <div>
+                              <strong>Pokémon:</strong> {d.pokemon}
+                            </div>
+                            <div>
+                              <strong>Rarity:</strong> {d.bucket}
+                            </div>
+                            <div>
+                              <strong>Level:</strong> {d.level}
+                            </div>
+                            <div>
+                              <strong>Weight:</strong> {d.weight}
+                            </div>
+                            <div>
+                              <strong>Biomes:</strong> {d.biomes}
+                            </div>
+                            <div>
+                              <strong>Dimensions:</strong> {d.dimensions}
+                            </div>
+                            <div>
+                              <strong>Can See Sky:</strong>{" "}
+                              {d.canSeeSky?.toString()}
+                            </div>
+                            <div>
+                              <strong>Structures:</strong> {d.structures}
+                            </div>
+                            <div>
+                              <strong>Raining:</strong>{" "}
+                              {d.isRaining?.toString()}
+                            </div>
+                            <div>
+                              <strong>Moon Phase:</strong> {d.moonPhase}
+                            </div>
+                            <div>
+                              <strong>Nearby Blocks:</strong>{" "}
+                              {d.neededNearbyBlocks}
+                            </div>
                           </div>
-                        </div>
-                      </>
-                    )}
-                  </details>
-                </div>
-              ))}
-          </div>
-        ))}
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </details>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
