@@ -36,6 +36,13 @@ export async function parseCobblemonZip(file) {
 
     for (const fileName of jsonFiles) {
       try {
+        const zipEntry = zip.files[fileName];
+
+        if (zipEntry._data.uncompressedSize === 0) {
+          console.warn(`⚠️ Skipping empty file: ${fileName}`);
+          continue;
+        }
+
         const content = await zip.files[fileName].async("string");
         const json = JSON.parse(content);
 

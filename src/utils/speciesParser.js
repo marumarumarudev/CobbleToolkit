@@ -10,7 +10,24 @@ export async function parseSpeciesFromZip(file) {
 
   for (const path of speciesFiles) {
     try {
-      const jsonStr = await zip.files[path].async("string");
+      if (!file || file.size === 0) {
+        throw new Error("Uploaded file is empty.");
+      }
+
+      const zipEntry = zip.files[path];
+      if (zipEntry._data.uncompressedSize === 0) {
+        console.warn(`⚠️ Skipping empty species file: ${path}`);
+        continue;
+      }
+
+      let jsonStr = await zip.files[path].async("string");
+
+      // Remove BOM if present
+      if (jsonStr.charCodeAt(0) === 0xfeff) {
+        jsonStr = jsonStr.slice(1);
+        jsonStr = jsonStr.replace(/\u0009/g, "  ");
+      }
+
       const data = JSON.parse(jsonStr);
 
       const drops = (data?.drops?.entries || []).map((entry) => ({
