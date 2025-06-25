@@ -67,7 +67,7 @@ export default function HomePage() {
         <footer className="text-sm text-gray-500 text-center">
           Built by{" "}
           <a
-            href="https://github.com/moonBSIS/CobbleToolkit"
+            href="https://github.com/marumarumarudev/CobbleToolkit"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-400 hover:underline"

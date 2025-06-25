@@ -50,7 +50,7 @@ For official updates and help, please join the [Cobblemon Discord](https://disco
 
 ## 🧑‍💻 Author
 
-Made with laziness and love by [maru](https://github.com/moonBSIS).
+Made with laziness and love by [maru](https://github.com/marumarumarudev).
 Discord: `zmoonmaru`
 
 ## 🪪 License
