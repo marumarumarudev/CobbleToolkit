@@ -264,9 +264,31 @@ export default function UploadArea() {
 
       <div className="w-full max-w-6xl mx-auto space-y-4">
         {sortedReports.map((report) => {
-          const isLong = report.data.length > 25;
+          const isLong = report.data.length > 10;
           const displayCount =
-            report.expanded && report.showAll ? report.data.length : 25;
+            report.expanded && report.showAll ? report.data.length : 10;
+          const term = report.searchTerm.toLowerCase();
+          const filteredData = report.data.filter((r) =>
+            [
+              r.pokemon,
+              r.bucket,
+              r.level,
+              r.weight,
+              r.biomes,
+              r.dimensions,
+              r.structures,
+              r.canSeeSky?.toString(),
+              r.isRaining?.toString(),
+              r.moonPhase,
+              r.neededNearbyBlocks,
+              r.timeRange,
+              r.lightLevel,
+              r.antiBiomes,
+              r.antiStructures,
+            ]
+              .filter(Boolean)
+              .some((field) => field.toLowerCase().includes(term))
+          );
 
           return (
             <div
@@ -362,6 +384,13 @@ export default function UploadArea() {
                                   key: "neededNearbyBlocks",
                                   label: "Nearby Blocks",
                                 },
+                                { key: "timeRange", label: "Time" },
+                                { key: "lightLevel", label: "Light Level" },
+                                { key: "antiBiomes", label: "Anti-Biomes" },
+                                {
+                                  key: "antiStructures",
+                                  label: "Anti-Structures",
+                                },
                               ].map(({ key, label }) => (
                                 <th
                                   key={key}
@@ -394,35 +423,35 @@ export default function UploadArea() {
                             </tr>
                           </thead>
                           <tbody>
-                            {sortData(
-                              report.data
-                                .filter((r) =>
-                                  r.pokemon
-                                    ?.toLowerCase()
-                                    .includes(report.searchTerm.toLowerCase())
-                                )
-                                .slice(0, displayCount)
-                            ).map((d, idx) => (
-                              <tr key={idx} className="bg-[#222]">
-                                <td className="p-2 border">{d.pokemon}</td>
-                                <td className="p-2 border">{d.bucket}</td>
-                                <td className="p-2 border">{d.level}</td>
-                                <td className="p-2 border">{d.weight}</td>
-                                <td className="p-2 border">{d.biomes}</td>
-                                <td className="p-2 border">{d.dimensions}</td>
-                                <td className="p-2 border">
-                                  {d.canSeeSky?.toString()}
-                                </td>
-                                <td className="p-2 border">{d.structures}</td>
-                                <td className="p-2 border">
-                                  {d.isRaining?.toString()}
-                                </td>
-                                <td className="p-2 border">{d.moonPhase}</td>
-                                <td className="p-2 border">
-                                  {d.neededNearbyBlocks}
-                                </td>
-                              </tr>
-                            ))}
+                            {sortData(filteredData.slice(0, displayCount)).map(
+                              (d, idx) => (
+                                <tr key={idx} className="bg-[#222]">
+                                  <td className="p-2 border">{d.pokemon}</td>
+                                  <td className="p-2 border">{d.bucket}</td>
+                                  <td className="p-2 border">{d.level}</td>
+                                  <td className="p-2 border">{d.weight}</td>
+                                  <td className="p-2 border">{d.biomes}</td>
+                                  <td className="p-2 border">{d.dimensions}</td>
+                                  <td className="p-2 border">
+                                    {d.canSeeSky?.toString()}
+                                  </td>
+                                  <td className="p-2 border">{d.structures}</td>
+                                  <td className="p-2 border">
+                                    {d.isRaining?.toString()}
+                                  </td>
+                                  <td className="p-2 border">{d.moonPhase}</td>
+                                  <td className="p-2 border">
+                                    {d.neededNearbyBlocks}
+                                  </td>
+                                  <td className="p-2 border">{d.timeRange}</td>
+                                  <td className="p-2 border">{d.lightLevel}</td>
+                                  <td className="p-2 border">{d.antiBiomes}</td>
+                                  <td className="p-2 border">
+                                    {d.antiStructures}
+                                  </td>
+                                </tr>
+                              )
+                            )}
                             {isLong && !report.showAll && (
                               <tr>
                                 <td colSpan={11} className="p-2 text-center">
@@ -470,57 +499,64 @@ export default function UploadArea() {
 
                       {/* Mobile Card View */}
                       <div className="md:hidden flex flex-col gap-4">
-                        {sortData(
-                          report.data
-                            .filter((r) =>
-                              r.pokemon
-                                ?.toLowerCase()
-                                .includes(report.searchTerm.toLowerCase())
-                            )
-                            .slice(0, displayCount)
-                        ).map((d, idx) => (
-                          <div
-                            key={idx}
-                            className="bg-[#222] p-4 rounded border text-sm space-y-1"
-                          >
-                            <div>
-                              <strong>Pokémon:</strong> {d.pokemon}
+                        {sortData(filteredData.slice(0, displayCount)).map(
+                          (d, idx) => (
+                            <div
+                              key={idx}
+                              className="bg-[#222] p-4 rounded border text-sm space-y-1"
+                            >
+                              <div>
+                                <strong>Pokémon:</strong> {d.pokemon}
+                              </div>
+                              <div>
+                                <strong>Rarity:</strong> {d.bucket}
+                              </div>
+                              <div>
+                                <strong>Level:</strong> {d.level}
+                              </div>
+                              <div>
+                                <strong>Weight:</strong> {d.weight}
+                              </div>
+                              <div>
+                                <strong>Biomes:</strong> {d.biomes}
+                              </div>
+                              <div>
+                                <strong>Dimensions:</strong> {d.dimensions}
+                              </div>
+                              <div>
+                                <strong>Can See Sky:</strong>{" "}
+                                {d.canSeeSky?.toString()}
+                              </div>
+                              <div>
+                                <strong>Structures:</strong> {d.structures}
+                              </div>
+                              <div>
+                                <strong>Raining:</strong>{" "}
+                                {d.isRaining?.toString()}
+                              </div>
+                              <div>
+                                <strong>Moon Phase:</strong> {d.moonPhase}
+                              </div>
+                              <div>
+                                <strong>Nearby Blocks:</strong>{" "}
+                                {d.neededNearbyBlocks}
+                              </div>
+                              <div>
+                                <strong>Time:</strong> {d.timeRange}
+                              </div>
+                              <div>
+                                <strong>Light Level:</strong> {d.lightLevel}
+                              </div>
+                              <div>
+                                <strong>Anti-Biomes:</strong> {d.antiBiomes}
+                              </div>
+                              <div>
+                                <strong>Anti-Structures:</strong>{" "}
+                                {d.antiStructures}
+                              </div>
                             </div>
-                            <div>
-                              <strong>Rarity:</strong> {d.bucket}
-                            </div>
-                            <div>
-                              <strong>Level:</strong> {d.level}
-                            </div>
-                            <div>
-                              <strong>Weight:</strong> {d.weight}
-                            </div>
-                            <div>
-                              <strong>Biomes:</strong> {d.biomes}
-                            </div>
-                            <div>
-                              <strong>Dimensions:</strong> {d.dimensions}
-                            </div>
-                            <div>
-                              <strong>Can See Sky:</strong>{" "}
-                              {d.canSeeSky?.toString()}
-                            </div>
-                            <div>
-                              <strong>Structures:</strong> {d.structures}
-                            </div>
-                            <div>
-                              <strong>Raining:</strong>{" "}
-                              {d.isRaining?.toString()}
-                            </div>
-                            <div>
-                              <strong>Moon Phase:</strong> {d.moonPhase}
-                            </div>
-                            <div>
-                              <strong>Nearby Blocks:</strong>{" "}
-                              {d.neededNearbyBlocks}
-                            </div>
-                          </div>
-                        ))}
+                          )
+                        )}
                       </div>
                     </div>
                   </>

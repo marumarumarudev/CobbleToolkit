@@ -48,6 +48,7 @@ export async function parseCobblemonZip(file) {
 
         for (const entry of json.spawns || []) {
           const condition = entry.condition || {};
+          const anticondition = entry.anticondition || {};
 
           results.push({
             pokemon: String(
@@ -70,6 +71,21 @@ export async function parseCobblemonZip(file) {
               : "",
             neededNearbyBlocks: Array.isArray(condition.neededNearbyBlocks)
               ? condition.neededNearbyBlocks.join(", ")
+              : "",
+            lightLevel:
+              condition.minSkyLight != null && condition.maxSkyLight != null
+                ? `${condition.minSkyLight}-${condition.maxSkyLight}`
+                : condition.minSkyLight != null
+                ? `${condition.minSkyLight}+`
+                : condition.maxSkyLight != null
+                ? `0-${condition.maxSkyLight}`
+                : "",
+            timeRange: condition.timeRange ?? "",
+            antiBiomes: Array.isArray(anticondition.biomes)
+              ? anticondition.biomes.join(", ")
+              : "",
+            antiStructures: Array.isArray(anticondition.structures)
+              ? anticondition.structures.join(", ")
               : "",
           });
         }
