@@ -5,9 +5,14 @@ export default function HomePage() {
   const availableTools = [
     { name: "Spawn Pool Scanner", path: "/spawn-scanner" },
     { name: "Species Scanner", path: "/species-scanner" },
+    { name: "Recommended Stuff", path: "/recommended" },
   ];
 
-  const upcomingTools = ["Idk, contact me on discord dawg"];
+  const upcomingTools = [
+    "Idk, contact me on discord dawg",
+    "probably fishing locations",
+    "maybe pasture block loot mod scanner",
+  ];
 
   return (
     <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-10 sm:px-6 sm:py-12 flex flex-col items-center">
@@ -35,7 +40,7 @@ export default function HomePage() {
               href={tool.path}
               className="block bg-[#2a2a2a] hover:bg-[#3a3a3a] transition p-4 rounded-lg shadow-sm"
             >
-              <h2 className="text-xl font-semibold">{tool.name}</h2>
+              <h2 className="text-xl font-semibold text-center">{tool.name}</h2>
             </Link>
           ))}
         </div>

@@ -42,6 +42,9 @@ export default function RootLayout({ children }) {
               <Link href="/species-scanner" className="hover:text-yellow-400">
                 Species Scanner
               </Link>
+              <Link href="/recommended" className="hover:text-yellow-400">
+                Recommended Stuff
+              </Link>
             </div>
           </div>
         </nav>
