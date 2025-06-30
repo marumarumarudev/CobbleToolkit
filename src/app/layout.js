@@ -2,7 +2,7 @@ import "./globals.css";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import Image from "next/image";
-import Link from "next/link";
+import ClientNav from "@/components/ClientNav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,27 +27,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#1a1a1a] text-white`}
       >
         {/* Navbar */}
-        <nav className="sticky top-0 z-50 bg-[#121212] border-b border-[#333] px-4 py-4 shadow-md">
-          <div className="max-w-6xl mx-auto flex justify-between items-center">
-            <Link
-              href="/"
-              className="font-mono text-lg font-semibold hover:text-yellow-400"
-            >
-              CobbleToolkit
-            </Link>
-            <div className="flex space-x-6 text-sm font-mono">
-              <Link href="/spawn-scanner" className="hover:text-yellow-400">
-                Spawn Scanner
-              </Link>
-              <Link href="/species-scanner" className="hover:text-yellow-400">
-                Species Scanner
-              </Link>
-              <Link href="/recommended" className="hover:text-yellow-400">
-                Recommended Stuff
-              </Link>
-            </div>
-          </div>
-        </nav>
+        <ClientNav />
 
         {children}
 
