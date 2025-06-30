@@ -26,7 +26,9 @@ export const recommendedResources = {
             note: "Really good for building",
           },
           {
-            name: "",
+            name: "Show Held Items",
+            url: "https://modrinth.com/mod/show-held-items",
+            note: "Shows your Pokemon's held items",
           },
         ],
       },
@@ -65,6 +67,11 @@ export const recommendedResources = {
         url: "https://modrinth.com/resourcepack/cobblemon-midnight",
         note: "Dark-mode Cobblemon GUI",
       },
+      {
+        name: "Etsan's Cobblemon Dreams Hotbar",
+        url: "https://modrinth.com/resourcepack/etsans-cobblemon-dreams-hotbar/gallery",
+        note: "If you want a cool-looking hotbar",
+      },
     ],
   },
   datapacks: {
@@ -84,6 +91,11 @@ export const recommendedResources = {
         name: "MythRecipe",
         url: "https://modrinth.com/datapack/mythrecipe",
         note: "Additional crafting recipes",
+      },
+      {
+        name: "Fire Fits for Fire Cats",
+        url: "https://modrinth.com/datapack/fire-fits-for-fire-cats-cobblemon-costume-pack",
+        note: "Incineroar fits. Both Datapack and Resourcepack",
       },
     ],
   },

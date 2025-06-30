@@ -12,6 +12,7 @@ export default function SpeciesScanner() {
   const [fileReports, setFileReports] = useState([]);
   const [loading, setLoading] = useState(false);
   const openMapRef = useRef({});
+  const [globalSearch, setGlobalSearch] = useState("");
 
   useEffect(() => {
     const saved = localStorage.getItem("species_reports");
@@ -135,6 +136,18 @@ export default function SpeciesScanner() {
       )}
 
       {fileReports.length > 0 && (
+        <div className="w-full max-w-3xl mb-6">
+          <input
+            type="text"
+            className="w-full p-2 bg-[#222] border border-gray-600 rounded text-sm"
+            placeholder="🔍 Global search (any field across all files)..."
+            value={globalSearch}
+            onChange={(e) => setGlobalSearch(e.target.value)}
+          />
+        </div>
+      )}
+
+      {fileReports.length > 0 && (
         <button
           className="mb-6 px-4 py-2 bg-red-600 rounded hover:bg-red-700"
           onClick={() => {
@@ -148,7 +161,8 @@ export default function SpeciesScanner() {
 
       <div className="w-full max-w-6xl space-y-6">
         {fileReports.map((report) => {
-          const searchLower = report.search.toLowerCase();
+          const searchLower = globalSearch.toLowerCase();
+          const globalSearchLower = globalSearch.toLowerCase();
 
           const filteredData = report.data.filter((p) => {
             const haystacks = [
@@ -179,13 +193,15 @@ export default function SpeciesScanner() {
             );
           });
 
+          if (filteredData.length === 0) return null;
+
           const paginatedData = filteredData.slice(
             0,
             report.page * ITEMS_PER_PAGE
           );
 
           return (
-            <details key={report.id} open={report.expanded}>
+            <details key={report.id}>
               <summary className="flex justify-between items-center text-lg font-medium cursor-pointer">
                 <span>
                   {report.name}
@@ -212,24 +228,10 @@ export default function SpeciesScanner() {
               </summary>
 
               <div className="p-4 space-y-4">
-                <input
-                  type="text"
-                  className="w-full p-2 bg-[#222] border border-gray-600 rounded text-sm"
-                  placeholder="Search Pokémon name..."
-                  value={report.search}
-                  onChange={(e) => {
-                    const search = e.target.value;
-                    setFileReports((prev) =>
-                      prev.map((r) =>
-                        r.id === report.id ? { ...r, search, page: 1 } : r
-                      )
-                    );
-                  }}
-                />
-
                 {paginatedData.map((p, index) => {
                   const key = `${report.id}-${index}`;
-                  const isOpen = openMapRef.current[key] || false;
+                  const isSearchActive = globalSearch.trim().length > 0;
+                  const isOpen = openMapRef.current[key] ?? isSearchActive;
 
                   return (
                     <details

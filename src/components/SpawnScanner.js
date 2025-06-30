@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { parseCobblemonZip } from "@/utils/spawnParser";
 import { saveAs } from "file-saver";
 import toast from "react-hot-toast";
@@ -10,7 +10,8 @@ import Spinner from "./Spinner";
 export default function UploadArea() {
   const [fileReports, setFileReports] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [setSearchTerm] = useState("");
+  const [searchField, setSearchField] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
   const [sort, setSort] = useState({ column: "bucket", direction: "asc" });
 
   useEffect(() => {
@@ -25,12 +26,63 @@ export default function UploadArea() {
     }
   }, []);
 
+  // on sort change
+  useEffect(() => {
+    localStorage.setItem("spawn_sort", JSON.stringify(sort));
+  }, [sort]);
+
+  // on load
+  useEffect(() => {
+    const savedSort = localStorage.getItem("spawn_sort");
+    if (savedSort) {
+      try {
+        setSort(JSON.parse(savedSort));
+      } catch {}
+    }
+  }, []);
+
+  const prevSearch = useRef("");
+
+  useEffect(() => {
+    if (prevSearch.current !== "" && searchTerm === "") {
+      setFileReports((prev) => prev.map((r) => ({ ...r, expanded: false })));
+    }
+    prevSearch.current = searchTerm;
+  }, [searchTerm]);
+
+  const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 200);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
   const rarityOrder = {
     common: 0,
     uncommon: 1,
     rare: 2,
     "ultra-rare": 3,
   };
+
+  const TABLE_COLUMNS = [
+    { key: "pokemon", label: "Pokémon", sortable: true },
+    { key: "bucket", label: "Rarity", sortable: true },
+    { key: "level", label: "Level", sortable: true },
+    { key: "weight", label: "Weight", sortable: true },
+    { key: "biomes", label: "Biomes", sortable: true },
+    { key: "dimensions", label: "Dimensions", sortable: true },
+    { key: "canSeeSky", label: "Can See Sky", sortable: true },
+    { key: "structures", label: "Structures", sortable: true },
+    { key: "isRaining", label: "Raining", sortable: true },
+    { key: "moonPhase", label: "Moon Phase", sortable: true },
+    { key: "neededNearbyBlocks", label: "Nearby Blocks", sortable: true },
+    { key: "timeRange", label: "Time", sortable: true },
+    { key: "lightLevel", label: "Light Level", sortable: true },
+    { key: "antiBiomes", label: "Anti-Biomes", sortable: false },
+    { key: "antiStructures", label: "Anti-Structures", sortable: false },
+  ];
 
   const handleFiles = async (files) => {
     if (loading) {
@@ -145,18 +197,67 @@ export default function UploadArea() {
   const downloadMarkdown = (name, data) => {
     const base = name.replace(/\.zip$/, "");
 
-    const md = [
+    const headers = [
+      "Pokémon",
+      "Rarity",
+      "Level",
+      "Weight",
+      "Biomes",
+      "Dimensions",
+      "Can See Sky",
+      "Structures",
+      "Raining",
+      "Moon Phase",
+      "Nearby Blocks",
+      "Time",
+      "Light Level",
+      "Anti-Biomes",
+      "Anti-Structures",
+    ];
+
+    const rows = data.map((d) => [
+      d.pokemon,
+      d.bucket,
+      d.level,
+      d.weight,
+      d.biomes,
+      d.dimensions,
+      d.canSeeSky?.toString() ?? "",
+      d.structures,
+      d.isRaining?.toString() ?? "",
+      d.moonPhase,
+      d.neededNearbyBlocks,
+      d.timeRange,
+      d.lightLevel,
+      d.antiBiomes,
+      d.antiStructures,
+    ]);
+
+    const colWidths = headers.map((h, i) =>
+      Math.max(h.length, ...rows.map((row) => row[i]?.toString().length ?? 0))
+    );
+
+    const pad = (text, len) => (text ?? "").toString().padEnd(len, " ");
+    const headerRow = `| ${headers
+      .map((h, i) => pad(h, colWidths[i]))
+      .join(" | ")} |`;
+    const separatorRow = `| ${colWidths
+      .map((w) => "-".repeat(w))
+      .join(" | ")} |`;
+    const dataRows = rows.map(
+      (row) =>
+        `| ${row.map((cell, i) => pad(cell, colWidths[i])).join(" | ")} |`
+    );
+
+    const markdown = [
       `# Spawn Data — ${base}`,
-      ``,
-      `| Pokémon | Rarity | Level | Weight | Biomes | Dimensions | Can See Sky | Structures | Raining | Moon Phase | Nearby Blocks |`,
-      `|---------|--------|-------|--------|--------|------------|-------------|------------|---------|------------|---------------|`,
-      ...data.map(
-        (d) =>
-          `| ${d.pokemon} | ${d.bucket} | ${d.level} | ${d.weight} | ${d.biomes} | ${d.dimensions} | ${d.canSeeSky} | ${d.structures} | ${d.isRaining} | ${d.moonPhase} | ${d.neededNearbyBlocks} |`
-      ),
+      "",
+      headerRow,
+      separatorRow,
+      ...dataRows,
     ].join("\n");
 
-    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+    const blob = new Blob([markdown], { type: "text/markdown;charset=utf-8" });
     saveAs(blob, `${base}.md`);
   };
 
@@ -216,7 +317,10 @@ export default function UploadArea() {
           type="file"
           multiple
           accept=".zip,.jar"
-          onChange={handleInputChange}
+          onChange={(e) => {
+            handleInputChange(e);
+            e.target.value = "";
+          }}
           className="hidden"
         />
       </div>
@@ -229,37 +333,73 @@ export default function UploadArea() {
       )}
 
       {fileReports.length > 0 && (
-        <button
-          className="mb-6 px-4 py-2 bg-red-600 rounded hover:bg-red-700"
-          onClick={clearAll}
-        >
-          Clear All
-        </button>
-      )}
+        <>
+          {/* Search Controls */}
+          <div className="flex flex-col md:flex-row gap-2 items-center mb-6 w-full max-w-3xl">
+            <select
+              value={searchField}
+              onChange={(e) => setSearchField(e.target.value)}
+              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full md:w-1/3"
+            >
+              <option value="all">All Fields</option>
+              <option value="pokemon">Pokémon</option>
+              <option value="bucket">Rarity</option>
+              <option value="level">Level</option>
+              <option value="weight">Weight</option>
+              <option value="biomes">Biomes</option>
+              <option value="dimensions">Dimensions</option>
+              <option value="canSeeSky">Can See Sky</option>
+              <option value="structures">Structures</option>
+              <option value="isRaining">Raining</option>
+              <option value="moonPhase">Moon Phase</option>
+              <option value="neededNearbyBlocks">Nearby Blocks</option>
+              <option value="timeRange">Time</option>
+              <option value="lightLevel">Light Level</option>
+              <option value="antiBiomes">Anti-Biomes</option>
+              <option value="antiStructures">Anti-Structures</option>
+            </select>
 
-      {fileReports.length > 0 && (
-        <div className="flex gap-4 mb-6">
-          <button
-            onClick={() =>
-              setFileReports((prev) =>
-                prev.map((r) => ({ ...r, expanded: true }))
-              )
-            }
-            className="px-3 py-1 bg-blue-700 rounded hover:bg-blue-800"
-          >
-            Expand All
-          </button>
-          <button
-            onClick={() =>
-              setFileReports((prev) =>
-                prev.map((r) => ({ ...r, expanded: false }))
-              )
-            }
-            className="px-3 py-1 bg-gray-600 rounded hover:bg-gray-700"
-          >
-            Collapse All
-          </button>
-        </div>
+            <input
+              type="text"
+              placeholder={`Search by ${
+                searchField === "all" ? "any field" : searchField
+              }...`}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full"
+            />
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-2 justify-center mb-6">
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition"
+              onClick={clearAll}
+            >
+              <X size={16} /> Clear All
+            </button>
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-green-700 rounded hover:bg-green-800 transition"
+              onClick={() =>
+                setFileReports((prev) =>
+                  prev.map((r) => ({ ...r, expanded: true }))
+                )
+              }
+            >
+              <ChevronDown size={16} /> Expand All
+            </button>
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-gray-600 rounded hover:bg-gray-700 transition"
+              onClick={() =>
+                setFileReports((prev) =>
+                  prev.map((r) => ({ ...r, expanded: false }))
+                )
+              }
+            >
+              <ChevronUp size={16} /> Collapse All
+            </button>
+          </div>
+        </>
       )}
 
       <div className="w-full max-w-6xl mx-auto space-y-4">
@@ -267,36 +407,48 @@ export default function UploadArea() {
           const isLong = report.data.length > 10;
           const displayCount =
             report.expanded && report.showAll ? report.data.length : 10;
-          const term = report.searchTerm.toLowerCase();
-          const filteredData = report.data.filter((r) =>
-            [
-              r.pokemon,
-              r.bucket,
-              r.level,
-              r.weight,
-              r.biomes,
-              r.dimensions,
-              r.structures,
-              r.canSeeSky?.toString(),
-              r.isRaining?.toString(),
-              r.moonPhase,
-              r.neededNearbyBlocks,
-              r.timeRange,
-              r.lightLevel,
-              r.antiBiomes,
-              r.antiStructures,
-            ]
-              .filter(Boolean)
-              .some((field) => field.toLowerCase().includes(term))
-          );
+          const term = searchTerm.toLowerCase();
 
+          const matches = (value) =>
+            typeof value === "string" && value.toLowerCase().includes(term);
+
+          const filteredData = report.data.filter((r) => {
+            if (!term) return true;
+
+            if (searchField === "all") {
+              return [
+                r.pokemon,
+                r.bucket,
+                r.level,
+                r.weight,
+                r.biomes,
+                r.dimensions,
+                r.structures,
+                r.canSeeSky?.toString(),
+                r.isRaining?.toString(),
+                r.moonPhase,
+                r.neededNearbyBlocks,
+                r.timeRange,
+                r.lightLevel,
+                r.antiBiomes,
+                r.antiStructures,
+              ]
+                .filter(Boolean)
+                .some(matches);
+            } else {
+              const value = r[searchField];
+              return value && matches(value.toString());
+            }
+          });
+
+          if (filteredData.length === 0) return null;
           return (
             <div
               key={report.id}
               className="bg-[#2a2a2a] p-4 rounded-lg shadow-md w-full overflow-hidden"
             >
               <details
-                open={report.expanded}
+                open={searchTerm ? true : report.expanded}
                 onToggle={(e) => {
                   const open = e.target.open;
                   setFileReports((prev) =>
@@ -349,74 +501,37 @@ export default function UploadArea() {
                     </button>
 
                     <div className="mt-4">
-                      <input
-                        className="bg-[#222] border border-gray-600 text-white p-2 rounded w-full mb-4"
-                        placeholder="Search Pokémon name..."
-                        onChange={(e) =>
-                          setFileReports((prev) =>
-                            prev.map((r) =>
-                              r.id === report.id
-                                ? { ...r, searchTerm: e.target.value }
-                                : r
-                            )
-                          )
-                        }
-                        value={report.searchTerm}
-                      />
-
                       {/* Desktop Table */}
                       <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-sm table-auto border-collapse min-w-[900px]">
-                          <thead className="bg-[#1e1e1e] sticky top-0 z-10">
+                          <thead>
                             <tr>
-                              {[
-                                { key: "pokemon", label: "Pokémon" },
-                                { key: "bucket", label: "Rarity" },
-                                { key: "level", label: "Level" },
-                                { key: "weight", label: "Weight" },
-                                { key: "biomes", label: "Biomes" },
-                                { key: "dimensions", label: "Dimensions" },
-                                { key: "canSeeSky", label: "Can See Sky" },
-                                { key: "structures", label: "Structures" },
-                                { key: "isRaining", label: "Raining" },
-                                { key: "moonPhase", label: "Moon Phase" },
-                                {
-                                  key: "neededNearbyBlocks",
-                                  label: "Nearby Blocks",
-                                },
-                                { key: "timeRange", label: "Time" },
-                                { key: "lightLevel", label: "Light Level" },
-                                { key: "antiBiomes", label: "Anti-Biomes" },
-                                {
-                                  key: "antiStructures",
-                                  label: "Anti-Structures",
-                                },
-                              ].map(({ key, label }) => (
+                              {TABLE_COLUMNS.map(({ key, label, sortable }) => (
                                 <th
                                   key={key}
-                                  onClick={() => toggleSort(key)}
-                                  className="p-2 border cursor-pointer hover:bg-[#333] group"
+                                  onClick={
+                                    sortable ? () => toggleSort(key) : undefined
+                                  }
+                                  className={`p-2 border ${
+                                    sortable
+                                      ? "cursor-pointer hover:bg-[#333]"
+                                      : ""
+                                  } group`}
                                 >
                                   <div className="flex items-center justify-center gap-1">
                                     <span>{label}</span>
                                     {sort.column === key ? (
                                       sort.direction === "asc" ? (
-                                        <ChevronUp
-                                          size={14}
-                                          className="text-white"
-                                        />
+                                        <ChevronUp size={14} />
                                       ) : (
-                                        <ChevronDown
-                                          size={14}
-                                          className="text-white"
-                                        />
+                                        <ChevronDown size={14} />
                                       )
-                                    ) : (
+                                    ) : sortable ? (
                                       <ChevronsUpDown
                                         size={14}
                                         className="text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                                       />
-                                    )}
+                                    ) : null}
                                   </div>
                                 </th>
                               ))}
@@ -426,35 +541,17 @@ export default function UploadArea() {
                             {sortData(filteredData.slice(0, displayCount)).map(
                               (d, idx) => (
                                 <tr key={idx} className="bg-[#222]">
-                                  <td className="p-2 border">{d.pokemon}</td>
-                                  <td className="p-2 border">{d.bucket}</td>
-                                  <td className="p-2 border">{d.level}</td>
-                                  <td className="p-2 border">{d.weight}</td>
-                                  <td className="p-2 border">{d.biomes}</td>
-                                  <td className="p-2 border">{d.dimensions}</td>
-                                  <td className="p-2 border">
-                                    {d.canSeeSky?.toString()}
-                                  </td>
-                                  <td className="p-2 border">{d.structures}</td>
-                                  <td className="p-2 border">
-                                    {d.isRaining?.toString()}
-                                  </td>
-                                  <td className="p-2 border">{d.moonPhase}</td>
-                                  <td className="p-2 border">
-                                    {d.neededNearbyBlocks}
-                                  </td>
-                                  <td className="p-2 border">{d.timeRange}</td>
-                                  <td className="p-2 border">{d.lightLevel}</td>
-                                  <td className="p-2 border">{d.antiBiomes}</td>
-                                  <td className="p-2 border">
-                                    {d.antiStructures}
-                                  </td>
+                                  {TABLE_COLUMNS.map(({ key }) => (
+                                    <td key={key} className="p-2 border">
+                                      {d[key]?.toString() ?? ""}
+                                    </td>
+                                  ))}
                                 </tr>
                               )
                             )}
                             {isLong && !report.showAll && (
                               <tr>
-                                <td colSpan={11} className="p-2 text-center">
+                                <td colSpan={15} className="p-2 text-center">
                                   <button
                                     onClick={() =>
                                       setFileReports((prev) =>
@@ -475,7 +572,7 @@ export default function UploadArea() {
 
                             {isLong && report.showAll && (
                               <tr>
-                                <td colSpan={11} className="p-2 text-center">
+                                <td colSpan={15} className="p-2 text-center">
                                   <button
                                     onClick={() =>
                                       setFileReports((prev) =>
@@ -505,57 +602,48 @@ export default function UploadArea() {
                               key={idx}
                               className="bg-[#222] p-4 rounded border text-sm space-y-1"
                             >
-                              <div>
-                                <strong>Pokémon:</strong> {d.pokemon}
-                              </div>
-                              <div>
-                                <strong>Rarity:</strong> {d.bucket}
-                              </div>
-                              <div>
-                                <strong>Level:</strong> {d.level}
-                              </div>
-                              <div>
-                                <strong>Weight:</strong> {d.weight}
-                              </div>
-                              <div>
-                                <strong>Biomes:</strong> {d.biomes}
-                              </div>
-                              <div>
-                                <strong>Dimensions:</strong> {d.dimensions}
-                              </div>
-                              <div>
-                                <strong>Can See Sky:</strong>{" "}
-                                {d.canSeeSky?.toString()}
-                              </div>
-                              <div>
-                                <strong>Structures:</strong> {d.structures}
-                              </div>
-                              <div>
-                                <strong>Raining:</strong>{" "}
-                                {d.isRaining?.toString()}
-                              </div>
-                              <div>
-                                <strong>Moon Phase:</strong> {d.moonPhase}
-                              </div>
-                              <div>
-                                <strong>Nearby Blocks:</strong>{" "}
-                                {d.neededNearbyBlocks}
-                              </div>
-                              <div>
-                                <strong>Time:</strong> {d.timeRange}
-                              </div>
-                              <div>
-                                <strong>Light Level:</strong> {d.lightLevel}
-                              </div>
-                              <div>
-                                <strong>Anti-Biomes:</strong> {d.antiBiomes}
-                              </div>
-                              <div>
-                                <strong>Anti-Structures:</strong>{" "}
-                                {d.antiStructures}
-                              </div>
+                              {TABLE_COLUMNS.map(({ key, label }) => (
+                                <div key={key}>
+                                  <strong>{label}:</strong>{" "}
+                                  {d[key]?.toString() ?? ""}
+                                </div>
+                              ))}
                             </div>
                           )
+                        )}
+
+                        {isLong && !report.showAll && (
+                          <button
+                            onClick={() =>
+                              setFileReports((prev) =>
+                                prev.map((r) =>
+                                  r.id === report.id
+                                    ? { ...r, showAll: true }
+                                    : r
+                                )
+                              )
+                            }
+                            className="mt-2 px-3 py-1 bg-gray-700 rounded hover:bg-gray-800 self-center"
+                          >
+                            Show more
+                          </button>
+                        )}
+
+                        {isLong && report.showAll && (
+                          <button
+                            onClick={() =>
+                              setFileReports((prev) =>
+                                prev.map((r) =>
+                                  r.id === report.id
+                                    ? { ...r, showAll: false }
+                                    : r
+                                )
+                              )
+                            }
+                            className="mt-2 px-3 py-1 bg-gray-700 rounded hover:bg-gray-800 self-center"
+                          >
+                            Show less
+                          </button>
                         )}
                       </div>
                     </div>

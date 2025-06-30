@@ -38,9 +38,9 @@ export default function HomePage() {
             <Link
               key={tool.path}
               href={tool.path}
-              className="block bg-[#2a2a2a] hover:bg-[#3a3a3a] transition p-4 rounded-lg shadow-sm"
+              className="block bg-[#2a2a2a] hover:bg-[#3a3a3a] transition p-4 rounded-lg shadow-sm text-center"
             >
-              <h2 className="text-xl font-semibold text-center">{tool.name}</h2>
+              <h2 className="text-xl font-semibold">{tool.name}</h2>
             </Link>
           ))}
         </div>
