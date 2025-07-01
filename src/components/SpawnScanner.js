@@ -518,12 +518,15 @@ export default function UploadArea() {
                   <p className="text-red-400 mt-2">❌ {report.error}</p>
                 ) : (
                   <>
-                    <p className="mt-2">
-                      ✅ Found {report.data.length} spawn entries
-                    </p>
+                    {searchTerm && (
+                      <p className="ml-4 mt-2 text-gray-400 text-sm">
+                        Showing {filteredData.length} matched entr
+                        {filteredData.length === 1 ? "y" : "ies"}.
+                      </p>
+                    )}
                     <button
                       onClick={() => downloadMarkdown(report.name, report.data)}
-                      className="mt-2 px-3 py-1 bg-blue-600 rounded hover:bg-blue-700"
+                      className="ml-3 mt-2 px-3 py-1 bg-blue-600 rounded hover:bg-blue-700"
                     >
                       Download Markdown
                     </button>
