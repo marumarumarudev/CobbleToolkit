@@ -8,11 +8,7 @@ export default function HomePage() {
     { name: "Recommended Stuff", path: "/recommended" },
   ];
 
-  const upcomingTools = [
-    "Idk, contact me on discord dawg",
-    "probably fishing locations",
-    "maybe pasture block loot mod scanner",
-  ];
+  const upcomingTools = ["running out of ideas >w<"];
 
   return (
     <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-10 sm:px-6 sm:py-12 flex flex-col items-center">
