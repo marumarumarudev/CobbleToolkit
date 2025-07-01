@@ -12,6 +12,7 @@ export default function UploadArea() {
   const [loading, setLoading] = useState(false);
   const [searchField, setSearchField] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [contextFilter, setContextFilter] = useState("all");
   const [sort, setSort] = useState({ column: "bucket", direction: "asc" });
 
   useEffect(() => {
@@ -59,6 +60,14 @@ export default function UploadArea() {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
+  const availableContexts = Array.from(
+    new Set(
+      fileReports
+        .flatMap((r) => r.data.map((d) => d.context))
+        .filter((c) => typeof c === "string" && c.length > 0)
+    )
+  ).sort();
+
   const rarityOrder = {
     common: 0,
     uncommon: 1,
@@ -71,6 +80,7 @@ export default function UploadArea() {
     { key: "bucket", label: "Rarity", sortable: true },
     { key: "level", label: "Level", sortable: true },
     { key: "weight", label: "Weight", sortable: true },
+    { key: "context", label: "Context", sortable: true },
     { key: "biomes", label: "Biomes", sortable: true },
     { key: "dimensions", label: "Dimensions", sortable: true },
     { key: "canSeeSky", label: "Can See Sky", sortable: true },
@@ -368,6 +378,19 @@ export default function UploadArea() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full"
             />
+
+            <select
+              value={contextFilter}
+              onChange={(e) => setContextFilter(e.target.value)}
+              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full md:w-1/3"
+            >
+              <option value="all">All Contexts</option>
+              {availableContexts.map((ctx) => (
+                <option key={ctx} value={ctx}>
+                  {ctx.charAt(0).toUpperCase() + ctx.slice(1)}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Action Buttons */}
@@ -413,6 +436,10 @@ export default function UploadArea() {
             typeof value === "string" && value.toLowerCase().includes(term);
 
           const filteredData = report.data.filter((r) => {
+            const matchesContext =
+              contextFilter === "all" || r.context === contextFilter;
+
+            if (!matchesContext) return false;
             if (!term) return true;
 
             if (searchField === "all") {
@@ -421,6 +448,7 @@ export default function UploadArea() {
                 r.bucket,
                 r.level,
                 r.weight,
+                r.context,
                 r.biomes,
                 r.dimensions,
                 r.structures,
@@ -551,7 +579,7 @@ export default function UploadArea() {
                             )}
                             {isLong && !report.showAll && (
                               <tr>
-                                <td colSpan={15} className="p-2 text-center">
+                                <td colSpan={16} className="p-2 text-center">
                                   <button
                                     onClick={() =>
                                       setFileReports((prev) =>
@@ -572,7 +600,7 @@ export default function UploadArea() {
 
                             {isLong && report.showAll && (
                               <tr>
-                                <td colSpan={15} className="p-2 text-center">
+                                <td colSpan={16} className="p-2 text-center">
                                   <button
                                     onClick={() =>
                                       setFileReports((prev) =>

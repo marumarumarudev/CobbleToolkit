@@ -57,6 +57,7 @@ export async function parseCobblemonZip(file) {
             bucket: String(entry.bucket || "Unknown"),
             level: String(entry.level ?? ""),
             weight: String(entry.weight ?? ""),
+            context: String(entry.context || "none"),
             biomes: Array.isArray(condition.biomes)
               ? condition.biomes.join(", ")
               : "",
