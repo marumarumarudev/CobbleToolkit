@@ -1,12 +1,22 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function FeedbackGallery() {
   const screenshots = [
     { src: "/feedback/feedback1.png", alt: "Feedback 1" },
     { src: "/feedback/feedback2.png", alt: "Feedback 2" },
+    { src: "/feedback/feedback3.png", alt: "Feedback 3" },
+    { src: "/feedback/feedback4.png", alt: "Feedback 4" },
   ];
+
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") setSelected(null);
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
 
   const [selected, setSelected] = useState(null);
 
@@ -26,13 +36,15 @@ export default function FeedbackGallery() {
             className="cursor-pointer overflow-hidden rounded-lg border border-[#333] bg-[#2c2c2c] hover:shadow-lg"
             onClick={() => setSelected(img)}
           >
-            <Image
-              src={img.src}
-              alt={img.alt}
-              width={600}
-              height={400}
-              className="w-full h-auto object-contain transition-transform duration-200 hover:scale-105"
-            />
+            <div className="flex items-center justify-center h-[150px] bg-[#1a1a1a] p-2">
+              <Image
+                src={img.src}
+                alt={img.alt}
+                width={800}
+                height={800}
+                className="object-contain max-h-full"
+              />
+            </div>
           </div>
         ))}
       </div>
@@ -54,6 +66,10 @@ export default function FeedbackGallery() {
           </div>
         </div>
       )}
+      <p className="text-center text-gray-500 mt-8 text-sm">
+        🙏 Huge thanks to everyone who’s shared their thoughts — your support
+        means a lot!
+      </p>
     </section>
   );
 }

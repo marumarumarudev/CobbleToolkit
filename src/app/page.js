@@ -6,9 +6,14 @@ export default function HomePage() {
     { name: "Spawn Pool Scanner", path: "/spawn-scanner" },
     { name: "Species Scanner", path: "/species-scanner" },
     { name: "Recommended Stuff", path: "/recommended" },
+    { name: "Feedback Gallery", path: "/feedback-gallery" },
+    // { name: "Conflict Analyzer", path: "/conflict-analyzer" },
   ];
 
-  const upcomingTools = ["running out of ideas >w<"];
+  const upcomingTools = [
+    "running out of ideas >w<",
+    "datapack spawn pools conflict detector or something",
+  ];
 
   return (
     <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-10 sm:px-6 sm:py-12 flex flex-col items-center">
@@ -85,7 +90,7 @@ export default function HomePage() {
             Vercel
           </a>
           <p className="mt-2 text-gray-500 text-sm">
-            Made this out of laziness and boredom. Discord:{" "}
+            Made this out of laziness, boredom and love. Discord:{" "}
             <strong>zmoonmaru</strong>.
           </p>
         </footer>

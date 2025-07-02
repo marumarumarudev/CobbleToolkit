@@ -93,6 +93,18 @@ export const recommendedResources = {
             author: "YajatKaul",
             note: "Adding mega evolutions, z-moves, teralization, dynamax, ultra burst and fusions to the game",
           },
+          {
+            name: "Explorer's Compass",
+            url: "https://modrinth.com/mod/explorers-compass",
+            author: "Chaosyr",
+            note: "Allows you to locate structures anywhere in the world.",
+          },
+          {
+            name: "Nature's Compass",
+            url: "https://modrinth.com/mod/natures-compass",
+            author: "Chaosyr",
+            note: "Allows you to locate biomes anywhere in the world.",
+          },
         ],
       },
     ],
