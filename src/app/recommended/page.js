@@ -1,4 +1,4 @@
-import RecommendedMods from "@/components/RecommendedMods";
+import RecommendedMods from "@/components/RecommendedPage";
 
 export default function Page() {
   return <RecommendedMods />;

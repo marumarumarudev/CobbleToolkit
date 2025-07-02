@@ -30,6 +30,21 @@ export const recommendedResources = {
             url: "https://modrinth.com/mod/show-held-items",
             note: "Shows your Pokemon's held items",
           },
+          {
+            name: "Jade",
+            url: "https://modrinth.com/mod/jade",
+            note: "Shows information about what you are looking at. (Pair with Cobblemon Integrations Mod)",
+          },
+          {
+            name: "Cobblemon Integrations",
+            url: "https://modrinth.com/mod/cobblemon-integrations",
+            note: "Various mod integrations for Cobblemon",
+          },
+          {
+            name: "Dynamic Crosshair",
+            url: "https://modrinth.com/mod/dynamiccrosshair",
+            note: "A mod that hides or changes the crosshair dependent on context",
+          },
         ],
       },
       {
@@ -39,6 +54,11 @@ export const recommendedResources = {
             name: "Lithium",
             url: "https://modrinth.com/mod/lithium",
             note: "Logic optimization",
+          },
+          {
+            name: "Cobblemon Mass Outbreaks",
+            url: "https://modrinth.com/mod/cobblemon-mass-outbreaks",
+            note: "Cobblemon addon that introduces Mass Outbreaks similar to those in Legends Arceus.",
           },
         ],
       },
@@ -55,6 +75,11 @@ export const recommendedResources = {
             url: "https://modrinth.com/mod/cobblemon-spawn-notification",
             note: "Broadcasts configurable spawns",
           },
+          {
+            name: "Cobblemon: Mega Showdown",
+            url: "https://modrinth.com/mod/cobblemon-mega-showdown",
+            note: "Adding mega evolutions, z-moves, teralization, dynamax, ultra burst and fusions to the game",
+          },
         ],
       },
     ],
@@ -69,8 +94,13 @@ export const recommendedResources = {
       },
       {
         name: "Etsan's Cobblemon Dreams Hotbar",
-        url: "https://modrinth.com/resourcepack/etsans-cobblemon-dreams-hotbar/gallery",
+        url: "https://modrinth.com/resourcepack/etsans-cobblemon-dreams-hotbar",
         note: "If you want a cool-looking hotbar",
+      },
+      {
+        name: "CobbleNostalgia UI",
+        url: "https://modrinth.com/resourcepack/generation-5-black-and-white-style-ui",
+        note: "GUI textures inspired by Classic Pokemon games",
       },
     ],
   },
@@ -96,6 +126,16 @@ export const recommendedResources = {
         name: "Fire Fits for Fire Cats",
         url: "https://modrinth.com/datapack/fire-fits-for-fire-cats-cobblemon-costume-pack",
         note: "Incineroar fits. Both Datapack and Resourcepack",
+      },
+      {
+        name: "AllTheMons [Cobblemon Addon]",
+        url: "https://modrinth.com/datapack/allthemons",
+        note: "A combination of several datapacks. Both Datapack and Resourcepack",
+      },
+      {
+        name: "AllTheMons x Mega Showdown",
+        url: "https://modrinth.com/datapack/allthemons-x-mega-showdown-legacy",
+        note: "Always wanted to play Mega Showdown with AllTheMons? Well that's the version you have been waiting for!",
       },
     ],
   },
