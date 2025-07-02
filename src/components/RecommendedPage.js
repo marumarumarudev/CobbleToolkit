@@ -17,6 +17,11 @@ export default function RecommendedPage() {
     modpacks: "Modpacks",
   };
 
+  const matchesSearch = (item) =>
+    [item.name, item.note, item.author]
+      .filter(Boolean)
+      .some((val) => val.toLowerCase().includes(search.toLowerCase()));
+
   return (
     <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-10">
       <div className="text-center mb-10">
@@ -65,17 +70,51 @@ export default function RecommendedPage() {
             const category = recommendedResources[categoryKey];
             if (!category) return null;
 
+            let filteredCategories = null;
+            let filteredItems = null;
+
+            if (category.categories) {
+              filteredCategories = category.categories
+                .map((cat) => ({
+                  ...cat,
+                  items: cat.items.filter(matchesSearch),
+                }))
+                .filter((cat) => cat.items.length > 0);
+            } else if (category.items) {
+              filteredItems = category.items.filter(matchesSearch);
+            }
+
+            if (
+              (filteredCategories && filteredCategories.length === 0) ||
+              (filteredItems && filteredItems.length === 0)
+            ) {
+              return null;
+            }
+
             return (
               <ResourceSection
                 key={categoryKey}
                 title={category.title}
-                categories={category.categories}
-                items={category.items}
+                categories={filteredCategories}
+                items={filteredItems}
                 search={search}
               />
             );
           })}
       </div>
+
+      {/* No Matches Message */}
+      {categoryOrder.every((key) => {
+        const category = recommendedResources[key];
+        const hasMatch =
+          category?.categories?.some((cat) => cat.items.some(matchesSearch)) ||
+          category?.items?.some(matchesSearch);
+        return !hasMatch;
+      }) && (
+        <p className="text-center text-gray-500 mt-8">
+          No matching resources found.
+        </p>
+      )}
 
       <footer className="mt-16 text-center text-gray-500 text-sm">
         Huge thanks to every creator featured here — your creativity makes the

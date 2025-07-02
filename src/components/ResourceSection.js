@@ -2,7 +2,9 @@ import ResourceItem from "./ResourceItem";
 
 export default function ResourceSection({ title, categories, items, search }) {
   const matchesSearch = (item) => {
-    const text = `${item.name} ${item.note || ""}`.toLowerCase();
+    const text = `${item.name} ${item.note || ""} ${
+      item.author || ""
+    }`.toLowerCase();
     return text.includes(search.toLowerCase());
   };
 
