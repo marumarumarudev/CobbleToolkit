@@ -53,6 +53,12 @@ export const recommendedResources = {
             author: "Crendgrim",
             note: "A mod that hides or changes the crosshair dependent on context",
           },
+          {
+            name: "Cobblemon RIze Tweaks",
+            url: "https://modrinth.com/mod/cobblemonrizetweaks",
+            author: "RIze2kNight",
+            note: "A QoL mod for 1.6 Cobblemon snapshot",
+          },
         ],
       },
       {
@@ -104,6 +110,24 @@ export const recommendedResources = {
             url: "https://modrinth.com/mod/natures-compass",
             author: "Chaosyr",
             note: "Allows you to locate biomes anywhere in the world.",
+          },
+          {
+            name: "Cobblemon Utility +",
+            url: "https://modrinth.com/mod/cobblemon-utility+",
+            author: "brendon3",
+            note: "Adds utility items to Cobblemon for a better experience",
+          },
+          {
+            name: "Cobblemon Unchained",
+            url: "https://modrinth.com/mod/cobblemon-unchained",
+            author: "tmetcalfe89",
+            note: "Naturally spawning Hidden Abilities. KOs and/or captures increase nearby shiny rates, and can also give perfect IVs to nearby spawns",
+          },
+          {
+            name: "Cobblemon Counter",
+            url: "https://modrinth.com/mod/cobblemon-counter",
+            author: "tmetcalfe89",
+            note: "A utility mod that keeps track of Cobblemon wild KO/capture counts/streaks",
           },
         ],
       },
