@@ -204,73 +204,6 @@ export default function UploadArea() {
     }));
   };
 
-  const downloadMarkdown = (name, data) => {
-    const base = name.replace(/\.zip$/, "");
-
-    const headers = [
-      "Pokémon",
-      "Rarity",
-      "Level",
-      "Weight",
-      "Biomes",
-      "Dimensions",
-      "Can See Sky",
-      "Structures",
-      "Raining",
-      "Moon Phase",
-      "Nearby Blocks",
-      "Time",
-      "Light Level",
-      "Anti-Biomes",
-      "Anti-Structures",
-    ];
-
-    const rows = data.map((d) => [
-      d.pokemon,
-      d.bucket,
-      d.level,
-      d.weight,
-      d.biomes,
-      d.dimensions,
-      d.canSeeSky?.toString() ?? "",
-      d.structures,
-      d.isRaining?.toString() ?? "",
-      d.moonPhase,
-      d.neededNearbyBlocks,
-      d.timeRange,
-      d.lightLevel,
-      d.antiBiomes,
-      d.antiStructures,
-    ]);
-
-    const colWidths = headers.map((h, i) =>
-      Math.max(h.length, ...rows.map((row) => row[i]?.toString().length ?? 0))
-    );
-
-    const pad = (text, len) => (text ?? "").toString().padEnd(len, " ");
-    const headerRow = `| ${headers
-      .map((h, i) => pad(h, colWidths[i]))
-      .join(" | ")} |`;
-    const separatorRow = `| ${colWidths
-      .map((w) => "-".repeat(w))
-      .join(" | ")} |`;
-    const dataRows = rows.map(
-      (row) =>
-        `| ${row.map((cell, i) => pad(cell, colWidths[i])).join(" | ")} |`
-    );
-
-    const markdown = [
-      `# Spawn Data — ${base}`,
-      "",
-      headerRow,
-      separatorRow,
-      ...dataRows,
-    ].join("\n");
-
-    const blob = new Blob([markdown], { type: "text/markdown;charset=utf-8" });
-    saveAs(blob, `${base}.md`);
-  };
-
   const sortedReports = [
     ...fileReports.filter((r) => !r.error),
     ...fileReports.filter((r) => r.error),
@@ -469,6 +402,17 @@ export default function UploadArea() {
             }
           });
 
+          const visibleColumns = TABLE_COLUMNS.filter(({ key }) =>
+            filteredData.some((d) => {
+              const value = d[key];
+              return Array.isArray(value)
+                ? value.length > 0
+                : typeof value === "boolean"
+                ? true
+                : value !== null && value !== undefined && value !== "";
+            })
+          );
+
           if (filteredData.length === 0) return null;
           return (
             <div
@@ -524,12 +468,6 @@ export default function UploadArea() {
                         {filteredData.length === 1 ? "y" : "ies"}.
                       </p>
                     )}
-                    <button
-                      onClick={() => downloadMarkdown(report.name, report.data)}
-                      className="ml-3 mt-2 px-3 py-1 bg-blue-600 rounded hover:bg-blue-700"
-                    >
-                      Download Markdown
-                    </button>
 
                     <div className="mt-4">
                       {/* Desktop Table */}
@@ -537,44 +475,50 @@ export default function UploadArea() {
                         <table className="w-full text-sm table-auto border-collapse min-w-[900px]">
                           <thead>
                             <tr>
-                              {TABLE_COLUMNS.map(({ key, label, sortable }) => (
-                                <th
-                                  key={key}
-                                  onClick={
-                                    sortable ? () => toggleSort(key) : undefined
-                                  }
-                                  className={`p-2 border ${
-                                    sortable
-                                      ? "cursor-pointer hover:bg-[#333]"
-                                      : ""
-                                  } group`}
-                                >
-                                  <div className="flex items-center justify-center gap-1">
-                                    <span>{label}</span>
-                                    {sort.column === key ? (
-                                      sort.direction === "asc" ? (
-                                        <ChevronUp size={14} />
-                                      ) : (
-                                        <ChevronDown size={14} />
-                                      )
-                                    ) : sortable ? (
-                                      <ChevronsUpDown
-                                        size={14}
-                                        className="text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                      />
-                                    ) : null}
-                                  </div>
-                                </th>
-                              ))}
+                              {visibleColumns.map(
+                                ({ key, label, sortable }) => (
+                                  <th
+                                    key={key}
+                                    onClick={
+                                      sortable
+                                        ? () => toggleSort(key)
+                                        : undefined
+                                    }
+                                    className={`p-2 border ${
+                                      sortable
+                                        ? "cursor-pointer hover:bg-[#333]"
+                                        : ""
+                                    } group`}
+                                  >
+                                    <div className="flex items-center justify-center gap-1">
+                                      <span>{label}</span>
+                                      {sort.column === key ? (
+                                        sort.direction === "asc" ? (
+                                          <ChevronUp size={14} />
+                                        ) : (
+                                          <ChevronDown size={14} />
+                                        )
+                                      ) : sortable ? (
+                                        <ChevronsUpDown
+                                          size={14}
+                                          className="text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                        />
+                                      ) : null}
+                                    </div>
+                                  </th>
+                                )
+                              )}
                             </tr>
                           </thead>
                           <tbody>
                             {sortData(filteredData.slice(0, displayCount)).map(
                               (d, idx) => (
                                 <tr key={idx} className="bg-[#222]">
-                                  {TABLE_COLUMNS.map(({ key }) => (
+                                  {visibleColumns.map(({ key }) => (
                                     <td key={key} className="p-2 border">
-                                      {d[key]?.toString() ?? ""}
+                                      {Array.isArray(d[key])
+                                        ? d[key].join(", ")
+                                        : d[key]?.toString() ?? ""}
                                     </td>
                                   ))}
                                 </tr>
@@ -582,7 +526,10 @@ export default function UploadArea() {
                             )}
                             {isLong && !report.showAll && (
                               <tr>
-                                <td colSpan={16} className="p-2 text-center">
+                                <td
+                                  colSpan={visibleColumns.length}
+                                  className="p-2 text-center"
+                                >
                                   <button
                                     onClick={() =>
                                       setFileReports((prev) =>
@@ -600,10 +547,12 @@ export default function UploadArea() {
                                 </td>
                               </tr>
                             )}
-
                             {isLong && report.showAll && (
                               <tr>
-                                <td colSpan={16} className="p-2 text-center">
+                                <td
+                                  colSpan={visibleColumns.length}
+                                  className="p-2 text-center"
+                                >
                                   <button
                                     onClick={() =>
                                       setFileReports((prev) =>
@@ -633,10 +582,12 @@ export default function UploadArea() {
                               key={idx}
                               className="bg-[#222] p-4 rounded border text-sm space-y-1"
                             >
-                              {TABLE_COLUMNS.map(({ key, label }) => (
+                              {visibleColumns.map(({ key, label }) => (
                                 <div key={key}>
                                   <strong>{label}:</strong>{" "}
-                                  {d[key]?.toString() ?? ""}
+                                  {Array.isArray(d[key])
+                                    ? d[key].join(", ")
+                                    : d[key]?.toString() ?? ""}
                                 </div>
                               ))}
                             </div>
