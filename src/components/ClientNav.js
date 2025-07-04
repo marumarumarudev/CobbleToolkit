@@ -30,8 +30,8 @@ export default function ClientNav() {
           <Link href="/spawn-scanner" className="hover:text-yellow-400">
             Spawn Scanner
           </Link>
-          <Link href="/species-scanner" className="hover:text-yellow-400">
-            Species Scanner
+          <Link href="/loot-scanner" className="hover:text-yellow-400">
+            Loot Drop Scanner
           </Link>
           <Link href="/recommended" className="hover:text-yellow-400">
             Recommended Stuff
@@ -45,11 +45,17 @@ export default function ClientNav() {
           <Link href="/spawn-scanner" className="block hover:text-yellow-400">
             Spawn Scanner
           </Link>
-          <Link href="/species-scanner" className="block hover:text-yellow-400">
-            Species Scanner
+          <Link href="/loot-scanner" className="block hover:text-yellow-400">
+            Loot Drop Scanner
           </Link>
           <Link href="/recommended" className="block hover:text-yellow-400">
             Recommended Stuff
+          </Link>
+          <Link
+            href="/feedback-gallery"
+            className="block hover:text-yellow-400"
+          >
+            Feedback Gallery
           </Link>
         </div>
       )}

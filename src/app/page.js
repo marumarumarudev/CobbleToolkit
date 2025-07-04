@@ -5,7 +5,7 @@ import Image from "next/image";
 export default function HomePage() {
   const availableTools = [
     { name: "Spawn Pool Scanner", path: "/spawn-scanner" },
-    { name: "Species Scanner", path: "/species-scanner" },
+    { name: "Loot Drop Scanner", path: "/loot-scanner" },
     { name: "Recommended Stuff", path: "/recommended" },
     { name: "Feedback Gallery", path: "/feedback-gallery" },
     // { name: "Conflict Analyzer", path: "/conflict-analyzer" },
