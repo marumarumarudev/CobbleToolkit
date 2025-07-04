@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function HomePage() {
   const availableTools = [
@@ -45,6 +46,17 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
+        {new Date().getMonth() === 6 && new Date().getDate() === 5 && (
+          <div className="flex justify-center mb-6">
+            <Image
+              height={120}
+              width={120}
+              src="/birthday.jpg"
+              alt="Happy Birthday!"
+              className="w-30 max-w-xs rounded-lg shadow-lg"
+            />
+          </div>
+        )}
 
         <h3 className="text-2xl font-semibold mb-2">Coming Soon</h3>
         <ul className="text-gray-400 list-disc list-inside space-y-1 mb-12">
