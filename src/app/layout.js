@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import Image from "next/image";
 import ClientNav from "@/components/ClientNav";
-import AdhdButton from "@/components/AdhdButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,9 +48,6 @@ export default function RootLayout({ children }) {
             },
           }}
         />
-
-        {/* ADHD Button and Player */}
-        <AdhdButton />
 
         {/* Decorative Images */}
         <Image

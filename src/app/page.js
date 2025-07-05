@@ -6,8 +6,10 @@ export default function HomePage() {
   const availableTools = [
     { name: "Spawn Pool Scanner", path: "/spawn-scanner" },
     { name: "Loot Drop Scanner", path: "/loot-scanner" },
+    { name: "Species Scanner", path: "/species-scanner" },
     { name: "Recommended Stuff", path: "/recommended" },
     { name: "Feedback Gallery", path: "/feedback-gallery" },
+    { name: "FAQ", path: "/faq" },
     // { name: "Conflict Analyzer", path: "/conflict-analyzer" },
   ];
 
@@ -47,7 +49,7 @@ export default function HomePage() {
           ))}
         </div>
         {new Date().getMonth() === 6 && new Date().getDate() === 5 && (
-          <div className="flex justify-center mb-6">
+          <div className="flex flex-col items-center mb-6">
             <Image
               height={120}
               width={120}
@@ -55,6 +57,9 @@ export default function HomePage() {
               alt="Happy Birthday!"
               className="w-30 max-w-xs rounded-lg shadow-lg"
             />
+            <p className="mt-2 text-sm text-gray-400 italic">
+              me when birthday
+            </p>
           </div>
         )}
 

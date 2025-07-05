@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { parseLootFromZip } from "@/utils/lootParser";
 import Spinner from "./Spinner";
+import { X } from "lucide-react";
 
 export default function LootScanner() {
   const [fileReports, setFileReports] = useState([]);
@@ -90,7 +91,6 @@ export default function LootScanner() {
   );
 
   const searchTerm = globalSearch.toLowerCase();
-
   const filtered = lootEntries.filter((entry) =>
     [entry.pokemon, entry.item, entry.chance, entry.sourceFile].some((val) =>
       val.toLowerCase().includes(searchTerm)
@@ -104,13 +104,21 @@ export default function LootScanner() {
 
   return (
     <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-8 flex flex-col items-center">
-      <h1 className="text-3xl font-bold mb-2">Cobblemon Loot Scanner</h1>
-      <p className="text-gray-400 text-sm mb-6">
-        Upload Cobblemon datapacks to view and search Pokémon loot drops.
-      </p>
+      <header className="text-center mb-10">
+        <h1 className="text-3xl md:text-4xl font-bold mb-2">
+          Cobblemon Loot Scanner
+        </h1>
+        <p className="text-gray-300 max-w-2xl mx-auto">
+          Upload Cobblemon datapacks (.zip or .jar) to scan Pokémon loot drops.
+        </p>
+        <p className="text-gray-300 text-sm text-center mt-2">
+          Drops like <code>cobblemon:raw_fish</code> are shown per Pokémon.
+        </p>
+      </header>
 
+      {/* Upload Area */}
       <div
-        className="border-2 border-dashed border-gray-600 rounded p-4 w-full max-w-2xl text-center bg-[#2c2c2c] hover:bg-[#3a3a3a] transition cursor-pointer mb-4"
+        className="border-2 border-dashed border-gray-600 rounded p-6 w-full max-w-2xl text-center bg-[#2c2c2c] hover:bg-[#3a3a3a] transition cursor-pointer mb-8"
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {
           e.preventDefault();
@@ -122,20 +130,23 @@ export default function LootScanner() {
         }}
         onClick={() => document.getElementById("lootInput").click()}
       >
-        <p className="text-gray-300">📦 Drag and drop files here</p>
+        <p className="text-gray-300 text-lg">📦 Drag and drop files here</p>
         <p className="text-sm text-gray-500">or click to select files</p>
         <input
           id="lootInput"
           type="file"
           multiple
           accept=".zip,.jar"
-          onChange={handleInputChange}
+          onChange={(e) => {
+            handleInputChange(e);
+            e.target.value = "";
+          }}
           className="hidden"
         />
       </div>
 
       {loading && (
-        <div className="flex gap-2 items-center text-blue-400 mb-4">
+        <div className="mb-4 flex items-center gap-2 text-blue-400">
           <Spinner />
           <span>Parsing loot data...</span>
         </div>
@@ -143,55 +154,49 @@ export default function LootScanner() {
 
       {lootEntries.length > 0 && (
         <>
-          <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-2">
+          {/* Search & Actions */}
+          <div className="flex flex-col md:flex-row gap-2 items-center mb-6 w-full max-w-3xl">
             <input
               type="text"
               placeholder="🔍 Search Pokémon or Item..."
-              className="w-full md:w-[77%] p-2 bg-[#222] border border-gray-600 rounded text-sm"
+              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full"
               value={globalSearch}
               onChange={(e) => setGlobalSearch(e.target.value)}
             />
 
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 text-sm">
-                <label className="text-gray-300">Group by:</label>
-                <select
-                  className="bg-[#222] border border-gray-600 rounded px-2 py-1"
-                  value={groupBy}
-                  onChange={(e) => setGroupBy(e.target.value)}
-                >
-                  <option value="pokemon">Pokémon</option>
-                  <option value="item">Item</option>
-                </select>
-              </div>
-
-              <button
-                className="px-3 py-1 bg-red-600 text-sm rounded hover:bg-red-700 whitespace-nowrap"
-                onClick={() => {
-                  setFileReports([]);
-                  localStorage.removeItem("loot_reports");
-                }}
-              >
-                Clear All
-              </button>
-            </div>
+            <select
+              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full md:w-1/3"
+              value={groupBy}
+              onChange={(e) => setGroupBy(e.target.value)}
+            >
+              <option value="pokemon">Group by Pokémon</option>
+              <option value="item">Group by Item</option>
+            </select>
           </div>
 
-          <div className="w-full overflow-x-auto max-w-6xl border border-gray-600 rounded">
-            <table className="min-w-full text-sm table-auto border-collapse">
-              <thead className="bg-[#2c2c2c] text-left text-gray-300">
-                <tr>
-                  <th className="py-2 px-4 border-b border-gray-600">
-                    Pokémon
-                  </th>
-                  <th className="py-2 px-4 border-b border-gray-600">Item</th>
-                  <th className="py-2 px-4 border-b border-gray-600">
-                    Quantity
-                  </th>
-                  <th className="py-2 px-4 border-b border-gray-600">Chance</th>
-                  <th className="py-2 px-4 border-b border-gray-600">
-                    Source File
-                  </th>
+          {/* Clear Button */}
+          <div className="flex flex-wrap gap-2 justify-center mb-6">
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition"
+              onClick={() => {
+                setFileReports([]);
+                localStorage.removeItem("loot_reports");
+              }}
+            >
+              <X size={16} /> Clear All
+            </button>
+          </div>
+
+          {/* Table View */}
+          <div className="w-full max-w-6xl overflow-x-auto">
+            <table className="w-full text-sm table-auto border-collapse min-w-[800px]">
+              <thead>
+                <tr className="bg-[#2c2c2c] text-left text-gray-300">
+                  <th className="p-2 border-b border-gray-700">Pokémon</th>
+                  <th className="p-2 border-b border-gray-700">Item</th>
+                  <th className="p-2 border-b border-gray-700">Quantity</th>
+                  <th className="p-2 border-b border-gray-700">Chance</th>
+                  <th className="p-2 border-b border-gray-700">Source File</th>
                 </tr>
               </thead>
               <tbody>
@@ -199,7 +204,7 @@ export default function LootScanner() {
                   <tr>
                     <td
                       colSpan={5}
-                      className="text-center py-6 text-gray-400 border-b border-gray-700"
+                      className="text-center p-6 text-gray-400 border-b border-gray-700"
                     >
                       No matching results found.
                     </td>
@@ -212,19 +217,19 @@ export default function LootScanner() {
                         index % 2 === 0 ? "bg-[#1e1e1e]" : "bg-[#252525]"
                       }
                     >
-                      <td className="py-2 px-4 border-b border-gray-700">
+                      <td className="p-2 border-b border-gray-700">
                         {entry.pokemon}
                       </td>
-                      <td className="py-2 px-4 border-b border-gray-700">
+                      <td className="p-2 border-b border-gray-700">
                         {entry.item}
                       </td>
-                      <td className="py-2 px-4 border-b border-gray-700">
+                      <td className="p-2 border-b border-gray-700">
                         {entry.quantity}
                       </td>
-                      <td className="py-2 px-4 border-b border-gray-700">
+                      <td className="p-2 border-b border-gray-700">
                         {entry.chance}
                       </td>
-                      <td className="py-2 px-4 border-b border-gray-700">
+                      <td className="p-2 border-b border-gray-700">
                         {entry.sourceFile}
                       </td>
                     </tr>
@@ -232,19 +237,19 @@ export default function LootScanner() {
                 )}
               </tbody>
             </table>
-            {grouped.length > visibleCount && (
-              <div className="mt-4 text-center">
-                <button
-                  className="px-4 mb-4 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded"
-                  onClick={() =>
-                    setVisibleCount((prev) => prev + SHOW_INCREMENT)
-                  }
-                >
-                  Show More ({visibleCount} / {grouped.length})
-                </button>
-              </div>
-            )}
           </div>
+
+          {/* Show More Button */}
+          {grouped.length > visibleCount && (
+            <div className="mt-4 text-center">
+              <button
+                className="px-4 mb-4 py-2 bg-blue-700 hover:bg-blue-800 text-gray-300 rounded"
+                onClick={() => setVisibleCount((prev) => prev + SHOW_INCREMENT)}
+              >
+                Show More ({visibleCount} / {grouped.length})
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>
