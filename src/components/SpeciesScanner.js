@@ -103,14 +103,25 @@ export default function SpeciesScanner() {
       return;
     }
 
-    try {
-      const parsed = await parseSpeciesAndSpawnFromZip(valid[0]);
-      setSpecies(parsed);
-      localStorage.setItem("species_data", JSON.stringify(parsed));
+    const allParsed = [];
+
+    for (const file of valid) {
+      try {
+        const parsed = await parseSpeciesAndSpawnFromZip(file);
+        allParsed.push(...parsed);
+      } catch (e) {
+        console.error(e);
+        toast.error(`Failed to parse ${file.name}`);
+      }
+    }
+
+    if (allParsed.length > 0) {
+      setSpecies(allParsed);
+      setFiltered(allParsed);
+      localStorage.setItem("species_data", JSON.stringify(allParsed));
       toast.success("Species data loaded!");
-    } catch (e) {
-      console.error(e);
-      toast.error("Failed to parse zip.");
+    } else {
+      toast.error("No species data found.");
     }
 
     setLoading(false);
@@ -255,7 +266,7 @@ export default function SpeciesScanner() {
                     .join(", ") || "—";
 
                 return (
-                  <Fragment key={mon.name}>
+                  <Fragment key={`${mon.name}-${mon.sourceFile}`}>
                     <tr
                       className={i % 2 === 0 ? "bg-[#1e1e1e]" : "bg-[#262626]"}
                     >
