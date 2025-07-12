@@ -1,12 +1,20 @@
 import ResourceItem from "./ResourceItem";
 
-export default function ResourceSection({ title, categories, items, search }) {
+export default function ResourceSection({
+  title,
+  categories,
+  items,
+  search,
+  categoryKey,
+}) {
   const matchesSearch = (item) => {
     const text = `${item.name} ${item.note || ""} ${
       item.author || ""
     }`.toLowerCase();
     return text.includes(search.toLowerCase());
   };
+
+  const currentCategory = categoryKey;
 
   return (
     <section>
@@ -24,7 +32,11 @@ export default function ResourceSection({ title, categories, items, search }) {
               </h3>
               <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
                 {filteredItems.map((item) => (
-                  <ResourceItem key={item.name} {...item} />
+                  <ResourceItem
+                    key={item.name}
+                    {...item}
+                    category={currentCategory}
+                  />
                 ))}
               </div>
             </div>
@@ -33,7 +45,11 @@ export default function ResourceSection({ title, categories, items, search }) {
       ) : (
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
           {items.filter(matchesSearch).map((item) => (
-            <ResourceItem key={item.name} {...item} />
+            <ResourceItem
+              key={item.name}
+              {...item}
+              category={currentCategory}
+            />
           ))}
         </div>
       )}

@@ -38,13 +38,21 @@ export async function parseCobblemonZip(file) {
       try {
         const zipEntry = zip.files[fileName];
 
-        if (zipEntry._data.uncompressedSize === 0) {
-          console.warn(`⚠️ Skipping empty file: ${fileName}`);
+        if (!zipEntry || zipEntry._data.uncompressedSize === 0) {
+          console.warn(`⚠️ Skipping empty or missing file: ${fileName}`);
           continue;
         }
 
-        const content = await zip.files[fileName].async("string");
-        const json = JSON.parse(content);
+        const content = await zipEntry.async("string");
+
+        // Ensure it is valid JSON
+        let json;
+        try {
+          json = JSON.parse(content);
+        } catch (parseErr) {
+          console.warn(`⚠️ Skipping invalid JSON in: ${fileName}`);
+          continue;
+        }
 
         for (const entry of json.spawns || []) {
           const condition = entry.condition || {};
@@ -91,7 +99,7 @@ export async function parseCobblemonZip(file) {
           });
         }
       } catch (err) {
-        console.error(`❌ Failed to parse ${fileName}`, err);
+        console.error(`❌ Failed to process ${fileName}`, err);
       }
     }
   }

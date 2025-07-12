@@ -5,7 +5,13 @@ import { recommendedResources } from "@/data/recommendedData";
 import ResourceSection from "@/components/ResourceSection";
 
 export default function RecommendedPage() {
-  const categoryOrder = ["mods", "resourcepacks", "datapacks", "modpacks"];
+  const categoryOrder = [
+    "mods",
+    "resourcepacks",
+    "datapacks",
+    "modpacks",
+    "servers",
+  ];
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
 
@@ -15,6 +21,7 @@ export default function RecommendedPage() {
     resourcepacks: "Resource Packs",
     datapacks: "Data Packs",
     modpacks: "Modpacks",
+    servers: "Multiplayer Servers",
   };
 
   const matchesSearch = (item) =>
@@ -95,6 +102,7 @@ export default function RecommendedPage() {
               <ResourceSection
                 key={categoryKey}
                 title={category.title}
+                categoryKey={categoryKey}
                 categories={filteredCategories}
                 items={filteredItems}
                 search={search}
