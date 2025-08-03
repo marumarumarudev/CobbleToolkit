@@ -10,7 +10,6 @@ export default function HomePage() {
     { name: "Recommended Stuff", path: "/recommended" },
     { name: "Feedback Gallery", path: "/feedback-gallery" },
     { name: "FAQ", path: "/faq" },
-    // { name: "Conflict Analyzer", path: "/conflict-analyzer" },
   ];
 
   const upcomingTools = [

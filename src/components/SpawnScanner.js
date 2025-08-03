@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { parseCobblemonZip } from "@/utils/spawnParser";
-import { saveAs } from "file-saver";
 import toast from "react-hot-toast";
 import { ChevronDown, ChevronUp, ChevronsUpDown, X } from "lucide-react";
 import Spinner from "./Spinner";
@@ -16,14 +15,17 @@ export default function UploadArea() {
   const [sort, setSort] = useState({ column: "bucket", direction: "asc" });
 
   useEffect(() => {
-    const saved = localStorage.getItem("spawn_reports");
-    if (saved) {
-      try {
+    try {
+      const saved = localStorage.getItem("spawn_reports");
+      if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) setFileReports(parsed);
-      } catch (err) {
-        console.error("Failed to load saved spawn reports:", err);
       }
+    } catch (err) {
+      console.error("Failed to load spawn reports from localStorage:", err);
+      toast.error(
+        "❌ Couldn't load saved reports. Storage might be corrupted."
+      );
     }
   }, []);
 
@@ -43,6 +45,21 @@ export default function UploadArea() {
   }, []);
 
   const prevSearch = useRef("");
+
+  const isStorageNearLimit = () => {
+    try {
+      const testKey = "__storage_test__";
+      const oneKb = "x".repeat(1024);
+      for (let i = 0; i < 5 * 1024; i++) {
+        localStorage.setItem(testKey, oneKb.repeat(i));
+      }
+    } catch (e) {
+      return true;
+    } finally {
+      localStorage.removeItem("__storage_test__");
+    }
+    return false;
+  };
 
   useEffect(() => {
     if (prevSearch.current !== "" && searchTerm === "") {
@@ -118,11 +135,13 @@ export default function UploadArea() {
     }
 
     const isBulk = newFiles.length > 1;
+
     const parsedReports = await Promise.all(
       newFiles.map(async (file) => {
         try {
           const parsed = await parseCobblemonZip(file);
           const hasData = parsed.length > 0;
+
           return {
             id: crypto.randomUUID(),
             name: file.name,
@@ -152,11 +171,28 @@ export default function UploadArea() {
       })
     );
 
-    setFileReports((prev) => {
-      const updated = [...parsedReports.filter(Boolean), ...prev];
+    const updated = [...parsedReports.filter(Boolean), ...fileReports];
+
+    if (isStorageNearLimit()) {
+      toast("⚠️ Local storage is nearly full. Consider clearing old reports.");
+    }
+
+    try {
       localStorage.setItem("spawn_reports", JSON.stringify(updated));
-      return updated;
-    });
+    } catch (err) {
+      if (
+        err instanceof DOMException &&
+        (err.name === "QuotaExceededError" ||
+          err.name === "NS_ERROR_DOM_QUOTA_REACHED")
+      ) {
+        console.error("❌ Local storage is full. Please clear old reports.");
+      } else {
+        console.error("Failed to save to localStorage:", err);
+      }
+    }
+
+    setFileReports(updated);
+
     setLoading(false);
   };
 
