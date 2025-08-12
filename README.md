@@ -7,14 +7,26 @@ A growing suite of open-source, browser-based tools to analyze and inspect **Cob
 ### 📦 Spawn Pool Scanner
 
 - Parses Cobblemon datapacks (`.zip` or `.jar`) and extracts Pokémon spawn data.
-- Displays a searchable, sortable table of biomes, structures, and rarity.
-- Supports downloading results as Markdown.
+- Searchable, sortable table with filters (context, rarity, and more).
+- Designed for quick inspection across multiple files.
+
+### 🎁 Loot Drop Scanner
+
+- Scans Pokémon loot drops from Cobblemon datapacks (`.zip` or `.jar`).
+- Group results by Pokémon or by Item; global search and large table view.
+- Supports drag-and-drop multiple files and clearing saved results.
 
 ### 🧬 Species Scanner
 
-- Extracts detailed species metadata from Cobblemon datapacks.
-- Shows base stats, types, evolutions, moves, abilities, drops, and more.
-- Built-in pagination, search, and collapsible panels for performance.
+- Extracts species metadata from Cobblemon datapacks.
+- Shows name, base stats, types, EV yields, and move lists.
+- Built-in pagination and search for fast browsing.
+
+### 🛠️ Spawn Pool Generator
+
+- Build spawn pool JSONs in-browser with a friendly editor (contexts, buckets, presets, conditions, levels, weights).
+- Import existing spawn pool JSONs, dedupe/merge, and edit inline via a JSON preview/editor.
+- Export a ready-to-use datapack ZIP (`data/cobblemon/spawn_pool_world/*.json`).
 
 ## 💡 Features
 
@@ -40,7 +52,7 @@ A growing suite of open-source, browser-based tools to analyze and inspect **Cob
 
 1. Visit the tool and upload one or more Cobblemon datapack `.zip` or `.jar` files.
 2. Explore data — sort, search, scroll, collapse, and expand.
-3. Download any results (Markdown export available in some tools).
+3. Download any results (where available) or export generated files.
 4. Use “Clear All” to reset and scan new files.
 
 ## ⚠️ Disclaimer
