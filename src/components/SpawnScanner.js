@@ -273,7 +273,7 @@ export default function UploadArea() {
 
     if (oversizedFiles.length > 0) {
       const fileNames = oversizedFiles.map((f) => f.name).join(", ");
-      toast.error(`Files too large (max 100MB): ${fileNames}`);
+      toast.error(`Files too large (max 150MB): ${fileNames}`);
       return;
     }
 
@@ -489,9 +489,16 @@ export default function UploadArea() {
 
       // Clear any cached data
       if ("caches" in window) {
-        caches.keys().then((names) => {
-          names.forEach((name) => caches.delete(name));
-        });
+        try {
+          caches
+            .keys()
+            .then((names) =>
+              Promise.allSettled(names.map((name) => caches.delete(name)))
+            )
+            .catch(() => {});
+        } catch (e) {
+          // ignore
+        }
       }
 
       // Clear console to free memory
