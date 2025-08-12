@@ -28,6 +28,12 @@ A growing suite of open-source, browser-based tools to analyze and inspect **Cob
 - Import existing spawn pool JSONs, dedupe/merge, and edit inline via a JSON preview/editor.
 - Export a ready-to-use datapack ZIP (`data/cobblemon/spawn_pool_world/*.json`).
 
+### 🧍‍♂️Trainer Scanner
+
+- Scans trainer configurations from Cobblemon datapacks (`.zip` or `.jar`).
+- Shows trainer teams, AI settings, battle formats, and Pokémon details.
+- Filter by format, team size, and search across trainers, Pokémon, and moves.
+
 ## 💡 Features
 
 - 🌙 Fully client-side (no upload required)

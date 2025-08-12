@@ -7,6 +7,7 @@ export default function HomePage() {
     { name: "Spawn Pool Scanner", path: "/spawn-scanner" },
     { name: "Loot Drop Scanner", path: "/loot-scanner" },
     { name: "Species Scanner", path: "/species-scanner" },
+    { name: "Trainer Scanner", path: "/trainer-scanner" },
     { name: "Spawn Pool Generator", path: "/spawn-pool-generator" },
     { name: "Recommended Stuff", path: "/recommended" },
     { name: "Feedback Gallery", path: "/feedback-gallery" },

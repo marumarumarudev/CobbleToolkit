@@ -50,23 +50,6 @@ export default function RootLayout({ children }) {
             },
           }}
         />
-
-        {/* Decorative Images */}
-        <Image
-          src="/gravoyle.png"
-          alt="soyle pointing"
-          width={128}
-          height={128}
-          className="fixed bottom-4 right-4 w-32 pointer-events-none select-none opacity-30 z-50"
-        />
-
-        <Image
-          src="/celebi.png"
-          alt="soyebi pointing"
-          width={128}
-          height={128}
-          className="fixed bottom-4 left-4 w-32 pointer-events-none select-none opacity-30 z-50"
-        />
       </body>
     </html>
   );
