@@ -7,15 +7,13 @@ export default function HomePage() {
     { name: "Spawn Pool Scanner", path: "/spawn-scanner" },
     { name: "Loot Drop Scanner", path: "/loot-scanner" },
     { name: "Species Scanner", path: "/species-scanner" },
+    { name: "Spawn Pool Generator", path: "/spawn-pool-generator" },
     { name: "Recommended Stuff", path: "/recommended" },
     { name: "Feedback Gallery", path: "/feedback-gallery" },
     { name: "FAQ", path: "/faq" },
   ];
 
-  const upcomingTools = [
-    "running out of ideas >w<",
-    "datapack spawn pools conflict detector or something",
-  ];
+  const upcomingTools = ["buh", "wuh", "guh"];
 
   return (
     <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-10 sm:px-6 sm:py-12 flex flex-col items-center">
@@ -26,7 +24,7 @@ export default function HomePage() {
           Cobblemon datapacks. This toolkit runs entirely in your browser — your
           files are never uploaded. Open source on{" "}
           <a
-            href="https://github.com/moonBSIS/Cobblemon-Datapack-Spawn-Scanner"
+            href="https://github.com/marumarumarudev/CobbleToolkit"
             className="text-blue-400 underline hover:text-blue-300"
             target="_blank"
             rel="noopener noreferrer"

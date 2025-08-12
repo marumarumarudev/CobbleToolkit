@@ -13,6 +13,16 @@ export default function UploadArea() {
   const [searchTerm, setSearchTerm] = useState("");
   const [contextFilter, setContextFilter] = useState("all");
   const [sort, setSort] = useState({ column: "bucket", direction: "asc" });
+  const [uploadProgress, setUploadProgress] = useState({
+    current: 0,
+    total: 0,
+    fileName: "",
+  });
+  const [storageUsage, setStorageUsage] = useState({
+    used: 0,
+    limit: 0,
+    percentage: 0,
+  });
 
   useEffect(() => {
     try {
@@ -27,6 +37,25 @@ export default function UploadArea() {
         "❌ Couldn't load saved reports. Storage might be corrupted."
       );
     }
+
+    // Chrome-specific memory optimization
+    if (
+      navigator.userAgent.includes("Chrome") ||
+      navigator.userAgent.includes("Chromium")
+    ) {
+      console.log("Chrome detected - enabling memory optimizations");
+      // Set memory pressure hints for Chrome
+      if ("memory" in performance) {
+        console.log(
+          "Available memory:",
+          Math.round(performance.memory.usedJSHeapSize / 1024 / 1024),
+          "MB used"
+        );
+      }
+    }
+
+    // Calculate initial storage usage
+    updateStorageUsage();
   }, []);
 
   // on sort change
@@ -117,6 +146,16 @@ export default function UploadArea() {
       return;
     }
 
+    // Check file sizes before processing
+    const maxFileSize = 100 * 1024 * 1024; // 100MB limit
+    const oversizedFiles = files.filter((f) => f.size > maxFileSize);
+
+    if (oversizedFiles.length > 0) {
+      const fileNames = oversizedFiles.map((f) => f.name).join(", ");
+      toast.error(`Files too large (max 100MB): ${fileNames}`);
+      return;
+    }
+
     setLoading(true);
 
     const existingNames = new Set(fileReports.map((r) => r.name));
@@ -131,18 +170,43 @@ export default function UploadArea() {
 
     if (newFiles.length === 0) {
       setLoading(false);
+      setUploadProgress({ current: 0, total: 0, fileName: "" });
       return;
     }
 
+    setUploadProgress({ current: 0, total: newFiles.length, fileName: "" });
+
     const isBulk = newFiles.length > 1;
 
-    const parsedReports = await Promise.all(
-      newFiles.map(async (file) => {
+    const parsedReports = [];
+
+    try {
+      for (let i = 0; i < newFiles.length; i++) {
+        const file = newFiles[i];
+        setUploadProgress({
+          current: i + 1,
+          total: newFiles.length,
+          fileName: file.name,
+        });
+
+        // Add timeout protection for individual file processing
+        const fileTimeout = setTimeout(() => {
+          console.warn(`File processing timeout for ${file.name}`);
+          // Reset loading state if timeout occurs
+          setLoading(false);
+          setUploadProgress({ current: 0, total: 0, fileName: "" });
+          toast.error(
+            `${file.name}: Processing timeout - file may be corrupted or too large.`
+          );
+        }, 45000); // 45 second timeout per file
+
         try {
           const parsed = await parseCobblemonZip(file);
+          clearTimeout(fileTimeout); // Clear timeout if successful
+
           const hasData = parsed.length > 0;
 
-          return {
+          parsedReports.push({
             id: crypto.randomUUID(),
             name: file.name,
             data: parsed,
@@ -150,35 +214,82 @@ export default function UploadArea() {
             expanded: !isBulk && hasData,
             searchTerm: "",
             showAll: false,
-          };
+          });
+
+          // Small delay to allow garbage collection between files
+          if (i < newFiles.length - 1) {
+            await new Promise((resolve) => setTimeout(resolve, 50));
+          }
         } catch (err) {
+          clearTimeout(fileTimeout); // Clear timeout on error
+
           const message = err.message || "Failed to parse file.";
 
           if (message.includes("spawn_pool_world")) {
             toast.error(`${file.name}: No spawn_pool_world folder.`);
-            return null;
+          } else if (message.includes("timeout")) {
+            toast.error(
+              `${file.name}: Processing timeout - file may be corrupted or too large.`
+            );
+          } else if (message.includes("memory") || message.includes("quota")) {
+            toast.error(
+              `${file.name}: Memory error - file too large for browser to handle.`
+            );
+          } else {
+            console.error(`❌ Failed to parse ${file.name}`, err);
+            toast.error(`${file.name}: ${message}`);
           }
 
-          console.error(`❌ Failed to parse ${file.name}`, err);
-          return {
+          parsedReports.push({
             id: crypto.randomUUID(),
             name: file.name,
             data: [],
-            error: err.message || "Failed to parse file.",
+            error: message,
             expanded: false,
-          };
+          });
         }
-      })
-    );
-
-    const updated = [...parsedReports.filter(Boolean), ...fileReports];
-
-    if (isStorageNearLimit()) {
-      toast("⚠️ Local storage is nearly full. Consider clearing old reports.");
+      }
+    } finally {
+      // Always reset loading state, even if there are errors
+      setLoading(false);
+      setUploadProgress({ current: 0, total: 0, fileName: "" });
     }
 
+    const updated = [...parsedReports, ...fileReports];
+
+    // Progressive localStorage saving to prevent Chrome hanging
     try {
-      localStorage.setItem("spawn_reports", JSON.stringify(updated));
+      // Auto-cleanup if storage is nearly full
+      autoCleanupStorage();
+
+      // Check storage size before saving
+      const dataSize = JSON.stringify(updated).length;
+      const maxStorageSize = 5 * 1024 * 1024; // 5MB limit
+
+      if (dataSize > maxStorageSize) {
+        // If data is too large, try to save only recent reports
+        const recentReports = updated.slice(0, Math.min(updated.length, 50)); // Keep only 50 most recent
+        const recentSize = JSON.stringify(recentReports).length;
+
+        if (recentSize <= maxStorageSize) {
+          localStorage.setItem("spawn_reports", JSON.stringify(recentReports));
+          setFileReports(recentReports);
+          toast.warning(
+            `⚠️ Data too large for storage. Keeping only ${recentReports.length} most recent reports.`
+          );
+        } else {
+          // Even recent reports are too large, clear storage and save only current batch
+          localStorage.removeItem("spawn_reports");
+          setFileReports(parsedReports);
+          toast.error(
+            "⚠️ Data too large for storage. Only current batch will be displayed."
+          );
+        }
+      } else {
+        // Normal save
+        localStorage.setItem("spawn_reports", JSON.stringify(updated));
+        setFileReports(updated);
+      }
     } catch (err) {
       if (
         err instanceof DOMException &&
@@ -186,14 +297,42 @@ export default function UploadArea() {
           err.name === "NS_ERROR_DOM_QUOTA_REACHED")
       ) {
         console.error("❌ Local storage is full. Please clear old reports.");
+        toast.error(
+          "❌ Storage full. Please clear old reports before adding new ones."
+        );
+
+        // Try to save only current batch
+        try {
+          const batchData = JSON.stringify(parsedReports);
+          if (batchData.length <= 5 * 1024 * 1024) {
+            // 5MB limit
+            localStorage.setItem("spawn_reports", batchData);
+            setFileReports(parsedReports);
+            toast.warning("⚠️ Cleared storage and saved only current batch.");
+          } else {
+            setFileReports(parsedReports);
+            toast.error(
+              "⚠️ Could not save to storage. Data will be lost on page refresh."
+            );
+          }
+        } catch (saveErr) {
+          setFileReports(parsedReports);
+          toast.error("⚠️ Storage error. Data will be lost on page refresh.");
+        }
       } else {
         console.error("Failed to save to localStorage:", err);
+        toast.error("⚠️ Failed to save data. It will be lost on page refresh.");
+        setFileReports(updated);
       }
     }
 
-    setFileReports(updated);
+    // Clean up memory after processing
+    cleanupMemory();
+    updateStorageUsage(); // Update storage usage after saving
 
+    // Always reset loading state
     setLoading(false);
+    setUploadProgress({ current: 0, total: 0, fileName: "" });
   };
 
   const handleInputChange = (e) => {
@@ -213,6 +352,79 @@ export default function UploadArea() {
     setFileReports([]);
     setSort({ column: "pokemon", direction: "asc" });
     localStorage.removeItem("spawn_reports");
+    updateStorageUsage(); // Update storage usage after clearing
+  };
+
+  // Memory cleanup for Chrome
+  const cleanupMemory = () => {
+    if (
+      navigator.userAgent.includes("Chrome") ||
+      navigator.userAgent.includes("Chromium")
+    ) {
+      // Force garbage collection if available
+      if (typeof window !== "undefined" && window.gc) {
+        try {
+          window.gc();
+        } catch (e) {
+          // gc() might not be available
+        }
+      }
+
+      // Clear any cached data
+      if ("caches" in window) {
+        caches.keys().then((names) => {
+          names.forEach((name) => caches.delete(name));
+        });
+      }
+
+      // Clear console to free memory
+      if (console.clear) {
+        try {
+          console.clear();
+        } catch (e) {
+          // console.clear might not be available
+        }
+      }
+    }
+  };
+
+  // Calculate storage usage
+  const updateStorageUsage = () => {
+    try {
+      const saved = localStorage.getItem("spawn_reports");
+      if (saved) {
+        const used = new Blob([saved]).size;
+        const limit = 5 * 1024 * 1024; // 5MB limit
+        const percentage = Math.round((used / limit) * 100);
+        setStorageUsage({ used, limit, percentage });
+      } else {
+        setStorageUsage({ used: 0, limit: 5 * 1024 * 1024, percentage: 0 });
+      }
+    } catch (err) {
+      setStorageUsage({ used: 0, limit: 5 * 1024 * 1024, percentage: 0 });
+    }
+  };
+
+  // Auto-cleanup storage when it gets too full
+  const autoCleanupStorage = () => {
+    if (storageUsage.percentage > 90) {
+      try {
+        const saved = localStorage.getItem("spawn_reports");
+        if (saved) {
+          const reports = JSON.parse(saved);
+          // Keep only the 25 most recent reports
+          const cleanedReports = reports.slice(0, 25);
+          localStorage.setItem("spawn_reports", JSON.stringify(cleanedReports));
+          setFileReports(cleanedReports);
+          updateStorageUsage();
+          toast.warning(
+            "⚠️ Storage was nearly full. Automatically removed old reports."
+          );
+        }
+      } catch (err) {
+        console.error("Auto-cleanup failed:", err);
+      }
+    }
   };
 
   const sortData = (rows) => {
@@ -291,6 +503,13 @@ export default function UploadArea() {
           📦 Drag and drop .zip files here
         </p>
         <p className="text-sm text-gray-500 mt-1">or click to select files</p>
+        <p className="text-xs text-gray-600 mt-2">
+          ⚠️ Maximum file size: 100MB. Large files may take longer to process.
+        </p>
+        <p className="text-xs text-gray-500 mt-1">
+          💡 Tip: Large files consume more storage. Consider clearing old
+          reports if you encounter issues.
+        </p>
         <input
           id="fileInput"
           type="file"
@@ -305,9 +524,32 @@ export default function UploadArea() {
       </div>
 
       {loading && (
-        <div className="mb-4 flex items-center gap-2 text-blue-400">
-          <Spinner />
-          <span>Parsing files...</span>
+        <div className="mb-4 flex flex-col items-center gap-2 text-blue-400">
+          <div className="flex items-center gap-2">
+            <Spinner />
+            <span>
+              {uploadProgress.total > 1
+                ? `Processing file ${uploadProgress.current} of ${uploadProgress.total}...`
+                : "Parsing file..."}
+            </span>
+          </div>
+          {uploadProgress.fileName && (
+            <div className="text-sm text-gray-400">
+              Current: {uploadProgress.fileName}
+            </div>
+          )}
+          {uploadProgress.total > 1 && (
+            <div className="w-64 bg-gray-700 rounded-full h-2">
+              <div
+                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                style={{
+                  width: `${
+                    (uploadProgress.current / uploadProgress.total) * 100
+                  }%`,
+                }}
+              ></div>
+            </div>
+          )}
         </div>
       )}
 
@@ -390,6 +632,32 @@ export default function UploadArea() {
             >
               <ChevronUp size={16} /> Collapse All
             </button>
+          </div>
+
+          {/* Storage Usage Indicator */}
+          <div className="flex flex-col items-center gap-2 mb-4">
+            <div className="text-sm text-gray-400">
+              Storage Usage:{" "}
+              {Math.round((storageUsage.used / 1024 / 1024) * 100) / 100}MB /{" "}
+              {Math.round((storageUsage.limit / 1024 / 1024) * 100) / 100}MB
+            </div>
+            <div className="w-64 bg-gray-700 rounded-full h-2">
+              <div
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  storageUsage.percentage > 80
+                    ? "bg-red-500"
+                    : storageUsage.percentage > 60
+                    ? "bg-yellow-500"
+                    : "bg-green-500"
+                }`}
+                style={{ width: `${Math.min(storageUsage.percentage, 100)}%` }}
+              ></div>
+            </div>
+            {storageUsage.percentage > 80 && (
+              <div className="text-xs text-yellow-400">
+                ⚠️ Storage nearly full. Consider clearing old reports.
+              </div>
+            )}
           </div>
         </>
       )}
