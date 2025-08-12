@@ -4,15 +4,6 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
-/**
- * Spawn Pool Generator - Updated
- * - Remove "Add" button for conditions; selecting a condition auto-adds it
- * - Bulk-add for list-type conditions is default (comma-separated)
- * - Add presets dropdown + custom presets (presets only serialized if non-empty)
- * - Single default spawn per new file
- * - Persistent localStorage
- */
-
 const STORAGE_KEY = "ct_spawn_files_v2";
 
 const CONTEXTS = ["grounded", "surface", "submerged", "fishing"];
@@ -128,14 +119,23 @@ export default function SpawnPoolGenerator() {
   // custom modal state
   const [modal, setModal] = useState({
     open: false,
-    mode: null, // 'prompt' | 'confirm'
+    mode: null, // 'prompt' | 'confirm' | 'batch-merge'
     title: "",
     message: "",
     placeholder: "",
     defaultValue: "",
+    mergeDetails: null,
     resolve: null,
   });
   const promptInputRef = useRef(null);
+
+  // Import progress state
+  const [importProgress, setImportProgress] = useState({
+    isImporting: false,
+    current: 0,
+    total: 0,
+    message: "",
+  });
 
   // Validation helpers
   const isValidFileIndex = useCallback(
@@ -377,32 +377,87 @@ export default function SpawnPoolGenerator() {
     input.accept = ".json";
     input.multiple = true;
 
-    input.onchange = (e) => {
+    input.onchange = async (e) => {
       const files = Array.from(e.target.files);
       if (!files.length) return;
 
-      files.forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          try {
-            const jsonContent = JSON.parse(event.target.result);
+      // Show loading modal
+      setImportProgress({
+        isImporting: true,
+        current: 0,
+        total: files.length,
+        message: "Starting import...",
+      });
 
-            // Check if it's a valid spawn pool file
-            if (!jsonContent.spawns || !Array.isArray(jsonContent.spawns)) {
-              alert(
-                `Invalid file: ${file.name} - Not a valid spawn pool file. File must contain a 'spawns' array.`
-              );
-              return;
-            }
+      const results = [];
+      let successCount = 0;
+      let errorCount = 0;
+      const mergeCandidates = []; // Track files that could be merged
 
-            if (jsonContent.spawns.length === 0) {
-              alert(
-                `Warning: ${file.name} contains no spawns. This will create an empty file.`
-              );
-            }
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
 
+        // Update progress
+        setImportProgress((prev) => ({
+          ...prev,
+          current: i + 1,
+          message: `Processing ${file.name}...`,
+        }));
+
+        try {
+          const jsonContent = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(JSON.parse(reader.result));
+            reader.onerror = () => reject(new Error("Failed to read file"));
+            reader.readAsText(file);
+          });
+
+          // Check if it's a valid spawn pool file
+          if (!jsonContent.spawns || !Array.isArray(jsonContent.spawns)) {
+            results.push({
+              file: file.name,
+              success: false,
+              error:
+                'Not a valid spawn pool file. File must contain a "spawns" array.',
+            });
+            errorCount++;
+            continue;
+          }
+
+          if (jsonContent.spawns.length === 0) {
+            results.push({
+              file: file.name,
+              success: true,
+              warning: "Empty file (no spawns)",
+              spawnCount: 0,
+            });
+          } else {
+            results.push({
+              file: file.name,
+              success: true,
+              spawnCount: jsonContent.spawns.length,
+            });
+          }
+
+          // Check for existing file with same base name
+          const baseName = file.name.replace(".json", "");
+          const existingFileIndex = fileList.findIndex(
+            (f) => f.name === baseName
+          );
+
+          if (existingFileIndex !== -1) {
+            // Found existing file with same name - offer merge
+            mergeCandidates.push({
+              newFile: {
+                name: baseName,
+                content: jsonContent,
+                originalName: file.name,
+              },
+              existingFileIndex,
+              existingFile: fileList[existingFileIndex],
+            });
+          } else {
             // Generate a unique filename
-            let baseName = file.name.replace(".json", "");
             let newName = baseName;
             let counter = 1;
             while (
@@ -464,25 +519,224 @@ export default function SpawnPoolGenerator() {
               return newList;
             });
 
-            // Show success message
-            if (jsonContent.spawns.length > 0) {
-              alert(
-                `Successfully imported ${file.name} with ${jsonContent.spawns.length} spawn(s)!`
-              );
-            } else {
-              alert(`Successfully imported ${file.name} (empty file).`);
-            }
-          } catch (error) {
-            alert(
-              `Error parsing ${file.name}: ${error.message}\n\nPlease ensure the file contains valid JSON.`
-            );
+            successCount++;
           }
-        };
-        reader.readAsText(file);
+        } catch (error) {
+          results.push({
+            file: file.name,
+            success: false,
+            error: error.message,
+          });
+          errorCount++;
+        }
+      }
+
+      // Hide loading modal
+      setImportProgress({
+        isImporting: false,
+        current: 0,
+        total: 0,
+        message: "",
+      });
+
+      // Handle merge candidates
+      if (mergeCandidates.length > 0) {
+        await handleMergeCandidates(mergeCandidates);
+      }
+
+      // Show simple summary
+      let summaryMessage = `Imported ${successCount} file(s) successfully.`;
+      if (errorCount > 0) {
+        summaryMessage += `\n\n${errorCount} file(s) failed to import.`;
+      }
+      if (mergeCandidates.length > 0) {
+        summaryMessage += `\n\n${mergeCandidates.length} file(s) were merged with existing files.`;
+      }
+
+      await openConfirm({
+        title: "Import Complete",
+        message: summaryMessage,
       });
     };
 
     input.click();
+  }
+
+  async function handleMergeCandidates(mergeCandidates) {
+    if (mergeCandidates.length === 0) return;
+
+    // Create a comprehensive merge summary
+    let mergeSummary = `Found ${mergeCandidates.length} file(s) that can be merged with existing files:\n\n`;
+
+    const mergeDetails = [];
+
+    for (const candidate of mergeCandidates) {
+      const { newFile, existingFileIndex, existingFile } = candidate;
+
+      // Analyze spawns for duplicates and new ones
+      const newSpawns = newFile.content.spawns.map((spawn, index) => {
+        // Parse level string to our level format
+        let levelMode = "single";
+        let levelSingle = 1;
+        let levelRangeMin = 1;
+        let levelRangeMax = 1;
+
+        if (spawn.level) {
+          const levelStr = String(spawn.level);
+          if (levelStr.includes("-")) {
+            const [min, max] = levelStr.split("-").map((n) => parseInt(n) || 1);
+            levelMode = "range";
+            levelRangeMin = min;
+            levelRangeMax = max;
+          } else {
+            levelSingle = parseInt(levelStr) || 1;
+          }
+        }
+
+        return {
+          id: spawn.id || `${newFile.name}-${index + 1}`,
+          pokemon: spawn.pokemon || newFile.name,
+          presets: spawn.presets || [],
+          type: spawn.type || "pokemon",
+          context: spawn.context || "grounded",
+          bucket: spawn.bucket || "common",
+          levelMode,
+          levelSingle,
+          levelRangeMin,
+          levelRangeMax,
+          weight: spawn.weight || 1,
+          condition: spawn.condition || {},
+          lastEdited: Date.now(),
+          uiCollapsed: false,
+        };
+      });
+
+      // Check for duplicates and new spawns
+      const duplicates = [];
+      const newUniqueSpawns = [];
+
+      for (const newSpawn of newSpawns) {
+        const duplicateIndex = existingFile.spawns.findIndex((existingSpawn) =>
+          isSpawnDuplicate(existingSpawn, newSpawn)
+        );
+
+        if (duplicateIndex !== -1) {
+          duplicates.push({
+            newSpawn,
+            existingSpawn: existingFile.spawns[duplicateIndex],
+            existingIndex: duplicateIndex,
+          });
+        } else {
+          newUniqueSpawns.push(newSpawn);
+        }
+      }
+
+      mergeDetails.push({
+        candidate,
+        duplicates,
+        newUniqueSpawns,
+        totalNew: newSpawns.length,
+        totalExisting: existingFile.spawns.length,
+      });
+
+      mergeSummary += `• ${newFile.originalName} → ${newFile.name}.json\n`;
+      mergeSummary += `  - ${newUniqueSpawns.length} new spawn(s)\n`;
+      mergeSummary += `  - ${duplicates.length} duplicate(s) found\n`;
+    }
+
+    // Show batch merge options
+    const mergeAction = await openBatchMergeDialog(mergeSummary, mergeDetails);
+
+    if (mergeAction === "cancel") return;
+
+    // Process the merge based on user choice
+    for (const detail of mergeDetails) {
+      const { candidate, duplicates, newUniqueSpawns } = detail;
+      const { existingFileIndex, existingFile } = candidate;
+
+      let finalSpawns = [...existingFile.spawns];
+
+      // Add new unique spawns
+      finalSpawns.push(...newUniqueSpawns);
+
+      // Handle duplicates based on user choice
+      if (mergeAction === "update-duplicates") {
+        // Replace existing spawns with new ones
+        for (const duplicate of duplicates) {
+          finalSpawns[duplicate.existingIndex] = duplicate.newSpawn;
+        }
+      } else if (mergeAction === "skip-duplicates") {
+        // Keep existing spawns, skip new duplicates
+        // (already handled by not adding them)
+      } else if (mergeAction === "replace-all") {
+        // Replace all spawns with new ones
+        finalSpawns = [
+          ...newUniqueSpawns,
+          ...duplicates.map((d) => d.newSpawn),
+        ];
+      }
+
+      // Update the existing file
+      setFileList((prev) => {
+        const fileListCopy = JSON.parse(JSON.stringify(prev));
+        fileListCopy[existingFileIndex] = {
+          ...fileListCopy[existingFileIndex],
+          spawns: finalSpawns,
+          lastEdited: Date.now(),
+        };
+        setActiveFileIndex(existingFileIndex);
+        return fileListCopy;
+      });
+    }
+  }
+
+  async function openBatchMergeDialog(summary, mergeDetails) {
+    return new Promise((resolve) => {
+      setModal({
+        open: true,
+        mode: "batch-merge",
+        title: "Merge Files",
+        message: summary,
+        mergeDetails,
+        resolve,
+      });
+    });
+  }
+
+  function isSpawnDuplicate(spawn1, spawn2) {
+    // Check if two spawns are essentially the same
+    // Compare key properties that would make them duplicates
+
+    // Basic properties
+    if (spawn1.pokemon !== spawn2.pokemon) return false;
+    if (spawn1.context !== spawn2.context) return false;
+    if (spawn1.bucket !== spawn2.bucket) return false;
+
+    // Level comparison
+    const level1 =
+      spawn1.levelMode === "single"
+        ? spawn1.levelSingle
+        : `${spawn1.levelRangeMin}-${spawn1.levelRangeMax}`;
+    const level2 =
+      spawn2.levelMode === "single"
+        ? spawn2.levelSingle
+        : `${spawn2.levelRangeMin}-${spawn2.levelRangeMax}`;
+    if (level1 !== level2) return false;
+
+    // Weight comparison (with small tolerance for floating point)
+    if (Math.abs(spawn1.weight - spawn2.weight) > 0.01) return false;
+
+    // Presets comparison
+    const presets1 = (spawn1.presets || []).sort();
+    const presets2 = (spawn2.presets || []).sort();
+    if (JSON.stringify(presets1) !== JSON.stringify(presets2)) return false;
+
+    // Condition comparison (simplified - could be more sophisticated)
+    const condition1 = JSON.stringify(spawn1.condition || {});
+    const condition2 = JSON.stringify(spawn2.condition || {});
+    if (condition1 !== condition2) return false;
+
+    return true;
   }
 
   function selectFile(i) {
@@ -842,6 +1096,17 @@ export default function SpawnPoolGenerator() {
       return;
     }
     const zip = new JSZip();
+
+    // Add pack.mcmeta at root level
+    const packMcmeta = {
+      pack: {
+        pack_format: 34,
+        description: "Made with CobbleToolkit Spawn Pool Generator by maru",
+      },
+    };
+    zip.file("pack.mcmeta", JSON.stringify(packMcmeta, null, 2));
+
+    // Add spawn pool files in data/cobblemon/spawn_pool_world/
     const base = zip
       .folder("data")
       .folder("cobblemon")
@@ -2183,6 +2448,47 @@ export default function SpawnPoolGenerator() {
         </div>
       </div>
 
+      {/* Loading Modal for Import Progress */}
+      {importProgress.isImporting && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60" />
+          <div className="relative z-[101] w-full max-w-md mx-4 rounded-lg bg-[#1f1f23] border border-[#2c2f3d] shadow-xl">
+            <div className="px-4 py-3 border-b border-[#2c2f3d]">
+              <div className="text-base font-semibold">Importing Files...</div>
+            </div>
+            <div className="p-6">
+              <div className="text-center mb-4">
+                <div className="text-sm text-gray-300 mb-2">
+                  {importProgress.message}
+                </div>
+                <div className="text-xs text-gray-400">
+                  {importProgress.current} of {importProgress.total} files
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="w-full bg-gray-700 rounded-full h-2 mb-4">
+                <div
+                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  style={{
+                    width: `${
+                      (importProgress.current / importProgress.total) * 100
+                    }%`,
+                  }}
+                />
+              </div>
+
+              <div className="text-center">
+                <div className="text-xs text-gray-400">
+                  Please wait while files are being processed...
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Modal */}
       {modal.open && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center">
           <div
@@ -2192,14 +2498,16 @@ export default function SpawnPoolGenerator() {
               closeModal();
             }}
           />
-          <div className="relative z-[101] w-full max-w-md mx-4 rounded-lg bg-[#1f1f23] border border-[#2c2f3d] shadow-xl">
+          <div className="relative z-[101] w-full max-w-2xl mx-4 rounded-lg bg-[#1f1f23] border border-[#2c2f3d] shadow-xl">
             <div className="px-4 py-3 border-b border-[#2c2f3d]">
               <div className="text-base font-semibold">{modal.title}</div>
-              {modal.message && (
-                <div className="text-sm text-gray-300 mt-1">
-                  {modal.message}
-                </div>
-              )}
+              {modal.message &&
+                modal.mode !== "confirm" &&
+                modal.mode !== "batch-merge" && (
+                  <div className="text-sm text-gray-300 mt-1 max-h-32 overflow-y-auto">
+                    {modal.message}
+                  </div>
+                )}
             </div>
             <div className="p-4">
               {modal.mode === "prompt" && (
@@ -2217,6 +2525,66 @@ export default function SpawnPoolGenerator() {
                     }
                   }}
                 />
+              )}
+              {modal.mode === "confirm" && (
+                <div className="text-sm text-gray-300 max-h-64 overflow-y-auto">
+                  {modal.message}
+                </div>
+              )}
+              {modal.mode === "batch-merge" && (
+                <div className="space-y-4">
+                  <div className="text-sm text-gray-300 max-h-48 overflow-y-auto">
+                    {modal.message}
+                  </div>
+
+                  <div className="border-t border-[#2c2f3d] pt-4">
+                    <div className="text-sm font-medium mb-3">
+                      How would you like to handle duplicates?
+                    </div>
+
+                    <div className="space-y-2 text-sm">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="merge-option"
+                          value="skip-duplicates"
+                          defaultChecked
+                          className="text-blue-600"
+                        />
+                        <span className="text-gray-300">
+                          <strong>Skip duplicates</strong> - Keep existing
+                          spawns, ignore new duplicates
+                        </span>
+                      </label>
+
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="merge-option"
+                          value="update-duplicates"
+                          className="text-blue-600"
+                        />
+                        <span className="text-gray-300">
+                          <strong>Update duplicates</strong> - Replace existing
+                          spawns with new versions
+                        </span>
+                      </label>
+
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="merge-option"
+                          value="replace-all"
+                          className="text-blue-600"
+                        />
+                        <span className="text-gray-300">
+                          <strong>Replace all</strong> - Replace all spawns with
+                          new ones (keeps unique + duplicates)
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
             <div className="px-4 py-3 border-t border-[#2c2f3d] flex justify-end gap-2">
@@ -2238,12 +2606,22 @@ export default function SpawnPoolGenerator() {
                     modal.resolve && modal.resolve(val);
                   } else if (modal.mode === "confirm") {
                     modal.resolve && modal.resolve(true);
+                  } else if (modal.mode === "batch-merge") {
+                    const selectedOption = document.querySelector(
+                      'input[name="merge-option"]:checked'
+                    )?.value;
+                    modal.resolve &&
+                      modal.resolve(selectedOption || "skip-duplicates");
                   }
                   closeModal();
                 }}
                 className="px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white"
               >
-                {modal.mode === "prompt" ? "OK" : "Confirm"}
+                {modal.mode === "prompt"
+                  ? "OK"
+                  : modal.mode === "batch-merge"
+                  ? "Merge Files"
+                  : "Confirm"}
               </button>
             </div>
           </div>
