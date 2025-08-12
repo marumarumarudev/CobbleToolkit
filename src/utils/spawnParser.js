@@ -1,9 +1,6 @@
 import JSZip from "jszip";
 
-/**
- * Parses a Cobblemon spawn .zip file and returns Pokémon spawn data.
- * Uses a memory-efficient approach for Chrome compatibility.
- */
+
 export async function parseCobblemonZip(file) {
   // Add timeout protection for Chrome
   const timeoutPromise = new Promise((_, reject) => {
@@ -195,6 +192,9 @@ export async function parseCobblemonZip(file) {
                     level: String(entry.level ?? ""),
                     weight: String(entry.weight ?? ""),
                     context: String(entry.context || "none"),
+                    presets: Array.isArray(entry.presets)
+                      ? entry.presets.join(", ")
+                      : "",
                     biomes: Array.isArray(condition.biomes)
                       ? condition.biomes.join(", ")
                       : "",

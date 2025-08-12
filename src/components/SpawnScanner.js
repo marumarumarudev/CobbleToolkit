@@ -130,6 +130,7 @@ export default function UploadArea() {
     { key: "level", label: "Level", sortable: true },
     { key: "weight", label: "Weight", sortable: true },
     { key: "context", label: "Context", sortable: true },
+    { key: "presets", label: "Presets", sortable: true },
     { key: "biomes", label: "Biomes", sortable: true },
     { key: "dimensions", label: "Dimensions", sortable: true },
     { key: "canSeeSky", label: "Can See Sky", sortable: true },
@@ -185,6 +186,7 @@ export default function UploadArea() {
         r.level,
         r.weight,
         r.context,
+        r.presets,
         r.biomes,
         r.dimensions,
         r.structures,
@@ -661,6 +663,8 @@ export default function UploadArea() {
               <option value="bucket">Rarity</option>
               <option value="level">Level</option>
               <option value="weight">Weight</option>
+              <option value="context">Context</option>
+              <option value="presets">Presets</option>
               <option value="biomes">Biomes</option>
               <option value="dimensions">Dimensions</option>
               <option value="canSeeSky">Can See Sky</option>
