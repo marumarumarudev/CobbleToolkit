@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
@@ -137,6 +137,48 @@ export default function SpawnPoolGenerator() {
   });
   const promptInputRef = useRef(null);
 
+  // Validation helpers
+  const isValidFileIndex = useCallback(
+    (index) => {
+      return index !== null && index >= 0 && index < fileList.length;
+    },
+    [fileList.length]
+  );
+
+  const isValidSpawnIndex = useCallback(
+    (fileIndex, spawnIndex) => {
+      return (
+        isValidFileIndex(fileIndex) &&
+        spawnIndex >= 0 &&
+        spawnIndex < fileList[fileIndex]?.spawns?.length
+      );
+    },
+    [isValidFileIndex, fileList]
+  );
+
+  // Sync JSON editor when file changes
+  useEffect(() => {
+    if (previewEditMode && isValidFileIndex(activeFileIndex)) {
+      const currentJson = buildJsonForFile(fileList[activeFileIndex]);
+      setPreviewEditContent(JSON.stringify(currentJson, null, 2));
+    }
+  }, [fileList, activeFileIndex, previewEditMode, isValidFileIndex]);
+
+  // Escape key handler for modals
+  useEffect(() => {
+    function handleEscape(e) {
+      if (e.key === "Escape" && modal.open) {
+        modal.resolve && modal.resolve(null);
+        closeModal();
+      }
+    }
+
+    if (modal.open) {
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
+    }
+  }, [modal]);
+
   function openPrompt({ title, message, placeholder, defaultValue = "" }) {
     return new Promise((resolve) => {
       setModal({
@@ -227,12 +269,18 @@ export default function SpawnPoolGenerator() {
   }
 
   function removeFile(index) {
+    if (!isValidFileIndex(index)) {
+      console.error("Invalid file index:", index);
+      return;
+    }
+
     (async () => {
       const ok = await openConfirm({
         title: "Delete File",
-        message: "Delete this file?",
+        message: `Are you sure you want to delete "${fileList[index]?.name}.json"? This action cannot be undone.`,
       });
       if (!ok) return;
+
       setFileList((prev) => {
         const copy = [...prev];
         copy.splice(index, 1);
@@ -247,6 +295,11 @@ export default function SpawnPoolGenerator() {
   }
 
   function renameFile(index) {
+    if (!isValidFileIndex(index)) {
+      console.error("Invalid file index:", index);
+      return;
+    }
+
     (async () => {
       const current = fileList[index]?.name || "";
       const raw = await openPrompt({
@@ -256,14 +309,15 @@ export default function SpawnPoolGenerator() {
       });
       if (!raw) return;
       const name = String(raw).trim();
-      if (!name) return;
+      if (!name) return alert("Filename cannot be empty.");
       if (
         fileList.some(
           (f, i) => f.name.toLowerCase() === name.toLowerCase() && i !== index
         )
       ) {
-        return alert("Name already used.");
+        return alert(`A file named "${name}.json" already exists.`);
       }
+
       setFileList((prev) => {
         const copy = [...prev];
         const oldName = copy[index].name;
@@ -280,6 +334,11 @@ export default function SpawnPoolGenerator() {
   }
 
   function duplicateFile(index) {
+    if (!isValidFileIndex(index)) {
+      console.error("Invalid file index:", index);
+      return;
+    }
+
     const originalFile = fileList[index];
     if (!originalFile) return;
 
@@ -330,8 +389,16 @@ export default function SpawnPoolGenerator() {
 
             // Check if it's a valid spawn pool file
             if (!jsonContent.spawns || !Array.isArray(jsonContent.spawns)) {
-              alert(`Invalid file: ${file.name} - Not a valid spawn pool file`);
+              alert(
+                `Invalid file: ${file.name} - Not a valid spawn pool file. File must contain a 'spawns' array.`
+              );
               return;
+            }
+
+            if (jsonContent.spawns.length === 0) {
+              alert(
+                `Warning: ${file.name} contains no spawns. This will create an empty file.`
+              );
             }
 
             // Generate a unique filename
@@ -396,8 +463,19 @@ export default function SpawnPoolGenerator() {
               setActiveFileIndex(newList.length - 1);
               return newList;
             });
+
+            // Show success message
+            if (jsonContent.spawns.length > 0) {
+              alert(
+                `Successfully imported ${file.name} with ${jsonContent.spawns.length} spawn(s)!`
+              );
+            } else {
+              alert(`Successfully imported ${file.name} (empty file).`);
+            }
           } catch (error) {
-            alert(`Error parsing ${file.name}: ${error.message}`);
+            alert(
+              `Error parsing ${file.name}: ${error.message}\n\nPlease ensure the file contains valid JSON.`
+            );
           }
         };
         reader.readAsText(file);
@@ -413,6 +491,11 @@ export default function SpawnPoolGenerator() {
 
   // SPAWN ENTRY MANAGEMENT
   function addSpawnToFile(fileIndex) {
+    if (!isValidFileIndex(fileIndex)) {
+      console.error("Invalid file index:", fileIndex);
+      return;
+    }
+
     setFileList((prev) => {
       const copy = JSON.parse(JSON.stringify(prev));
       copy[fileIndex].spawns.push(emptySpawn(copy[fileIndex].name));
@@ -422,12 +505,21 @@ export default function SpawnPoolGenerator() {
   }
 
   function removeSpawn(fileIndex, spawnIndex) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
     (async () => {
+      const spawnName =
+        fileList[fileIndex]?.spawns[spawnIndex]?.pokemon ||
+        `spawn #${spawnIndex + 1}`;
       const ok = await openConfirm({
         title: "Delete Spawn",
-        message: "Delete this spawn?",
+        message: `Are you sure you want to delete "${spawnName}"? This action cannot be undone.`,
       });
       if (!ok) return;
+
       setFileList((prev) => {
         const copy = JSON.parse(JSON.stringify(prev));
         copy[fileIndex].spawns.splice(spawnIndex, 1);
@@ -438,6 +530,11 @@ export default function SpawnPoolGenerator() {
   }
 
   function duplicateSpawn(fileIndex, spawnIndex) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
     setFileList((prev) => {
       const copy = JSON.parse(JSON.stringify(prev));
       const spawn = JSON.parse(
@@ -451,6 +548,11 @@ export default function SpawnPoolGenerator() {
   }
 
   function updateSpawnField(fileIndex, spawnIndex, field, value) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
     setFileList((prev) => {
       const copy = JSON.parse(JSON.stringify(prev));
       copy[fileIndex].spawns[spawnIndex][field] = value;
@@ -460,6 +562,11 @@ export default function SpawnPoolGenerator() {
   }
 
   function toggleSpawnCollapsed(fileIndex, spawnIndex) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
     setFileList((prev) => {
       const copy = JSON.parse(JSON.stringify(prev));
       const spawn = copy[fileIndex]?.spawns?.[spawnIndex];
@@ -472,6 +579,11 @@ export default function SpawnPoolGenerator() {
   }
 
   function setAllSpawnsCollapsed(fileIndex, collapsed) {
+    if (!isValidFileIndex(fileIndex)) {
+      console.error("Invalid file index:", fileIndex);
+      return;
+    }
+
     setFileList((prev) => {
       const copy = JSON.parse(JSON.stringify(prev));
       const spawns = copy[fileIndex]?.spawns || [];
@@ -492,6 +604,11 @@ export default function SpawnPoolGenerator() {
 
   // CONDITION MANAGEMENT
   function addConditionKey(fileIndex, spawnIndex, key) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
     setFileList((prev) => {
       const copy = JSON.parse(JSON.stringify(prev));
       const cond = copy[fileIndex].spawns[spawnIndex].condition || {};
@@ -512,6 +629,11 @@ export default function SpawnPoolGenerator() {
   }
 
   function removeConditionKey(fileIndex, spawnIndex, key) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
     setFileList((prev) => {
       const copy = JSON.parse(JSON.stringify(prev));
       const cond = copy[fileIndex].spawns[spawnIndex].condition || {};
@@ -524,6 +646,11 @@ export default function SpawnPoolGenerator() {
 
   // Bulk-add for list-type: COMMA-separated (dedupe)
   function addConditionListItems(fileIndex, spawnIndex, key) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
     (async () => {
       const raw = await openPrompt({
         title: "Add",
@@ -556,6 +683,11 @@ export default function SpawnPoolGenerator() {
   }
 
   function removeConditionListItem(fileIndex, spawnIndex, key, idx) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
     setFileList((prev) => {
       const copy = JSON.parse(JSON.stringify(prev));
       const cond = copy[fileIndex].spawns[spawnIndex].condition || {};
@@ -567,6 +699,11 @@ export default function SpawnPoolGenerator() {
   }
 
   function setConditionValue(fileIndex, spawnIndex, key, value) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
     setFileList((prev) => {
       const copy = JSON.parse(JSON.stringify(prev));
       const cond = copy[fileIndex].spawns[spawnIndex].condition || {};
@@ -579,6 +716,11 @@ export default function SpawnPoolGenerator() {
 
   // ---------- PRESETS management ----------
   function addPresetsBulkToSpawn(fileIndex, spawnIndex) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
     (async () => {
       const raw = await openPrompt({
         title: "Bulk Add Presets",
@@ -591,6 +733,7 @@ export default function SpawnPoolGenerator() {
         .map((s) => s.trim())
         .filter(Boolean);
       if (!items.length) return;
+
       setFileList((prev) => {
         const copy = JSON.parse(JSON.stringify(prev));
         const s = copy[fileIndex].spawns[spawnIndex];
@@ -609,7 +752,12 @@ export default function SpawnPoolGenerator() {
   }
 
   function addPresetToSpawn(fileIndex, spawnIndex, preset) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
     if (!preset) return;
+
     setFileList((prev) => {
       const copy = JSON.parse(JSON.stringify(prev));
       const s = copy[fileIndex].spawns[spawnIndex];
@@ -621,6 +769,11 @@ export default function SpawnPoolGenerator() {
   }
 
   function removePresetFromSpawn(fileIndex, spawnIndex, idx) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
     setFileList((prev) => {
       const copy = JSON.parse(JSON.stringify(prev));
       const s = copy[fileIndex].spawns[spawnIndex];
@@ -702,12 +855,48 @@ export default function SpawnPoolGenerator() {
   }
 
   function updateFileFromJson(jsonString) {
+    if (!isValidFileIndex(activeFileIndex)) {
+      alert("No valid file selected for editing.");
+      return false;
+    }
+
     try {
       const parsed = JSON.parse(jsonString);
 
       // Validate the structure
       if (!parsed.spawns || !Array.isArray(parsed.spawns)) {
         throw new Error("Invalid structure: missing or invalid 'spawns' array");
+      }
+
+      if (parsed.spawns.length === 0) {
+        throw new Error("Spawns array cannot be empty");
+      }
+
+      // Validate each spawn has required fields
+      for (let i = 0; i < parsed.spawns.length; i++) {
+        const spawn = parsed.spawns[i];
+        if (!spawn.pokemon) {
+          throw new Error(
+            `Spawn at index ${i} is missing required 'pokemon' field`
+          );
+        }
+        if (
+          spawn.weight !== undefined &&
+          (isNaN(spawn.weight) || spawn.weight < 0)
+        ) {
+          throw new Error(
+            `Spawn at index ${i} has invalid weight: ${spawn.weight}. Weight must be a non-negative number.`
+          );
+        }
+        if (
+          spawn.level &&
+          typeof spawn.level !== "string" &&
+          typeof spawn.level !== "number"
+        ) {
+          throw new Error(
+            `Spawn at index ${i} has invalid level: ${spawn.level}. Level must be a string or number.`
+          );
+        }
       }
 
       // Convert external format to internal format
@@ -765,14 +954,23 @@ export default function SpawnPoolGenerator() {
         return copy;
       });
 
+      // Show success message
+      alert(`Successfully updated file with ${updatedSpawns.length} spawn(s)!`);
       return true;
     } catch (error) {
-      alert(`Invalid JSON: ${error.message}`);
+      alert(
+        `Invalid JSON: ${error.message}\n\nPlease check your syntax and try again.`
+      );
       return false;
     }
   }
 
   function togglePreviewEditMode() {
+    if (!isValidFileIndex(activeFileIndex)) {
+      alert("No valid file selected for editing.");
+      return;
+    }
+
     if (!previewEditMode) {
       // Entering edit mode - populate with current JSON
       const currentJson = buildJsonForFile(fileList[activeFileIndex]);
@@ -795,6 +993,11 @@ export default function SpawnPoolGenerator() {
 
   // Condition editor renderer
   function renderConditionEditor(fileIndex, spawnIndex) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return null;
+    }
+
     const spawn = fileList[fileIndex].spawns[spawnIndex];
     const condition = spawn.condition || {};
 
@@ -1117,7 +1320,7 @@ export default function SpawnPoolGenerator() {
                 onClick={async () => {
                   const ok = await openConfirm({
                     title: "Clear All",
-                    message: "Clear all saved files?",
+                    message: `Are you sure you want to clear all ${fileList.length} saved files? This action cannot be undone and all your work will be lost.`,
                   });
                   if (!ok) return;
                   setFileList([]);

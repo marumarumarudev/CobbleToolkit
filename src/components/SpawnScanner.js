@@ -23,6 +23,8 @@ export default function UploadArea() {
     limit: 0,
     percentage: 0,
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 50;
 
   useEffect(() => {
     try {
@@ -92,7 +94,8 @@ export default function UploadArea() {
 
   useEffect(() => {
     if (prevSearch.current !== "" && searchTerm === "") {
-      setFileReports((prev) => prev.map((r) => ({ ...r, expanded: false })));
+      // Reset search state when clearing search
+      setCurrentPage(1);
     }
     prevSearch.current = searchTerm;
   }, [searchTerm]);
@@ -138,7 +141,125 @@ export default function UploadArea() {
     { key: "lightLevel", label: "Light Level", sortable: true },
     { key: "antiBiomes", label: "Anti-Biomes", sortable: false },
     { key: "antiStructures", label: "Anti-Structures", sortable: false },
+    { key: "sourceFile", label: "Source File", sortable: true },
   ];
+
+  // Get rarity color
+  const getRarityColor = (bucket) => {
+    switch (bucket) {
+      case "common":
+        return "bg-green-500/20 text-green-300 border-green-500/30";
+      case "uncommon":
+        return "bg-blue-500/20 text-blue-300 border-blue-500/30";
+      case "rare":
+        return "bg-purple-500/20 text-purple-300 border-purple-500/30";
+      case "ultra-rare":
+        return "bg-orange-500/20 text-orange-300 border-orange-500/30";
+      default:
+        return "bg-gray-500/20 text-gray-300 border-gray-500/30";
+    }
+  };
+
+  // Combine all spawn data from all files
+  const allSpawnData = fileReports
+    .filter((r) => !r.error)
+    .flatMap((r) =>
+      r.data.map((d) => ({
+        ...d,
+        sourceFile: r.name,
+      }))
+    );
+
+  // Filter and search the combined data
+  const filteredData = allSpawnData.filter((r) => {
+    const matchesContext =
+      contextFilter === "all" || r.context === contextFilter;
+
+    if (!matchesContext) return false;
+    if (!searchTerm) return true;
+
+    if (searchField === "all") {
+      return [
+        r.pokemon,
+        r.bucket,
+        r.level,
+        r.weight,
+        r.context,
+        r.biomes,
+        r.dimensions,
+        r.structures,
+        r.canSeeSky?.toString(),
+        r.isRaining?.toString(),
+        r.moonPhase,
+        r.neededNearbyBlocks,
+        r.timeRange,
+        r.lightLevel,
+        r.antiBiomes,
+        r.antiStructures,
+        r.sourceFile,
+      ]
+        .filter(Boolean)
+        .some(
+          (value) =>
+            typeof value === "string" &&
+            value.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    } else {
+      const value = r[searchField];
+      return (
+        value &&
+        value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+  });
+
+  // Sort the filtered data
+  const sortedData = [...filteredData].sort((a, b) => {
+    const { column, direction } = sort;
+    let valA = a[column] ?? "";
+    let valB = b[column] ?? "";
+
+    if (column === "bucket") {
+      valA = rarityOrder[valA] ?? 99;
+      valB = rarityOrder[valB] ?? 99;
+    }
+
+    if (valA < valB) return direction === "asc" ? -1 : 1;
+    if (valA > valB) return direction === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  // Paginate the sorted data
+  const paginatedData = sortedData.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
+  // Get visible columns based on available data
+  const visibleColumns = TABLE_COLUMNS.filter(({ key }) =>
+    filteredData.some((d) => {
+      const value = d[key];
+      return Array.isArray(value)
+        ? value.length > 0
+        : typeof value === "boolean"
+        ? true
+        : value !== null && value !== undefined && value !== "";
+    })
+  );
+
+  const toggleSort = (column) => {
+    setSort((prev) => ({
+      column,
+      direction:
+        prev.column === column && prev.direction === "asc" ? "desc" : "asc",
+    }));
+    setCurrentPage(1); // Reset to first page when sorting
+  };
+
+  // Reset to first page when search or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, contextFilter, searchField]);
 
   const handleFiles = async (files) => {
     if (loading) {
@@ -147,7 +268,7 @@ export default function UploadArea() {
     }
 
     // Check file sizes before processing
-    const maxFileSize = 100 * 1024 * 1024; // 100MB limit
+    const maxFileSize = 150 * 1024 * 1024; // 150MB limit
     const oversizedFiles = files.filter((f) => f.size > maxFileSize);
 
     if (oversizedFiles.length > 0) {
@@ -211,9 +332,6 @@ export default function UploadArea() {
             name: file.name,
             data: parsed,
             error: hasData ? null : "No valid spawn data found.",
-            expanded: !isBulk && hasData,
-            searchTerm: "",
-            showAll: false,
           });
 
           // Small delay to allow garbage collection between files
@@ -245,7 +363,6 @@ export default function UploadArea() {
             name: file.name,
             data: [],
             error: message,
-            expanded: false,
           });
         }
       }
@@ -427,36 +544,6 @@ export default function UploadArea() {
     }
   };
 
-  const sortData = (rows) => {
-    const { column, direction } = sort;
-    return [...rows].sort((a, b) => {
-      let valA = a[column] ?? "";
-      let valB = b[column] ?? "";
-
-      if (column === "bucket") {
-        valA = rarityOrder[valA] ?? 99;
-        valB = rarityOrder[valB] ?? 99;
-      }
-
-      if (valA < valB) return direction === "asc" ? -1 : 1;
-      if (valA > valB) return direction === "asc" ? 1 : -1;
-      return 0;
-    });
-  };
-
-  const toggleSort = (column) => {
-    setSort((prev) => ({
-      column,
-      direction:
-        prev.column === column && prev.direction === "asc" ? "desc" : "asc",
-    }));
-  };
-
-  const sortedReports = [
-    ...fileReports.filter((r) => !r.error),
-    ...fileReports.filter((r) => r.error),
-  ];
-
   return (
     <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-8 flex flex-col items-center">
       <header className="text-center mb-10">
@@ -504,7 +591,7 @@ export default function UploadArea() {
         </p>
         <p className="text-sm text-gray-500 mt-1">or click to select files</p>
         <p className="text-xs text-gray-600 mt-2">
-          ⚠️ Maximum file size: 100MB. Large files may take longer to process.
+          ⚠️ Maximum file size: 150MB. Large files may take longer to process.
         </p>
         <p className="text-xs text-gray-500 mt-1">
           💡 Tip: Large files consume more storage. Consider clearing old
@@ -612,26 +699,6 @@ export default function UploadArea() {
             >
               <X size={16} /> Clear All
             </button>
-            <button
-              className="flex items-center gap-2 px-4 py-2 bg-green-700 rounded hover:bg-green-800 transition"
-              onClick={() =>
-                setFileReports((prev) =>
-                  prev.map((r) => ({ ...r, expanded: true }))
-                )
-              }
-            >
-              <ChevronDown size={16} /> Expand All
-            </button>
-            <button
-              className="flex items-center gap-2 px-4 py-2 bg-gray-600 rounded hover:bg-gray-700 transition"
-              onClick={() =>
-                setFileReports((prev) =>
-                  prev.map((r) => ({ ...r, expanded: false }))
-                )
-              }
-            >
-              <ChevronUp size={16} /> Collapse All
-            </button>
           </div>
 
           {/* Storage Usage Indicator */}
@@ -659,287 +726,154 @@ export default function UploadArea() {
               </div>
             )}
           </div>
+
+          {/* Results Summary */}
+          <div className="text-center mb-4 text-gray-300">
+            Showing {filteredData.length} spawn entries from{" "}
+            {fileReports.filter((r) => !r.error).length} files
+            {searchTerm && (
+              <span className="text-blue-400">
+                {" "}
+                • {filteredData.length} matches for &ldquo;{searchTerm}&rdquo;
+              </span>
+            )}
+          </div>
         </>
       )}
 
-      <div className="w-full max-w-6xl mx-auto space-y-4">
-        {sortedReports.map((report) => {
-          const isLong = report.data.length > 10;
-          const displayCount =
-            report.expanded && report.showAll ? report.data.length : 10;
-          const term = searchTerm.toLowerCase();
+      {/* Unified Spawn Data Table */}
+      {filteredData.length > 0 && (
+        <div className="w-full max-w-7xl mx-auto">
+          <div className="overflow-hidden rounded-lg border border-gray-700/50 bg-[#2a2a2a]">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gradient-to-r from-gray-800/50 to-gray-700/50">
+                    {visibleColumns.map(({ key, label, sortable }) => (
+                      <th
+                        key={key}
+                        onClick={sortable ? () => toggleSort(key) : undefined}
+                        className={`p-3 text-left font-medium text-gray-300 border-b border-gray-700/50 ${
+                          sortable
+                            ? "cursor-pointer hover:bg-gray-700/30 transition-colors duration-200"
+                            : ""
+                        } group`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span>{label}</span>
+                          {sort.column === key ? (
+                            sort.direction === "asc" ? (
+                              <ChevronUp size={14} className="text-blue-400" />
+                            ) : (
+                              <ChevronDown
+                                size={14}
+                                className="text-blue-400"
+                              />
+                            )
+                          ) : sortable ? (
+                            <ChevronsUpDown
+                              size={14}
+                              className="text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                            />
+                          ) : null}
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-700/30">
+                  {paginatedData.map((spawn, idx) => (
+                    <tr
+                      key={`${spawn.pokemon}-${spawn.sourceFile}-${idx}`}
+                      className="bg-gray-800/20 hover:bg-gray-700/30 transition-colors duration-150"
+                    >
+                      {visibleColumns.map(({ key }) => {
+                        const value = spawn[key];
+                        const isArray = Array.isArray(value);
+                        const isRarity = key === "bucket";
 
-          const matches = (value) =>
-            typeof value === "string" && value.toLowerCase().includes(term);
-
-          const filteredData = report.data.filter((r) => {
-            const matchesContext =
-              contextFilter === "all" || r.context === contextFilter;
-
-            if (!matchesContext) return false;
-            if (!term) return true;
-
-            if (searchField === "all") {
-              return [
-                r.pokemon,
-                r.bucket,
-                r.level,
-                r.weight,
-                r.context,
-                r.biomes,
-                r.dimensions,
-                r.structures,
-                r.canSeeSky?.toString(),
-                r.isRaining?.toString(),
-                r.moonPhase,
-                r.neededNearbyBlocks,
-                r.timeRange,
-                r.lightLevel,
-                r.antiBiomes,
-                r.antiStructures,
-              ]
-                .filter(Boolean)
-                .some(matches);
-            } else {
-              const value = r[searchField];
-              return value && matches(value.toString());
-            }
-          });
-
-          const visibleColumns = TABLE_COLUMNS.filter(({ key }) =>
-            filteredData.some((d) => {
-              const value = d[key];
-              return Array.isArray(value)
-                ? value.length > 0
-                : typeof value === "boolean"
-                ? true
-                : value !== null && value !== undefined && value !== "";
-            })
-          );
-
-          if (filteredData.length === 0) return null;
-          return (
-            <div
-              key={report.id}
-              className="bg-[#2a2a2a] p-4 rounded-lg shadow-md w-full overflow-hidden"
-            >
-              <details
-                open={searchTerm ? true : report.expanded}
-                onToggle={(e) => {
-                  const open = e.target.open;
-                  setFileReports((prev) =>
-                    prev.map((r) =>
-                      r.id === report.id
-                        ? { ...r, expanded: open, showAll: false }
-                        : r
-                    )
-                  );
-                }}
-              >
-                <summary className="cursor-pointer flex justify-between items-center text-lg font-medium w-full truncate">
-                  <span className="break-all truncate block max-w-full">
-                    {report.name}
-                    {!report.expanded && (
-                      <span className="text-sm text-gray-400 ml-2">
-                        {report.error
-                          ? report.error === "No valid spawn data found."
-                            ? "— no spawn_pool_folder"
-                            : `— ${report.error}`
-                          : `— ${report.data.length} entries`}
-                      </span>
-                    )}
-                  </span>
-                  <button
-                    className="text-gray-400 hover:text-red-500 ml-4"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setFileReports((prev) =>
-                        prev.filter((r) => r.id !== report.id)
-                      );
-                    }}
-                  >
-                    <X size={18} />
-                  </button>
-                </summary>
-
-                {report.error ? (
-                  <p className="text-red-400 mt-2">❌ {report.error}</p>
-                ) : (
-                  <>
-                    {searchTerm && (
-                      <p className="ml-4 mt-2 text-gray-400 text-sm">
-                        Showing {filteredData.length} matched entr
-                        {filteredData.length === 1 ? "y" : "ies"}.
-                      </p>
-                    )}
-
-                    <div className="mt-4">
-                      {/* Desktop Table */}
-                      <div className="hidden md:block overflow-x-auto">
-                        <table className="w-full text-sm table-auto border-collapse min-w-[900px]">
-                          <thead>
-                            <tr>
-                              {visibleColumns.map(
-                                ({ key, label, sortable }) => (
-                                  <th
-                                    key={key}
-                                    onClick={
-                                      sortable
-                                        ? () => toggleSort(key)
-                                        : undefined
-                                    }
-                                    className={`p-2 border ${
-                                      sortable
-                                        ? "cursor-pointer hover:bg-[#333]"
-                                        : ""
-                                    } group`}
+                        return (
+                          <td key={key} className="p-3">
+                            {isRarity ? (
+                              <span
+                                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getRarityColor(
+                                  value
+                                )}`}
+                              >
+                                {value}
+                              </span>
+                            ) : isArray ? (
+                              <div className="flex flex-wrap gap-1">
+                                {value.map((item, i) => (
+                                  <span
+                                    key={i}
+                                    className="px-2 py-1 bg-gray-700/50 rounded text-xs"
                                   >
-                                    <div className="flex items-center justify-center gap-1">
-                                      <span>{label}</span>
-                                      {sort.column === key ? (
-                                        sort.direction === "asc" ? (
-                                          <ChevronUp size={14} />
-                                        ) : (
-                                          <ChevronDown size={14} />
-                                        )
-                                      ) : sortable ? (
-                                        <ChevronsUpDown
-                                          size={14}
-                                          className="text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                        />
-                                      ) : null}
-                                    </div>
-                                  </th>
-                                )
-                              )}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {sortData(filteredData.slice(0, displayCount)).map(
-                              (d, idx) => (
-                                <tr key={idx} className="bg-[#222]">
-                                  {visibleColumns.map(({ key }) => (
-                                    <td key={key} className="p-2 border">
-                                      {Array.isArray(d[key])
-                                        ? d[key].join(", ")
-                                        : d[key]?.toString() ?? ""}
-                                    </td>
-                                  ))}
-                                </tr>
-                              )
+                                    {item}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : key === "sourceFile" ? (
+                              <span className="text-xs text-gray-400 font-mono">
+                                {value}
+                              </span>
+                            ) : (
+                              <span className="text-gray-300">
+                                {value?.toString() ?? ""}
+                              </span>
                             )}
-                            {isLong && !report.showAll && (
-                              <tr>
-                                <td
-                                  colSpan={visibleColumns.length}
-                                  className="p-2 text-center"
-                                >
-                                  <button
-                                    onClick={() =>
-                                      setFileReports((prev) =>
-                                        prev.map((r) =>
-                                          r.id === report.id
-                                            ? { ...r, showAll: true }
-                                            : r
-                                        )
-                                      )
-                                    }
-                                    className="mt-2 px-3 py-1 bg-gray-700 rounded hover:bg-gray-800"
-                                  >
-                                    Show more
-                                  </button>
-                                </td>
-                              </tr>
-                            )}
-                            {isLong && report.showAll && (
-                              <tr>
-                                <td
-                                  colSpan={visibleColumns.length}
-                                  className="p-2 text-center"
-                                >
-                                  <button
-                                    onClick={() =>
-                                      setFileReports((prev) =>
-                                        prev.map((r) =>
-                                          r.id === report.id
-                                            ? { ...r, showAll: false }
-                                            : r
-                                        )
-                                      )
-                                    }
-                                    className="mt-2 px-3 py-1 bg-gray-700 rounded hover:bg-gray-800"
-                                  >
-                                    Show less
-                                  </button>
-                                </td>
-                              </tr>
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-
-                      {/* Mobile Card View */}
-                      <div className="md:hidden flex flex-col gap-4">
-                        {sortData(filteredData.slice(0, displayCount)).map(
-                          (d, idx) => (
-                            <div
-                              key={idx}
-                              className="bg-[#222] p-4 rounded border text-sm space-y-1"
-                            >
-                              {visibleColumns.map(({ key, label }) => (
-                                <div key={key}>
-                                  <strong>{label}:</strong>{" "}
-                                  {Array.isArray(d[key])
-                                    ? d[key].join(", ")
-                                    : d[key]?.toString() ?? ""}
-                                </div>
-                              ))}
-                            </div>
-                          )
-                        )}
-
-                        {isLong && !report.showAll && (
-                          <button
-                            onClick={() =>
-                              setFileReports((prev) =>
-                                prev.map((r) =>
-                                  r.id === report.id
-                                    ? { ...r, showAll: true }
-                                    : r
-                                )
-                              )
-                            }
-                            className="mt-2 px-3 py-1 bg-gray-700 rounded hover:bg-gray-800 self-center"
-                          >
-                            Show more
-                          </button>
-                        )}
-
-                        {isLong && report.showAll && (
-                          <button
-                            onClick={() =>
-                              setFileReports((prev) =>
-                                prev.map((r) =>
-                                  r.id === report.id
-                                    ? { ...r, showAll: false }
-                                    : r
-                                )
-                              )
-                            }
-                            className="mt-2 px-3 py-1 bg-gray-700 rounded hover:bg-gray-800 self-center"
-                          >
-                            Show less
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </details>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          );
-        })}
-      </div>
+          </div>
+
+          {/* Pagination */}
+          {filteredData.length > PAGE_SIZE && (
+            <div className="mt-6 flex justify-center items-center gap-4">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-sm transition-colors duration-200"
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              <span className="text-gray-300 text-sm">
+                Page {currentPage} /{" "}
+                {Math.ceil(filteredData.length / PAGE_SIZE)}
+              </span>
+              <button
+                onClick={() =>
+                  setCurrentPage((p) =>
+                    Math.min(Math.ceil(filteredData.length / PAGE_SIZE), p + 1)
+                  )
+                }
+                className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-sm transition-colors duration-200"
+                disabled={
+                  currentPage === Math.ceil(filteredData.length / PAGE_SIZE)
+                }
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* No Results Message */}
+      {fileReports.length > 0 && filteredData.length === 0 && (
+        <div className="text-center py-12 text-gray-400">
+          <div className="text-6xl mb-4">🔍</div>
+          <h3 className="text-xl font-medium mb-2">No spawn data found</h3>
+          <p className="text-gray-500">
+            Try adjusting your search terms or filters
+          </p>
+        </div>
+      )}
     </div>
   );
 }
