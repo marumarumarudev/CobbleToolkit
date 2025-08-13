@@ -1606,6 +1606,17 @@ export default function TrainerScanner() {
                                       {pokemon.evSpread && (
                                         <div>EVs: {pokemon.evSpread}</div>
                                       )}
+                                      {Object.keys(pokemon.ivs).length > 0 && (
+                                        <div>
+                                          IVs:{" "}
+                                          {Object.entries(pokemon.ivs)
+                                            .map(
+                                              ([stat, iv]) =>
+                                                `${stat.toUpperCase()}: ${iv}`
+                                            )
+                                            .join(", ")}
+                                        </div>
+                                      )}
                                       {pokemon.heldItem && (
                                         <div>
                                           Item:{" "}
