@@ -99,6 +99,8 @@ function emptySpawn(defaultName) {
     levelRangeMax: 1,
     weight: 1,
     condition: {},
+    anticondition: {},
+    weightMultiplier: null,
     lastEdited: Date.now(),
     uiCollapsed: false,
   };
@@ -207,6 +209,27 @@ export default function SpawnPoolGenerator() {
 
   function closeModal() {
     setModal((m) => ({ ...m, open: false }));
+  }
+
+  function openWeightMultiplierConditionsModal(fileIndex, spawnIndex) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
+    const spawn = fileList[fileIndex].spawns[spawnIndex];
+    const weightMultiplier = spawn.weightMultiplier || {};
+
+    // Create a temporary modal to show the weight multiplier conditions editor
+    setModal({
+      open: true,
+      mode: "weight-multiplier-conditions",
+      title: "Weight Multiplier Conditions",
+      fileIndex,
+      spawnIndex,
+      weightMultiplier,
+      resolve: () => closeModal(),
+    });
   }
 
   // load from storage
@@ -507,6 +530,8 @@ export default function SpawnPoolGenerator() {
                   levelRangeMax,
                   weight: spawn.weight || 1,
                   condition: spawn.condition || {},
+                  anticondition: spawn.anticondition || {},
+                  weightMultiplier: spawn.weightMultiplier || null,
                   lastEdited: Date.now(),
                   uiCollapsed: false,
                 };
@@ -606,6 +631,8 @@ export default function SpawnPoolGenerator() {
           levelRangeMax,
           weight: spawn.weight || 1,
           condition: spawn.condition || {},
+          anticondition: spawn.anticondition || {},
+          weightMultiplier: spawn.weightMultiplier || null,
           lastEdited: Date.now(),
           uiCollapsed: false,
         };
@@ -736,6 +763,16 @@ export default function SpawnPoolGenerator() {
     const condition2 = JSON.stringify(spawn2.condition || {});
     if (condition1 !== condition2) return false;
 
+    // Anticondition comparison
+    const anticondition1 = JSON.stringify(spawn1.anticondition || {});
+    const anticondition2 = JSON.stringify(spawn2.anticondition || {});
+    if (anticondition1 !== anticondition2) return false;
+
+    // WeightMultiplier comparison
+    const weightMultiplier1 = JSON.stringify(spawn1.weightMultiplier || null);
+    const weightMultiplier2 = JSON.stringify(spawn2.weightMultiplier || null);
+    if (weightMultiplier1 !== weightMultiplier2) return false;
+
     return true;
   }
 
@@ -856,6 +893,15 @@ export default function SpawnPoolGenerator() {
     return Object.keys(spawn.condition || {}).length;
   }
 
+  function getAnticonditionKeyCount(spawn) {
+    return Object.keys(spawn.anticondition || {}).length;
+  }
+
+  function getWeightMultiplierKeyCount(spawn) {
+    if (!spawn.weightMultiplier || !spawn.weightMultiplier.condition) return 0;
+    return Object.keys(spawn.weightMultiplier.condition).length;
+  }
+
   // CONDITION MANAGEMENT
   function addConditionKey(fileIndex, spawnIndex, key) {
     if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
@@ -968,6 +1014,364 @@ export default function SpawnPoolGenerator() {
     });
   }
 
+  // ---------- ANTICONDITION management ----------
+  function addAnticonditionKey(fileIndex, spawnIndex, key) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
+    setFileList((prev) => {
+      const copy = JSON.parse(JSON.stringify(prev));
+      const anticond = copy[fileIndex].spawns[spawnIndex].anticondition || {};
+      if (anticond.hasOwnProperty(key)) {
+        return copy;
+      }
+      const def = CONDITION_DEFS.find((d) => d.key === key);
+      if (!def) return copy;
+      if (def.type === "list") anticond[key] = [];
+      else if (def.type === "number") anticond[key] = "";
+      else if (def.type === "boolean") anticond[key] = false;
+      else if (def.type === "enum") anticond[key] = def.options[0];
+      else anticond[key] = "";
+      copy[fileIndex].spawns[spawnIndex].anticondition = anticond;
+      touchFile(copy, fileIndex);
+      return copy;
+    });
+  }
+
+  function removeAnticonditionKey(fileIndex, spawnIndex, key) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
+    setFileList((prev) => {
+      const copy = JSON.parse(JSON.stringify(prev));
+      const anticond = copy[fileIndex].spawns[spawnIndex].anticondition || {};
+      if (anticond.hasOwnProperty(key)) delete anticond[key];
+      copy[fileIndex].spawns[spawnIndex].anticondition = anticond;
+      touchFile(copy, fileIndex);
+      return copy;
+    });
+  }
+
+  function addAnticonditionListItems(fileIndex, spawnIndex, key) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
+    (async () => {
+      const raw = await openPrompt({
+        title: "Add",
+        message: `Add values for ${key} (paste comma-separated). Example: minecraft:plains, minecraft:dark_forest`,
+        placeholder: `${key}1, ${key}2`,
+      });
+      if (!raw) return;
+      const items = String(raw)
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      if (!items.length) return;
+
+      setFileList((prev) => {
+        const copy = JSON.parse(JSON.stringify(prev));
+        const anticond = copy[fileIndex].spawns[spawnIndex].anticondition || {};
+        anticond[key] = anticond[key] || [];
+        const existing = new Set(anticond[key]);
+        for (const it of items) {
+          if (!existing.has(it)) {
+            anticond[key].push(it);
+            existing.add(it);
+          }
+        }
+        copy[fileIndex].spawns[spawnIndex].anticondition = anticond;
+        touchFile(copy, fileIndex);
+        return copy;
+      });
+    })();
+  }
+
+  function removeAnticonditionListItem(fileIndex, spawnIndex, key, idx) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
+    setFileList((prev) => {
+      const copy = JSON.parse(JSON.stringify(prev));
+      const anticond = copy[fileIndex].spawns[spawnIndex].anticondition || {};
+      if (Array.isArray(anticond[key])) anticond[key].splice(idx, 1);
+      copy[fileIndex].spawns[spawnIndex].anticondition = anticond;
+      touchFile(copy, fileIndex);
+      return copy;
+    });
+  }
+
+  function setAnticonditionValue(fileIndex, spawnIndex, key, value) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
+    setFileList((prev) => {
+      const copy = JSON.parse(JSON.stringify(prev));
+      const anticond = copy[fileIndex].spawns[spawnIndex].anticondition || {};
+      anticond[key] = value;
+      copy[fileIndex].spawns[spawnIndex].anticondition = anticond;
+      touchFile(copy, fileIndex);
+      return copy;
+    });
+  }
+
+  // ---------- WEIGHT MULTIPLIER management ----------
+  function toggleWeightMultiplier(fileIndex, spawnIndex) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
+    setFileList((prev) => {
+      const copy = JSON.parse(JSON.stringify(prev));
+      const spawn = copy[fileIndex].spawns[spawnIndex];
+      if (spawn.weightMultiplier && spawn.weightMultiplier.multiplier) {
+        // Disable
+        spawn.weightMultiplier = null;
+      } else {
+        // Enable with defaults
+        spawn.weightMultiplier = {
+          multiplier: 2.0,
+          condition: {},
+        };
+      }
+      touchFile(copy, fileIndex);
+      return copy;
+    });
+  }
+
+  function setWeightMultiplierValue(fileIndex, spawnIndex, key, value) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
+    setFileList((prev) => {
+      const copy = JSON.parse(JSON.stringify(prev));
+      const spawn = copy[fileIndex].spawns[spawnIndex];
+      if (!spawn.weightMultiplier) {
+        spawn.weightMultiplier = { multiplier: 1.0, condition: {} };
+      }
+      spawn.weightMultiplier[key] = value;
+      touchFile(copy, fileIndex);
+      return copy;
+    });
+  }
+
+  function addWeightMultiplierConditionKey(fileIndex, spawnIndex, key) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
+    setFileList((prev) => {
+      const copy = JSON.parse(JSON.stringify(prev));
+      const spawn = copy[fileIndex].spawns[spawnIndex];
+      if (!spawn.weightMultiplier) {
+        spawn.weightMultiplier = { multiplier: 1.0, condition: {} };
+      }
+      const cond = spawn.weightMultiplier.condition || {};
+      if (cond.hasOwnProperty(key)) {
+        return copy;
+      }
+      const def = CONDITION_DEFS.find((d) => d.key === key);
+      if (!def) return copy;
+      if (def.type === "list") cond[key] = [];
+      else if (def.type === "number") cond[key] = "";
+      else if (def.type === "boolean") cond[key] = false;
+      else if (def.type === "enum") cond[key] = def.options[0];
+      else cond[key] = "";
+      spawn.weightMultiplier.condition = cond;
+      touchFile(copy, fileIndex);
+
+      // Update modal state if it's open for this spawn
+      if (
+        modal.open &&
+        modal.mode === "weight-multiplier-conditions" &&
+        modal.fileIndex === fileIndex &&
+        modal.spawnIndex === spawnIndex
+      ) {
+        setModal((prev) => ({
+          ...prev,
+          weightMultiplier: { ...spawn.weightMultiplier },
+        }));
+      }
+
+      return copy;
+    });
+  }
+
+  function removeWeightMultiplierConditionKey(fileIndex, spawnIndex, key) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
+    setFileList((prev) => {
+      const copy = JSON.parse(JSON.stringify(prev));
+      const spawn = copy[fileIndex].spawns[spawnIndex];
+      if (spawn.weightMultiplier && spawn.weightMultiplier.condition) {
+        const cond = spawn.weightMultiplier.condition;
+        if (cond.hasOwnProperty(key)) delete cond[key];
+        touchFile(copy, fileIndex);
+
+        // Update modal state if it's open for this spawn
+        if (
+          modal.open &&
+          modal.mode === "weight-multiplier-conditions" &&
+          modal.fileIndex === fileIndex &&
+          modal.spawnIndex === spawnIndex
+        ) {
+          setModal((prev) => ({
+            ...prev,
+            weightMultiplier: { ...spawn.weightMultiplier },
+          }));
+        }
+      }
+      return copy;
+    });
+  }
+
+  function addWeightMultiplierConditionListItems(fileIndex, spawnIndex, key) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
+    (async () => {
+      const raw = await openPrompt({
+        title: "Add",
+        message: `Add values for ${key} (paste comma-separated). Example: minecraft:plains, minecraft:dark_forest`,
+        placeholder: `${key}1, ${key}2`,
+      });
+      if (!raw) return;
+      const items = String(raw)
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      if (!items.length) return;
+
+      setFileList((prev) => {
+        const copy = JSON.parse(JSON.stringify(prev));
+        const spawn = copy[fileIndex].spawns[spawnIndex];
+        if (!spawn.weightMultiplier) {
+          spawn.weightMultiplier = { multiplier: 1.0, condition: {} };
+        }
+        const cond = spawn.weightMultiplier.condition || {};
+        cond[key] = cond[key] || [];
+        const existing = new Set(cond[key]);
+        for (const it of items) {
+          if (!existing.has(it)) {
+            cond[key].push(it);
+            existing.add(it);
+          }
+        }
+        spawn.weightMultiplier.condition = cond;
+        touchFile(copy, fileIndex);
+
+        // Update modal state if it's open for this spawn
+        if (
+          modal.open &&
+          modal.mode === "weight-multiplier-conditions" &&
+          modal.fileIndex === fileIndex &&
+          modal.spawnIndex === spawnIndex
+        ) {
+          setModal((prev) => ({
+            ...prev,
+            weightMultiplier: { ...spawn.weightMultiplier },
+          }));
+        }
+
+        return copy;
+      });
+    })();
+  }
+
+  function removeWeightMultiplierConditionListItem(
+    fileIndex,
+    spawnIndex,
+    key,
+    idx
+  ) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
+    setFileList((prev) => {
+      const copy = JSON.parse(JSON.stringify(prev));
+      const spawn = copy[fileIndex].spawns[spawnIndex];
+      if (spawn.weightMultiplier && spawn.weightMultiplier.condition) {
+        const cond = spawn.weightMultiplier.condition;
+        if (Array.isArray(cond[key])) cond[key].splice(idx, 1);
+        touchFile(copy, fileIndex);
+
+        // Update modal state if it's open for this spawn
+        if (
+          modal.open &&
+          modal.mode === "weight-multiplier-conditions" &&
+          modal.fileIndex === fileIndex &&
+          modal.spawnIndex === spawnIndex
+        ) {
+          setModal((prev) => ({
+            ...prev,
+            weightMultiplier: { ...spawn.weightMultiplier },
+          }));
+        }
+      }
+      return copy;
+    });
+  }
+
+  function setWeightMultiplierConditionValue(
+    fileIndex,
+    spawnIndex,
+    key,
+    value
+  ) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return;
+    }
+
+    setFileList((prev) => {
+      const copy = JSON.parse(JSON.stringify(prev));
+      const spawn = copy[fileIndex].spawns[spawnIndex];
+      if (!spawn.weightMultiplier) {
+        spawn.weightMultiplier = { multiplier: 1.0, condition: {} };
+      }
+      const cond = spawn.weightMultiplier.condition || {};
+      cond[key] = value;
+      spawn.weightMultiplier.condition = cond;
+      touchFile(copy, fileIndex);
+
+      // Update modal state if it's open for this spawn
+      if (
+        modal.open &&
+        modal.mode === "weight-multiplier-conditions" &&
+        modal.fileIndex === fileIndex &&
+        modal.spawnIndex === spawnIndex
+      ) {
+        setModal((prev) => ({
+          ...prev,
+          weightMultiplier: { ...spawn.weightMultiplier },
+        }));
+      }
+
+      return copy;
+    });
+  }
+
   // ---------- PRESETS management ----------
   function addPresetsBulkToSpawn(fileIndex, spawnIndex) {
     if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
@@ -1062,6 +1466,18 @@ export default function SpawnPoolGenerator() {
         weight: Number(s.weight) || 0,
       });
 
+      // Add weightMultiplier if it exists and has content (BEFORE condition)
+      if (
+        s.weightMultiplier &&
+        s.weightMultiplier.multiplier &&
+        s.weightMultiplier.condition
+      ) {
+        spawnObj.weightMultiplier = {
+          multiplier: Number(s.weightMultiplier.multiplier) || 1.0,
+          condition: s.weightMultiplier.condition,
+        };
+      }
+
       const cond = s.condition || {};
       if (cond && Object.keys(cond).length > 0) {
         const cleaned = {};
@@ -1076,6 +1492,23 @@ export default function SpawnPoolGenerator() {
           }
         }
         if (Object.keys(cleaned).length > 0) spawnObj.condition = cleaned;
+      }
+
+      // Add anticondition if it exists and has content
+      const anticond = s.anticondition || {};
+      if (anticond && Object.keys(anticond).length > 0) {
+        const cleaned = {};
+        for (const k of Object.keys(anticond)) {
+          const v = anticond[k];
+          if (Array.isArray(v)) {
+            if (v.length) cleaned[k] = v;
+          } else if (v === "" || v === null || typeof v === "undefined") {
+            // skip
+          } else {
+            cleaned[k] = v;
+          }
+        }
+        if (Object.keys(cleaned).length > 0) spawnObj.anticondition = cleaned;
       }
 
       return spawnObj;
@@ -1197,6 +1630,8 @@ export default function SpawnPoolGenerator() {
           levelRangeMax,
           weight: spawn.weight || 1,
           condition: spawn.condition || {},
+          anticondition: spawn.anticondition || {},
+          weightMultiplier: spawn.weightMultiplier || null,
           lastEdited: Date.now(),
           uiCollapsed: false,
         };
@@ -1528,6 +1963,307 @@ export default function SpawnPoolGenerator() {
             </div>
           )}
         </div>
+      </div>
+    );
+  }
+
+  // Anticondition editor renderer
+  function renderAnticonditionEditor(fileIndex, spawnIndex) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return null;
+    }
+
+    const spawn = fileList[fileIndex].spawns[spawnIndex];
+    const anticondition = spawn.anticondition || {};
+
+    return (
+      <div className="mt-3 p-3 bg-[#1a0f0f] rounded border border-[#4a2a2a]">
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-sm font-medium text-red-300">
+            Anti-Conditions (Prevent Spawning)
+          </div>
+          <div className="flex items-center gap-2">
+            <select
+              id={`anticond-picker-${fileIndex}-${spawnIndex}`}
+              className="bg-[#1f1f23] p-1 rounded border text-sm"
+              defaultValue=""
+              onChange={(e) => {
+                const key = e.target.value;
+                if (!key) return;
+                const def = CONDITION_DEFS.find((d) => d.key === key);
+                addAnticonditionKey(fileIndex, spawnIndex, key);
+                if (def && def.type === "list") {
+                  // bulk-add prompt immediately after creating the key
+                  addAnticonditionListItems(fileIndex, spawnIndex, key);
+                }
+                // reset the select back to placeholder
+                e.target.selectedIndex = 0;
+              }}
+            >
+              <option value="" disabled>
+                Add anti-condition...
+              </option>
+              {CONDITION_DEFS.map((d) => (
+                <option key={d.key} value={d.key}>
+                  {d.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="max-h-72 overflow-auto pr-1">
+          {Object.keys(anticondition).length === 0 ? (
+            <div className="text-gray-400 text-sm">No anti-conditions set</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {Object.keys(anticondition).map((key) => {
+                const def = CONDITION_DEFS.find((d) => d.key === key) || {
+                  type: typeof anticondition[key],
+                };
+                const val = anticondition[key];
+
+                // list-type UI
+                if (def.type === "list") {
+                  return (
+                    <div key={key} className="bg-[#0b0f0f] p-2 rounded h-full">
+                      <div className="flex items-center justify-between">
+                        <div className="font-medium">{def.label}</div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() =>
+                              addAnticonditionListItems(
+                                fileIndex,
+                                spawnIndex,
+                                key
+                              )
+                            }
+                            className="text-xs bg-green-600 px-2 py-1 rounded"
+                          >
+                            Bulk Add
+                          </button>
+                          <button
+                            onClick={() =>
+                              removeAnticonditionKey(fileIndex, spawnIndex, key)
+                            }
+                            className="text-xs bg-red-600 px-2 py-1 rounded"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="mt-2 space-y-2">
+                        {(!val || !val.length) && (
+                          <div className="text-gray-400 text-sm">Empty</div>
+                        )}
+                        {val &&
+                          val.map((it, idx) => (
+                            <div key={idx} className="flex items-center gap-2">
+                              <div className="bg-[#07100f] px-2 py-1 rounded text-sm">
+                                {it}
+                              </div>
+                              <button
+                                onClick={() =>
+                                  removeAnticonditionListItem(
+                                    fileIndex,
+                                    spawnIndex,
+                                    key,
+                                    idx
+                                  )
+                                }
+                                className="text-red-500"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                // number-type
+                if (def.type === "number") {
+                  return (
+                    <div
+                      key={key}
+                      className="bg-[#07100f] p-2 rounded flex items-center justify-between h-full"
+                    >
+                      <div>
+                        <div className="font-medium">{def.label}</div>
+                        <input
+                          type="number"
+                          value={val}
+                          onChange={(e) =>
+                            setAnticonditionValue(
+                              fileIndex,
+                              spawnIndex,
+                              key,
+                              e.target.value === ""
+                                ? ""
+                                : Number(e.target.value)
+                            )
+                          }
+                          className="mt-1 p-1 rounded bg-[#121217] border w-32"
+                          autoComplete="off"
+                          min="0"
+                          step="0.1"
+                        />
+                      </div>
+                      <button
+                        onClick={() =>
+                          removeAnticonditionKey(fileIndex, spawnIndex, key)
+                        }
+                        className="text-xs bg-red-600 px-2 py-1 rounded"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  );
+                }
+
+                // boolean-type
+                if (def.type === "boolean") {
+                  return (
+                    <div
+                      key={key}
+                      className="bg-[#07100f] p-2 rounded flex items-center justify-between h-full"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="font-medium">{def.label}</div>
+                        <label className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={!!val}
+                            onChange={(e) =>
+                              setAnticonditionValue(
+                                fileIndex,
+                                spawnIndex,
+                                key,
+                                e.target.checked
+                              )
+                            }
+                          />
+                          <span className="text-sm">
+                            {val ? "True" : "False"}
+                          </span>
+                        </label>
+                      </div>
+                      <button
+                        onClick={() =>
+                          removeAnticonditionKey(fileIndex, spawnIndex, key)
+                        }
+                        className="text-xs bg-red-600 px-2 py-1 rounded"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  );
+                }
+
+                // default to string
+                return (
+                  <div
+                    key={key}
+                    className="bg-[#07100f] p-2 rounded flex items-center justify-between h-full"
+                  >
+                    <div>
+                      <div className="font-medium">{def.label || key}</div>
+                      <input
+                        type="text"
+                        value={val ?? ""}
+                        onChange={(e) =>
+                          setAnticonditionValue(
+                            fileIndex,
+                            spawnIndex,
+                            key,
+                            e.target.value
+                          )
+                        }
+                        className="mt-1 p-1 rounded bg-[#121217] border w-64"
+                        placeholder={`Enter ${def.label || key}`}
+                        spellCheck={false}
+                      />
+                    </div>
+                    <button
+                      onClick={() =>
+                        removeAnticonditionKey(fileIndex, spawnIndex, key)
+                      }
+                      className="text-xs bg-red-600 px-2 py-1 rounded"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Weight multiplier editor renderer
+  function renderWeightMultiplierEditor(fileIndex, spawnIndex) {
+    if (!isValidSpawnIndex(fileIndex, spawnIndex)) {
+      console.error("Invalid spawn index:", { fileIndex, spawnIndex });
+      return null;
+    }
+
+    const spawn = fileList[fileIndex].spawns[spawnIndex];
+    const weightMultiplier = spawn.weightMultiplier || {};
+
+    return (
+      <div className="col-span-6">
+        <div className="flex items-center justify-between mb-1">
+          <label className="text-sm text-gray-300">Weight Multiplier</label>
+          <button
+            onClick={() => toggleWeightMultiplier(fileIndex, spawnIndex)}
+            className={`text-xs px-2 py-1 rounded ${
+              weightMultiplier.multiplier ? "bg-green-600" : "bg-gray-600"
+            } hover:bg-green-700`}
+          >
+            {weightMultiplier.multiplier ? "Enabled" : "Enable"}
+          </button>
+        </div>
+
+        {weightMultiplier.multiplier ? (
+          <div className="space-y-2">
+            <input
+              type="number"
+              value={weightMultiplier.multiplier || 1.0}
+              onChange={(e) =>
+                setWeightMultiplierValue(
+                  fileIndex,
+                  spawnIndex,
+                  "multiplier",
+                  e.target.value === "" ? 1.0 : Number(e.target.value)
+                )
+              }
+              className="w-full p-2 rounded bg-[#2a2a2a] border"
+              autoComplete="off"
+              min="0.1"
+              step="0.1"
+              placeholder="Multiplier value"
+            />
+            <div className="text-xs text-gray-400">
+              {Object.keys(weightMultiplier.condition || {}).length}{" "}
+              condition(s) set
+              <button
+                onClick={() =>
+                  openWeightMultiplierConditionsModal(fileIndex, spawnIndex)
+                }
+                className="ml-2 text-blue-400 hover:text-blue-300 underline"
+              >
+                Manage
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="text-xs text-gray-400 italic">Disabled</div>
+        )}
       </div>
     );
   }
@@ -1944,6 +2680,12 @@ export default function SpawnPoolGenerator() {
                           <span className="px-2 py-0.5 rounded bg-[#20222c] border border-[#2c2f3d]">
                             Cond: {getConditionKeyCount(s)}
                           </span>
+                          <span className="px-2 py-0.5 rounded bg-[#20222c] border border-[#2c2f3d]">
+                            Anti: {getAnticonditionKeyCount(s)}
+                          </span>
+                          <span className="px-2 py-0.5 rounded bg-[#20222c] border border-[#2c2f3d]">
+                            WM: {getWeightMultiplierKeyCount(s)}
+                          </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -2223,6 +2965,9 @@ export default function SpawnPoolGenerator() {
                             />
                           </div>
 
+                          {/* weight multiplier editor */}
+                          {renderWeightMultiplierEditor(activeFileIndex, si)}
+
                           <div className="col-span-3">
                             <label className="text-sm text-gray-300">
                               Level
@@ -2317,6 +3062,9 @@ export default function SpawnPoolGenerator() {
 
                         {/* condition editor */}
                         {renderConditionEditor(activeFileIndex, si)}
+
+                        {/* anticondition editor */}
+                        {renderAnticonditionEditor(activeFileIndex, si)}
                       </div>
                     )}
                   </div>
@@ -2503,7 +3251,8 @@ export default function SpawnPoolGenerator() {
               <div className="text-base font-semibold">{modal.title}</div>
               {modal.message &&
                 modal.mode !== "confirm" &&
-                modal.mode !== "batch-merge" && (
+                modal.mode !== "batch-merge" &&
+                modal.mode !== "weight-multiplier-conditions" && (
                   <div className="text-sm text-gray-300 mt-1 max-h-32 overflow-y-auto">
                     {modal.message}
                   </div>
@@ -2586,6 +3335,288 @@ export default function SpawnPoolGenerator() {
                   </div>
                 </div>
               )}
+              {modal.mode === "weight-multiplier-conditions" && (
+                <div className="space-y-4">
+                  <div className="text-sm text-gray-300">
+                    Configure conditions that will trigger the weight
+                    multiplier.
+                  </div>
+
+                  <div className="p-3 bg-[#0b0f0b] rounded border border-[#2a3a2a]">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-sm font-medium">
+                        Multiplier Conditions
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <select
+                          id={`wm-modal-cond-picker-${modal.fileIndex}-${modal.spawnIndex}`}
+                          className="bg-[#1f1f23] p-1 rounded border text-sm"
+                          defaultValue=""
+                          onChange={(e) => {
+                            const key = e.target.value;
+                            if (!key) return;
+                            const def = CONDITION_DEFS.find(
+                              (d) => d.key === key
+                            );
+                            addWeightMultiplierConditionKey(
+                              modal.fileIndex,
+                              modal.spawnIndex,
+                              key
+                            );
+                            if (def && def.type === "list") {
+                              addWeightMultiplierConditionListItems(
+                                modal.fileIndex,
+                                modal.spawnIndex,
+                                key
+                              );
+                            }
+                            e.target.selectedIndex = 0;
+                          }}
+                        >
+                          <option value="" disabled>
+                            Add condition...
+                          </option>
+                          {CONDITION_DEFS.map((d) => (
+                            <option key={d.key} value={d.key}>
+                              {d.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="max-h-48 overflow-auto pr-1">
+                      {Object.keys(modal.weightMultiplier.condition || {})
+                        .length === 0 ? (
+                        <div className="text-gray-400 text-sm">
+                          No conditions set
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {Object.keys(
+                            modal.weightMultiplier.condition || {}
+                          ).map((key) => {
+                            const def = CONDITION_DEFS.find(
+                              (d) => d.key === key
+                            ) || {
+                              type: typeof modal.weightMultiplier.condition[
+                                key
+                              ],
+                            };
+                            const val = modal.weightMultiplier.condition[key];
+
+                            // list-type UI
+                            if (def.type === "list") {
+                              return (
+                                <div
+                                  key={key}
+                                  className="bg-[#07100f] p-2 rounded h-full"
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="font-medium">
+                                      {def.label}
+                                    </div>
+                                    <div className="flex gap-2">
+                                      <button
+                                        onClick={() =>
+                                          addWeightMultiplierConditionListItems(
+                                            modal.fileIndex,
+                                            modal.spawnIndex,
+                                            key
+                                          )
+                                        }
+                                        className="text-xs bg-green-600 px-2 py-1 rounded"
+                                      >
+                                        Bulk Add
+                                      </button>
+                                      <button
+                                        onClick={() =>
+                                          removeWeightMultiplierConditionKey(
+                                            modal.fileIndex,
+                                            modal.spawnIndex,
+                                            key
+                                          )
+                                        }
+                                        className="text-xs bg-red-600 px-2 py-1 rounded"
+                                      >
+                                        Remove
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <div className="mt-2 space-y-2">
+                                    {(!val || !val.length) && (
+                                      <div className="text-gray-400 text-sm">
+                                        Empty
+                                      </div>
+                                    )}
+                                    {val &&
+                                      val.map((it, idx) => (
+                                        <div
+                                          key={idx}
+                                          className="flex items-center gap-2"
+                                        >
+                                          <div className="bg-[#071018] px-2 py-1 rounded text-sm">
+                                            {it}
+                                          </div>
+                                          <button
+                                            onClick={() =>
+                                              removeWeightMultiplierConditionListItem(
+                                                modal.fileIndex,
+                                                modal.spawnIndex,
+                                                key,
+                                                idx
+                                              )
+                                            }
+                                            className="text-red-500"
+                                          >
+                                            ✕
+                                          </button>
+                                        </div>
+                                      ))}
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            // number-type
+                            if (def.type === "number") {
+                              return (
+                                <div
+                                  key={key}
+                                  className="bg-[#07100f] p-2 rounded flex items-center justify-between h-full"
+                                >
+                                  <div>
+                                    <div className="font-medium">
+                                      {def.label}
+                                    </div>
+                                    <input
+                                      type="number"
+                                      value={val}
+                                      onChange={(e) =>
+                                        setWeightMultiplierConditionValue(
+                                          modal.fileIndex,
+                                          modal.spawnIndex,
+                                          key,
+                                          e.target.value === ""
+                                            ? ""
+                                            : Number(e.target.value)
+                                        )
+                                      }
+                                      className="mt-1 p-1 rounded bg-[#121217] border w-32"
+                                      autoComplete="off"
+                                      min="0"
+                                      step="0.1"
+                                    />
+                                  </div>
+                                  <button
+                                    onClick={() =>
+                                      removeWeightMultiplierConditionKey(
+                                        modal.fileIndex,
+                                        modal.spawnIndex,
+                                        key
+                                      )
+                                    }
+                                    className="text-xs bg-red-600 px-2 py-1 rounded"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+                              );
+                            }
+
+                            // boolean-type
+                            if (def.type === "boolean") {
+                              return (
+                                <div
+                                  key={key}
+                                  className="bg-[#07100f] p-2 rounded flex items-center justify-between h-full"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <div className="font-medium">
+                                      {def.label}
+                                    </div>
+                                    <label className="flex items-center gap-2 text-sm">
+                                      <input
+                                        type="checkbox"
+                                        checked={!!val}
+                                        onChange={(e) =>
+                                          setWeightMultiplierConditionValue(
+                                            modal.fileIndex,
+                                            modal.spawnIndex,
+                                            key,
+                                            e.target.checked
+                                          )
+                                        }
+                                      />
+                                      <span className="text-sm">
+                                        {val ? "True" : "False"}
+                                      </span>
+                                    </label>
+                                  </div>
+                                  <button
+                                    onClick={() =>
+                                      removeWeightMultiplierConditionKey(
+                                        modal.fileIndex,
+                                        modal.spawnIndex,
+                                        key
+                                      )
+                                    }
+                                    className="text-xs bg-red-600 px-2 py-1 rounded"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+                              );
+                            }
+
+                            // default to string
+                            return (
+                              <div
+                                key={key}
+                                className="bg-[#07100f] p-2 rounded flex items-center justify-between h-full"
+                              >
+                                <div>
+                                  <div className="font-medium">
+                                    {def.label || key}
+                                  </div>
+                                  <input
+                                    type="text"
+                                    value={val ?? ""}
+                                    onChange={(e) =>
+                                      setWeightMultiplierConditionValue(
+                                        modal.fileIndex,
+                                        modal.spawnIndex,
+                                        key,
+                                        e.target.value
+                                      )
+                                    }
+                                    className="mt-1 p-1 rounded bg-[#121217] border w-64"
+                                    placeholder={`Enter ${def.label || key}`}
+                                    spellCheck={false}
+                                  />
+                                </div>
+                                <button
+                                  onClick={() =>
+                                    removeWeightMultiplierConditionKey(
+                                      modal.fileIndex,
+                                      modal.spawnIndex,
+                                      key
+                                    )
+                                  }
+                                  className="text-xs bg-red-600 px-2 py-1 rounded"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             <div className="px-4 py-3 border-t border-[#2c2f3d] flex justify-end gap-2">
               <button
@@ -2612,6 +3643,8 @@ export default function SpawnPoolGenerator() {
                     )?.value;
                     modal.resolve &&
                       modal.resolve(selectedOption || "skip-duplicates");
+                  } else if (modal.mode === "weight-multiplier-conditions") {
+                    modal.resolve && modal.resolve(modal.weightMultiplier);
                   }
                   closeModal();
                 }}
@@ -2621,6 +3654,8 @@ export default function SpawnPoolGenerator() {
                   ? "OK"
                   : modal.mode === "batch-merge"
                   ? "Merge Files"
+                  : modal.mode === "weight-multiplier-conditions"
+                  ? "Save Changes"
                   : "Confirm"}
               </button>
             </div>

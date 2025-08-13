@@ -1,6 +1,5 @@
 import JSZip from "jszip";
 
-
 export async function parseCobblemonZip(file) {
   // Add timeout protection for Chrome
   const timeoutPromise = new Promise((_, reject) => {
@@ -181,10 +180,51 @@ export async function parseCobblemonZip(file) {
 
                 const condition = entry.condition || {};
                 const anticondition = entry.anticondition || {};
+                const weightMultiplier = entry.weightMultiplier || null;
+
+                // Helper function to format array values
+                const formatArrayValue = (value) => {
+                  if (Array.isArray(value)) {
+                    return value.length > 0 ? value.join(", ") : "";
+                  }
+                  return "";
+                };
+
+                // Helper function to format single values
+                const formatSingleValue = (value) => {
+                  if (value === null || value === undefined || value === "") {
+                    return "";
+                  }
+                  return String(value);
+                };
+
+                // Helper function to format light level
+                const formatLightLevel = (condition) => {
+                  if (
+                    condition.minSkyLight != null &&
+                    condition.maxSkyLight != null
+                  ) {
+                    return `${condition.minSkyLight}-${condition.maxSkyLight}`;
+                  } else if (condition.minSkyLight != null) {
+                    return `${condition.minSkyLight}+`;
+                  } else if (condition.maxSkyLight != null) {
+                    return `0-${condition.maxSkyLight}`;
+                  } else if (
+                    condition.minLight != null &&
+                    condition.maxLight != null
+                  ) {
+                    return `${condition.minLight}-${condition.maxLight}`;
+                  } else if (condition.minLight != null) {
+                    return `${condition.minLight}+`;
+                  } else if (condition.maxLight != null) {
+                    return `0-${condition.maxLight}`;
+                  }
+                  return "";
+                };
 
                 // Only add valid entries
                 if (entry.pokemon || entry.species || entry.id) {
-                  results.push({
+                  const spawnData = {
                     pokemon: String(
                       entry.pokemon || entry.species || entry.id || "Unknown"
                     ),
@@ -192,43 +232,311 @@ export async function parseCobblemonZip(file) {
                     level: String(entry.level ?? ""),
                     weight: String(entry.weight ?? ""),
                     context: String(entry.context || "none"),
-                    presets: Array.isArray(entry.presets)
-                      ? entry.presets.join(", ")
-                      : "",
-                    biomes: Array.isArray(condition.biomes)
-                      ? condition.biomes.join(", ")
-                      : "",
-                    dimensions: Array.isArray(condition.dimensions)
-                      ? condition.dimensions.join(", ")
-                      : "",
-                    canSeeSky: String(condition.canSeeSky ?? ""),
-                    moonPhase: String(condition.moonPhase ?? ""),
-                    isRaining: String(condition.isRaining ?? ""),
-                    structures: Array.isArray(condition.structures)
-                      ? condition.structures.join(", ")
-                      : "",
-                    neededNearbyBlocks: Array.isArray(
+                    presets: formatArrayValue(entry.presets),
+
+                    // Condition fields
+                    biomes: formatArrayValue(condition.biomes),
+                    dimensions: formatArrayValue(condition.dimensions),
+                    structures: formatArrayValue(condition.structures),
+                    neededNearbyBlocks: formatArrayValue(
                       condition.neededNearbyBlocks
-                    )
-                      ? condition.neededNearbyBlocks.join(", ")
-                      : "",
-                    lightLevel:
-                      condition.minSkyLight != null &&
-                      condition.maxSkyLight != null
-                        ? `${condition.minSkyLight}-${condition.maxSkyLight}`
-                        : condition.minSkyLight != null
-                        ? `${condition.minSkyLight}+`
-                        : condition.maxSkyLight != null
-                        ? `0-${condition.maxSkyLight}`
+                    ),
+                    neededBaseBlocks: formatArrayValue(
+                      condition.neededBaseBlocks
+                    ),
+                    labels: formatArrayValue(condition.labels),
+
+                    // Boolean condition fields
+                    canSeeSky: formatSingleValue(condition.canSeeSky),
+                    isRaining: formatSingleValue(condition.isRaining),
+                    isThundering: formatSingleValue(condition.isThundering),
+                    isSlimeChunk: formatSingleValue(condition.isSlimeChunk),
+                    fluidIsSource: formatSingleValue(condition.fluidIsSource),
+
+                    // Numeric condition fields
+                    moonPhase: formatSingleValue(condition.moonPhase),
+                    minX: formatSingleValue(condition.minX),
+                    minY: formatSingleValue(condition.minY),
+                    minZ: formatSingleValue(condition.minZ),
+                    maxX: formatSingleValue(condition.maxX),
+                    maxY: formatSingleValue(condition.maxY),
+                    maxZ: formatSingleValue(condition.maxZ),
+                    minLight: formatSingleValue(condition.minLight),
+                    maxLight: formatSingleValue(condition.maxLight),
+                    minSkyLight: formatSingleValue(condition.minSkyLight),
+                    maxSkyLight: formatSingleValue(condition.maxSkyLight),
+                    minWidth: formatSingleValue(condition.minWidth),
+                    maxWidth: formatSingleValue(condition.maxWidth),
+                    minHeight: formatSingleValue(condition.minHeight),
+                    maxHeight: formatSingleValue(condition.maxHeight),
+                    minDepth: formatSingleValue(condition.minDepth),
+                    maxDepth: formatSingleValue(condition.maxDepth),
+                    minLureLevel: formatSingleValue(condition.minLureLevel),
+                    maxLureLevel: formatSingleValue(condition.maxLureLevel),
+
+                    // String condition fields
+                    timeRange: formatSingleValue(condition.timeRange),
+                    fluidBlock: formatSingleValue(condition.fluidBlock),
+                    bobber: formatSingleValue(condition.bobber),
+                    bait: formatSingleValue(condition.bait),
+                    labelMode: formatSingleValue(condition.labelMode),
+
+                    // Light level (computed field)
+                    lightLevel: formatLightLevel(condition),
+
+                    // Anticondition fields
+                    antiBiomes: formatArrayValue(anticondition.biomes),
+                    antiStructures: formatArrayValue(anticondition.structures),
+                    antiDimensions: formatArrayValue(anticondition.dimensions),
+                    antiNeededNearbyBlocks: formatArrayValue(
+                      anticondition.neededNearbyBlocks
+                    ),
+                    antiNeededBaseBlocks: formatArrayValue(
+                      anticondition.neededBaseBlocks
+                    ),
+                    antiLabels: formatArrayValue(anticondition.labels),
+
+                    // Boolean anticondition fields
+                    antiCanSeeSky: formatSingleValue(anticondition.canSeeSky),
+                    antiIsRaining: formatSingleValue(anticondition.isRaining),
+                    antiIsThundering: formatSingleValue(
+                      anticondition.isThundering
+                    ),
+                    antiIsSlimeChunk: formatSingleValue(
+                      anticondition.isSlimeChunk
+                    ),
+                    antiFluidIsSource: formatSingleValue(
+                      anticondition.fluidIsSource
+                    ),
+
+                    // Numeric anticondition fields
+                    antiMoonPhase: formatSingleValue(anticondition.moonPhase),
+                    antiMinX: formatSingleValue(anticondition.minX),
+                    antiMinY: formatSingleValue(anticondition.minY),
+                    antiMinZ: formatSingleValue(anticondition.minZ),
+                    antiMaxX: formatSingleValue(anticondition.maxX),
+                    antiMaxY: formatSingleValue(anticondition.maxY),
+                    antiMaxZ: formatSingleValue(anticondition.maxZ),
+                    antiMinLight: formatSingleValue(anticondition.minLight),
+                    antiMaxLight: formatSingleValue(anticondition.maxLight),
+                    antiMinSkyLight: formatSingleValue(
+                      anticondition.minSkyLight
+                    ),
+                    antiMaxSkyLight: formatSingleValue(
+                      anticondition.maxSkyLight
+                    ),
+                    antiMinWidth: formatSingleValue(anticondition.minWidth),
+                    antiMaxWidth: formatSingleValue(anticondition.maxWidth),
+                    antiMinHeight: formatSingleValue(anticondition.minHeight),
+                    antiMaxHeight: formatSingleValue(anticondition.maxHeight),
+                    antiMinDepth: formatSingleValue(anticondition.minDepth),
+                    antiMaxDepth: formatSingleValue(anticondition.maxDepth),
+                    antiMinLureLevel: formatSingleValue(
+                      anticondition.minLureLevel
+                    ),
+                    antiMaxLureLevel: formatSingleValue(
+                      anticondition.maxLureLevel
+                    ),
+
+                    // String anticondition fields
+                    antiTimeRange: formatSingleValue(anticondition.timeRange),
+                    antiFluidBlock: formatSingleValue(anticondition.fluidBlock),
+                    antiBobber: formatSingleValue(anticondition.bobber),
+                    antiBait: formatSingleValue(anticondition.bait),
+                    antiLabelMode: formatSingleValue(anticondition.labelMode),
+
+                    // Weight multiplier fields
+                    weightMultiplierMultiplier:
+                      weightMultiplier && weightMultiplier.multiplier
+                        ? String(weightMultiplier.multiplier)
                         : "",
-                    timeRange: condition.timeRange ?? "",
-                    antiBiomes: Array.isArray(anticondition.biomes)
-                      ? anticondition.biomes.join(", ")
-                      : "",
-                    antiStructures: Array.isArray(anticondition.structures)
-                      ? anticondition.structures.join(", ")
-                      : "",
-                  });
+                    weightMultiplierBiomes:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatArrayValue(weightMultiplier.condition.biomes)
+                        : "",
+                    weightMultiplierDimensions:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatArrayValue(
+                            weightMultiplier.condition.dimensions
+                          )
+                        : "",
+                    weightMultiplierStructures:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatArrayValue(
+                            weightMultiplier.condition.structures
+                          )
+                        : "",
+                    weightMultiplierNeededNearbyBlocks:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatArrayValue(
+                            weightMultiplier.condition.neededNearbyBlocks
+                          )
+                        : "",
+                    weightMultiplierNeededBaseBlocks:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatArrayValue(
+                            weightMultiplier.condition.neededBaseBlocks
+                          )
+                        : "",
+                    weightMultiplierLabels:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatArrayValue(weightMultiplier.condition.labels)
+                        : "",
+
+                    // Boolean weight multiplier fields
+                    weightMultiplierCanSeeSky:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(
+                            weightMultiplier.condition.canSeeSky
+                          )
+                        : "",
+                    weightMultiplierIsRaining:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(
+                            weightMultiplier.condition.isRaining
+                          )
+                        : "",
+                    weightMultiplierIsThundering:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(
+                            weightMultiplier.condition.isThundering
+                          )
+                        : "",
+                    weightMultiplierIsSlimeChunk:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(
+                            weightMultiplier.condition.isSlimeChunk
+                          )
+                        : "",
+                    weightMultiplierFluidIsSource:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(
+                            weightMultiplier.condition.fluidIsSource
+                          )
+                        : "",
+
+                    // Numeric weight multiplier fields
+                    weightMultiplierMoonPhase:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(
+                            weightMultiplier.condition.moonPhase
+                          )
+                        : "",
+                    weightMultiplierMinX:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(weightMultiplier.condition.minX)
+                        : "",
+                    weightMultiplierMinY:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(weightMultiplier.condition.minY)
+                        : "",
+                    weightMultiplierMinZ:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(weightMultiplier.condition.minZ)
+                        : "",
+                    weightMultiplierMaxX:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(weightMultiplier.condition.maxX)
+                        : "",
+                    weightMultiplierMaxY:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(weightMultiplier.condition.maxY)
+                        : "",
+                    weightMultiplierMaxZ:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(weightMultiplier.condition.maxZ)
+                        : "",
+                    weightMultiplierMinLight:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(weightMultiplier.condition.minLight)
+                        : "",
+                    weightMultiplierMaxLight:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(weightMultiplier.condition.maxLight)
+                        : "",
+                    weightMultiplierMinSkyLight:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(
+                            weightMultiplier.condition.minSkyLight
+                          )
+                        : "",
+                    weightMultiplierMaxSkyLight:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(
+                            weightMultiplier.condition.maxSkyLight
+                          )
+                        : "",
+                    weightMultiplierMinWidth:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(weightMultiplier.condition.minWidth)
+                        : "",
+                    weightMultiplierMaxWidth:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(weightMultiplier.condition.maxWidth)
+                        : "",
+                    weightMultiplierMinHeight:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(
+                            weightMultiplier.condition.minHeight
+                          )
+                        : "",
+                    weightMultiplierMaxHeight:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(
+                            weightMultiplier.condition.maxHeight
+                          )
+                        : "",
+                    weightMultiplierMinDepth:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(weightMultiplier.condition.minDepth)
+                        : "",
+                    weightMultiplierMaxDepth:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(weightMultiplier.condition.maxDepth)
+                        : "",
+                    weightMultiplierMinLureLevel:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(
+                            weightMultiplier.condition.minLureLevel
+                          )
+                        : "",
+                    weightMultiplierMaxLureLevel:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(
+                            weightMultiplier.condition.maxLureLevel
+                          )
+                        : "",
+
+                    // String weight multiplier fields
+                    weightMultiplierTimeRange:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(
+                            weightMultiplier.condition.timeRange
+                          )
+                        : "",
+                    weightMultiplierFluidBlock:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(
+                            weightMultiplier.condition.fluidBlock
+                          )
+                        : "",
+                    weightMultiplierBobber:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(weightMultiplier.condition.bobber)
+                        : "",
+                    weightMultiplierBait:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(weightMultiplier.condition.bait)
+                        : "",
+                    weightMultiplierLabelMode:
+                      weightMultiplier && weightMultiplier.condition
+                        ? formatSingleValue(
+                            weightMultiplier.condition.labelMode
+                          )
+                        : "",
+                  };
+
+                  results.push(spawnData);
                 }
               } catch (entryErr) {
                 // Skip individual invalid entries without stopping the whole process

@@ -24,7 +24,7 @@ export default function UploadArea() {
     percentage: 0,
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const PAGE_SIZE = 50;
+  const PAGE_SIZE = 25;
 
   useEffect(() => {
     try {
@@ -131,17 +131,200 @@ export default function UploadArea() {
     { key: "weight", label: "Weight", sortable: true },
     { key: "context", label: "Context", sortable: true },
     { key: "presets", label: "Presets", sortable: true },
+
+    // Condition fields
     { key: "biomes", label: "Biomes", sortable: true },
     { key: "dimensions", label: "Dimensions", sortable: true },
-    { key: "canSeeSky", label: "Can See Sky", sortable: true },
     { key: "structures", label: "Structures", sortable: true },
-    { key: "isRaining", label: "Raining", sortable: true },
-    { key: "moonPhase", label: "Moon Phase", sortable: true },
     { key: "neededNearbyBlocks", label: "Nearby Blocks", sortable: true },
-    { key: "timeRange", label: "Time", sortable: true },
+    { key: "neededBaseBlocks", label: "Base Blocks", sortable: true },
+    { key: "labels", label: "Labels", sortable: true },
+    { key: "canSeeSky", label: "Can See Sky", sortable: true },
+    { key: "isRaining", label: "Raining", sortable: true },
+    { key: "isThundering", label: "Thundering", sortable: true },
+    { key: "isSlimeChunk", label: "Slime Chunk", sortable: true },
+    { key: "fluidIsSource", label: "Fluid Is Source", sortable: true },
+    { key: "moonPhase", label: "Moon Phase", sortable: true },
+    { key: "minX", label: "Min X", sortable: true },
+    { key: "minY", label: "Min Y", sortable: true },
+    { key: "minZ", label: "Min Z", sortable: true },
+    { key: "maxX", label: "Max X", sortable: true },
+    { key: "maxY", label: "Max Y", sortable: true },
+    { key: "maxZ", label: "Max Z", sortable: true },
+    { key: "minLight", label: "Min Light", sortable: true },
+    { key: "maxLight", label: "Max Light", sortable: true },
+    { key: "minSkyLight", label: "Min Sky Light", sortable: true },
+    { key: "maxSkyLight", label: "Max Sky Light", sortable: true },
+    { key: "minWidth", label: "Min Width", sortable: true },
+    { key: "maxWidth", label: "Max Width", sortable: true },
+    { key: "minHeight", label: "Min Height", sortable: true },
+    { key: "maxHeight", label: "Max Height", sortable: true },
+    { key: "minDepth", label: "Min Depth", sortable: true },
+    { key: "maxDepth", label: "Max Depth", sortable: true },
+    { key: "minLureLevel", label: "Min Lure Level", sortable: true },
+    { key: "maxLureLevel", label: "Max Lure Level", sortable: true },
+    { key: "timeRange", label: "Time Range", sortable: true },
+    { key: "fluidBlock", label: "Fluid Block", sortable: true },
+    { key: "bobber", label: "Bobber", sortable: true },
+    { key: "bait", label: "Bait", sortable: true },
+    { key: "labelMode", label: "Label Mode", sortable: true },
     { key: "lightLevel", label: "Light Level", sortable: true },
-    { key: "antiBiomes", label: "Anti-Biomes", sortable: false },
-    { key: "antiStructures", label: "Anti-Structures", sortable: false },
+
+    // Anti-condition fields
+    { key: "antiBiomes", label: "Anti-Biomes", sortable: true },
+    { key: "antiStructures", label: "Anti-Structures", sortable: true },
+    { key: "antiDimensions", label: "Anti-Dimensions", sortable: true },
+    {
+      key: "antiNeededNearbyBlocks",
+      label: "Anti-Nearby Blocks",
+      sortable: true,
+    },
+    { key: "antiNeededBaseBlocks", label: "Anti-Base Blocks", sortable: true },
+    { key: "antiLabels", label: "Anti-Labels", sortable: true },
+    { key: "antiCanSeeSky", label: "Anti-Can See Sky", sortable: true },
+    { key: "antiIsRaining", label: "Anti-Raining", sortable: true },
+    { key: "antiIsThundering", label: "Anti-Thundering", sortable: true },
+    { key: "antiIsSlimeChunk", label: "Anti-Slime Chunk", sortable: true },
+    { key: "antiFluidIsSource", label: "Anti-Fluid Is Source", sortable: true },
+    { key: "antiMoonPhase", label: "Anti-Moon Phase", sortable: true },
+    { key: "antiMinX", label: "Anti-Min X", sortable: true },
+    { key: "antiMinY", label: "Anti-Min Y", sortable: true },
+    { key: "antiMinZ", label: "Anti-Min Z", sortable: true },
+    { key: "antiMaxX", label: "Anti-Max X", sortable: true },
+    { key: "antiMaxY", label: "Anti-Max Y", sortable: true },
+    { key: "antiMaxZ", label: "Anti-Max Z", sortable: true },
+    { key: "antiMinLight", label: "Anti-Min Light", sortable: true },
+    { key: "antiMaxLight", label: "Anti-Max Light", sortable: true },
+    { key: "antiMinSkyLight", label: "Anti-Min Sky Light", sortable: true },
+    { key: "antiMaxSkyLight", label: "Anti-Max Sky Light", sortable: true },
+    { key: "antiMinWidth", label: "Anti-Min Width", sortable: true },
+    { key: "antiMaxWidth", label: "Anti-Max Width", sortable: true },
+    { key: "antiMinHeight", label: "Anti-Min Height", sortable: true },
+    { key: "antiMaxHeight", label: "Anti-Max Height", sortable: true },
+    { key: "antiMinDepth", label: "Anti-Min Depth", sortable: true },
+    { key: "antiMaxDepth", label: "Anti-Max Depth", sortable: true },
+    { key: "antiMinLureLevel", label: "Anti-Min Lure Level", sortable: true },
+    { key: "antiMaxLureLevel", label: "Anti-Max Lure Level", sortable: true },
+    { key: "antiTimeRange", label: "Anti-Time Range", sortable: true },
+    { key: "antiFluidBlock", label: "Anti-Fluid Block", sortable: true },
+    { key: "antiBobber", label: "Anti-Bobber", sortable: true },
+    { key: "antiBait", label: "Anti-Bait", sortable: true },
+    { key: "antiLabelMode", label: "Anti-Label Mode", sortable: true },
+
+    // Weight multiplier fields
+    {
+      key: "weightMultiplierMultiplier",
+      label: "Weight Multiplier",
+      sortable: true,
+    },
+    { key: "weightMultiplierBiomes", label: "WM-Biomes", sortable: true },
+    {
+      key: "weightMultiplierDimensions",
+      label: "WM-Dimensions",
+      sortable: true,
+    },
+    {
+      key: "weightMultiplierStructures",
+      label: "WM-Structures",
+      sortable: true,
+    },
+    {
+      key: "weightMultiplierNeededNearbyBlocks",
+      label: "WM-Nearby Blocks",
+      sortable: true,
+    },
+    {
+      key: "weightMultiplierNeededBaseBlocks",
+      label: "WM-Base Blocks",
+      sortable: true,
+    },
+    { key: "weightMultiplierLabels", label: "WM-Labels", sortable: true },
+    {
+      key: "weightMultiplierCanSeeSky",
+      label: "WM-Can See Sky",
+      sortable: true,
+    },
+    { key: "weightMultiplierIsRaining", label: "WM-Raining", sortable: true },
+    {
+      key: "weightMultiplierIsThundering",
+      label: "WM-Thundering",
+      sortable: true,
+    },
+    {
+      key: "weightMultiplierIsSlimeChunk",
+      label: "WM-Slime Chunk",
+      sortable: true,
+    },
+    {
+      key: "weightMultiplierFluidIsSource",
+      label: "WM-Fluid Is Source",
+      sortable: true,
+    },
+    {
+      key: "weightMultiplierMoonPhase",
+      label: "WM-Moon Phase",
+      sortable: true,
+    },
+    { key: "weightMultiplierMinX", label: "WM-Min X", sortable: true },
+    { key: "weightMultiplierMinY", label: "WM-Min Y", sortable: true },
+    { key: "weightMultiplierMinZ", label: "WM-Min Z", sortable: true },
+    { key: "weightMultiplierMaxX", label: "WM-Max X", sortable: true },
+    { key: "weightMultiplierMaxY", label: "WM-Max Y", sortable: true },
+    { key: "weightMultiplierMaxZ", label: "WM-Max Z", sortable: true },
+    { key: "weightMultiplierMinLight", label: "WM-Min Light", sortable: true },
+    { key: "weightMultiplierMaxLight", label: "WM-Max Light", sortable: true },
+    {
+      key: "weightMultiplierMinSkyLight",
+      label: "WM-Min Sky Light",
+      sortable: true,
+    },
+    {
+      key: "weightMultiplierMaxSkyLight",
+      label: "WM-Max Sky Light",
+      sortable: true,
+    },
+    { key: "weightMultiplierMinWidth", label: "WM-Min Width", sortable: true },
+    { key: "weightMultiplierMaxWidth", label: "WM-Max Width", sortable: true },
+    {
+      key: "weightMultiplierMinHeight",
+      label: "WM-Min Height",
+      sortable: true,
+    },
+    {
+      key: "weightMultiplierMaxHeight",
+      label: "WM-Max Height",
+      sortable: true,
+    },
+    { key: "weightMultiplierMinDepth", label: "WM-Min Depth", sortable: true },
+    { key: "weightMultiplierMaxDepth", label: "WM-Max Depth", sortable: true },
+    {
+      key: "weightMultiplierMinLureLevel",
+      label: "WM-Min Lure Level",
+      sortable: true,
+    },
+    {
+      key: "weightMultiplierMaxLureLevel",
+      label: "WM-Max Lure Level",
+      sortable: true,
+    },
+    {
+      key: "weightMultiplierTimeRange",
+      label: "WM-Time Range",
+      sortable: true,
+    },
+    {
+      key: "weightMultiplierFluidBlock",
+      label: "WM-Fluid Block",
+      sortable: true,
+    },
+    { key: "weightMultiplierBobber", label: "WM-Bobber", sortable: true },
+    { key: "weightMultiplierBait", label: "WM-Bait", sortable: true },
+    {
+      key: "weightMultiplierLabelMode",
+      label: "WM-Label Mode",
+      sortable: true,
+    },
+
     { key: "sourceFile", label: "Source File", sortable: true },
   ];
 
@@ -190,14 +373,110 @@ export default function UploadArea() {
         r.biomes,
         r.dimensions,
         r.structures,
+        r.neededNearbyBlocks,
+        r.neededBaseBlocks,
+        r.labels,
         r.canSeeSky?.toString(),
         r.isRaining?.toString(),
+        r.isThundering?.toString(),
+        r.isSlimeChunk?.toString(),
+        r.fluidIsSource?.toString(),
         r.moonPhase,
-        r.neededNearbyBlocks,
+        r.minX,
+        r.minY,
+        r.minZ,
+        r.maxX,
+        r.maxY,
+        r.maxZ,
+        r.minLight,
+        r.maxLight,
+        r.minSkyLight,
+        r.maxSkyLight,
+        r.minWidth,
+        r.maxWidth,
+        r.minHeight,
+        r.maxHeight,
+        r.minDepth,
+        r.maxDepth,
+        r.minLureLevel,
+        r.maxLureLevel,
         r.timeRange,
+        r.fluidBlock,
+        r.bobber,
+        r.bait,
+        r.labelMode,
         r.lightLevel,
         r.antiBiomes,
         r.antiStructures,
+        r.antiDimensions,
+        r.antiNeededNearbyBlocks,
+        r.antiNeededBaseBlocks,
+        r.antiLabels,
+        r.antiCanSeeSky?.toString(),
+        r.antiIsRaining?.toString(),
+        r.antiIsThundering?.toString(),
+        r.antiIsSlimeChunk?.toString(),
+        r.antiFluidIsSource?.toString(),
+        r.antiMoonPhase,
+        r.antiMinX,
+        r.antiMinY,
+        r.antiMinZ,
+        r.antiMaxX,
+        r.antiMaxY,
+        r.antiMaxZ,
+        r.antiMinLight,
+        r.antiMaxLight,
+        r.antiMinSkyLight,
+        r.antiMaxSkyLight,
+        r.antiMinWidth,
+        r.antiMaxWidth,
+        r.antiMinHeight,
+        r.antiMaxHeight,
+        r.antiMinDepth,
+        r.antiMaxDepth,
+        r.antiMinLureLevel,
+        r.antiMaxLureLevel,
+        r.antiTimeRange,
+        r.antiFluidBlock,
+        r.antiBobber,
+        r.antiBait,
+        r.antiLabelMode,
+        r.weightMultiplierMultiplier,
+        r.weightMultiplierBiomes,
+        r.weightMultiplierDimensions,
+        r.weightMultiplierStructures,
+        r.weightMultiplierNeededNearbyBlocks,
+        r.weightMultiplierNeededBaseBlocks,
+        r.weightMultiplierLabels,
+        r.weightMultiplierCanSeeSky?.toString(),
+        r.weightMultiplierIsRaining?.toString(),
+        r.weightMultiplierIsThundering?.toString(),
+        r.weightMultiplierIsSlimeChunk?.toString(),
+        r.weightMultiplierFluidIsSource?.toString(),
+        r.weightMultiplierMoonPhase,
+        r.weightMultiplierMinX,
+        r.weightMultiplierMinY,
+        r.weightMultiplierMinZ,
+        r.weightMultiplierMaxX,
+        r.weightMultiplierMaxY,
+        r.weightMultiplierMaxZ,
+        r.weightMultiplierMinLight,
+        r.weightMultiplierMaxLight,
+        r.weightMultiplierMinSkyLight,
+        r.weightMultiplierMaxSkyLight,
+        r.weightMultiplierMinWidth,
+        r.weightMultiplierMaxWidth,
+        r.weightMultiplierMinHeight,
+        r.weightMultiplierMaxHeight,
+        r.weightMultiplierMinDepth,
+        r.weightMultiplierMaxDepth,
+        r.weightMultiplierMinLureLevel,
+        r.weightMultiplierMaxLureLevel,
+        r.weightMultiplierTimeRange,
+        r.weightMultiplierFluidBlock,
+        r.weightMultiplierBobber,
+        r.weightMultiplierBait,
+        r.weightMultiplierLabelMode,
         r.sourceFile,
       ]
         .filter(Boolean)
@@ -423,16 +702,30 @@ export default function UploadArea() {
         // Try to save only current batch
         try {
           const batchData = JSON.stringify(parsedReports);
-          if (batchData.length <= 5 * 1024 * 1024) {
-            // 5MB limit
+          if (batchData.length <= maxStorageSize) {
             localStorage.setItem("spawn_reports", batchData);
             setFileReports(parsedReports);
             toast.warning("⚠️ Cleared storage and saved only current batch.");
           } else {
-            setFileReports(parsedReports);
-            toast.error(
-              "⚠️ Could not save to storage. Data will be lost on page refresh."
-            );
+            // Even current batch is too large, try to compress or reduce data
+            const compressedReports = parsedReports.map((report) => ({
+              ...report,
+              data: report.data.slice(0, 1000), // Keep only first 1000 spawns per file
+            }));
+            const compressedData = JSON.stringify(compressedReports);
+
+            if (compressedData.length <= maxStorageSize) {
+              localStorage.setItem("spawn_reports", compressedData);
+              setFileReports(compressedReports);
+              toast.warning(
+                "⚠️ Storage full. Kept only first 1000 spawns per file."
+              );
+            } else {
+              setFileReports(parsedReports);
+              toast.error(
+                "⚠️ Could not save to storage. Data will be lost on page refresh."
+              );
+            }
           }
         } catch (saveErr) {
           setFileReports(parsedReports);
@@ -533,18 +826,25 @@ export default function UploadArea() {
 
   // Auto-cleanup storage when it gets too full
   const autoCleanupStorage = () => {
-    if (storageUsage.percentage > 90) {
+    if (storageUsage.percentage > 80) {
+      // Lowered threshold from 90% to 80%
       try {
         const saved = localStorage.getItem("spawn_reports");
         if (saved) {
           const reports = JSON.parse(saved);
-          // Keep only the 25 most recent reports
-          const cleanedReports = reports.slice(0, 25);
+
+          // More aggressive cleanup - keep only the 15 most recent reports
+          // and limit spawns per report to reduce storage usage
+          const cleanedReports = reports.slice(0, 15).map((report) => ({
+            ...report,
+            data: report.data.slice(0, 500), // Keep only first 500 spawns per file
+          }));
+
           localStorage.setItem("spawn_reports", JSON.stringify(cleanedReports));
           setFileReports(cleanedReports);
           updateStorageUsage();
           toast.warning(
-            "⚠️ Storage was nearly full. Automatically removed old reports."
+            "⚠️ Storage was nearly full. Automatically removed old reports and limited spawns per file."
           );
         }
       } catch (err) {
@@ -665,17 +965,139 @@ export default function UploadArea() {
               <option value="weight">Weight</option>
               <option value="context">Context</option>
               <option value="presets">Presets</option>
+
+              {/* Condition fields */}
               <option value="biomes">Biomes</option>
               <option value="dimensions">Dimensions</option>
-              <option value="canSeeSky">Can See Sky</option>
               <option value="structures">Structures</option>
-              <option value="isRaining">Raining</option>
-              <option value="moonPhase">Moon Phase</option>
               <option value="neededNearbyBlocks">Nearby Blocks</option>
-              <option value="timeRange">Time</option>
+              <option value="neededBaseBlocks">Base Blocks</option>
+              <option value="labels">Labels</option>
+              <option value="canSeeSky">Can See Sky</option>
+              <option value="isRaining">Raining</option>
+              <option value="isThundering">Thundering</option>
+              <option value="isSlimeChunk">Slime Chunk</option>
+              <option value="fluidIsSource">Fluid Is Source</option>
+              <option value="moonPhase">Moon Phase</option>
+              <option value="minX">Min X</option>
+              <option value="minY">Min Y</option>
+              <option value="minZ">Min Z</option>
+              <option value="maxX">Max X</option>
+              <option value="maxY">Max Y</option>
+              <option value="maxZ">Max Z</option>
+              <option value="minLight">Min Light</option>
+              <option value="maxLight">Max Light</option>
+              <option value="minSkyLight">Min Sky Light</option>
+              <option value="maxSkyLight">Max Sky Light</option>
+              <option value="minWidth">Min Width</option>
+              <option value="maxWidth">Max Width</option>
+              <option value="minHeight">Min Height</option>
+              <option value="maxHeight">Max Height</option>
+              <option value="minDepth">Min Depth</option>
+              <option value="maxDepth">Max Depth</option>
+              <option value="minLureLevel">Min Lure Level</option>
+              <option value="maxLureLevel">Max Lure Level</option>
+              <option value="timeRange">Time Range</option>
+              <option value="fluidBlock">Fluid Block</option>
+              <option value="bobber">Bobber</option>
+              <option value="bait">Bait</option>
+              <option value="labelMode">Label Mode</option>
               <option value="lightLevel">Light Level</option>
+
+              {/* Anti-condition fields */}
               <option value="antiBiomes">Anti-Biomes</option>
               <option value="antiStructures">Anti-Structures</option>
+              <option value="antiDimensions">Anti-Dimensions</option>
+              <option value="antiNeededNearbyBlocks">Anti-Nearby Blocks</option>
+              <option value="antiNeededBaseBlocks">Anti-Base Blocks</option>
+              <option value="antiLabels">Anti-Labels</option>
+              <option value="antiCanSeeSky">Anti-Can See Sky</option>
+              <option value="antiIsRaining">Anti-Raining</option>
+              <option value="antiIsThundering">Anti-Thundering</option>
+              <option value="antiIsSlimeChunk">Anti-Slime Chunk</option>
+              <option value="antiFluidIsSource">Anti-Fluid Is Source</option>
+              <option value="antiMoonPhase">Anti-Moon Phase</option>
+              <option value="antiMinX">Anti-Min X</option>
+              <option value="antiMinY">Anti-Min Y</option>
+              <option value="antiMinZ">Anti-Min Z</option>
+              <option value="antiMaxX">Anti-Max X</option>
+              <option value="antiMaxY">Anti-Max Y</option>
+              <option value="antiMaxZ">Anti-Max Z</option>
+              <option value="antiMinLight">Anti-Min Light</option>
+              <option value="antiMaxLight">Anti-Max Light</option>
+              <option value="antiMinSkyLight">Anti-Min Sky Light</option>
+              <option value="antiMaxSkyLight">Anti-Max Sky Light</option>
+              <option value="antiMinWidth">Anti-Min Width</option>
+              <option value="antiMaxWidth">Anti-Max Width</option>
+              <option value="antiMinHeight">Anti-Min Height</option>
+              <option value="antiMaxHeight">Anti-Max Height</option>
+              <option value="antiMinDepth">Anti-Min Depth</option>
+              <option value="antiMaxDepth">Anti-Max Depth</option>
+              <option value="antiMinLureLevel">Anti-Min Lure Level</option>
+              <option value="antiMaxLureLevel">Anti-Max Lure Level</option>
+              <option value="antiTimeRange">Anti-Time Range</option>
+              <option value="antiFluidBlock">Anti-Fluid Block</option>
+              <option value="antiBobber">Anti-Bobber</option>
+              <option value="antiBait">Anti-Bait</option>
+              <option value="antiLabelMode">Anti-Label Mode</option>
+
+              {/* Weight multiplier fields */}
+              <option value="weightMultiplierMultiplier">
+                Weight Multiplier
+              </option>
+              <option value="weightMultiplierBiomes">WM-Biomes</option>
+              <option value="weightMultiplierDimensions">WM-Dimensions</option>
+              <option value="weightMultiplierStructures">WM-Structures</option>
+              <option value="weightMultiplierNeededNearbyBlocks">
+                WM-Nearby Blocks
+              </option>
+              <option value="weightMultiplierNeededBaseBlocks">
+                WM-Base Blocks
+              </option>
+              <option value="weightMultiplierLabels">WM-Labels</option>
+              <option value="weightMultiplierCanSeeSky">WM-Can See Sky</option>
+              <option value="weightMultiplierIsRaining">WM-Raining</option>
+              <option value="weightMultiplierIsThundering">
+                WM-Thundering
+              </option>
+              <option value="weightMultiplierIsSlimeChunk">
+                WM-Slime Chunk
+              </option>
+              <option value="weightMultiplierFluidIsSource">
+                WM-Fluid Is Source
+              </option>
+              <option value="weightMultiplierMoonPhase">WM-Moon Phase</option>
+              <option value="weightMultiplierMinX">WM-Min X</option>
+              <option value="weightMultiplierMinY">WM-Min Y</option>
+              <option value="weightMultiplierMinZ">WM-Min Z</option>
+              <option value="weightMultiplierMaxX">WM-Max X</option>
+              <option value="weightMultiplierMaxY">WM-Max Y</option>
+              <option value="weightMultiplierMaxZ">WM-Max Z</option>
+              <option value="weightMultiplierMinLight">WM-Min Light</option>
+              <option value="weightMultiplierMaxLight">WM-Max Light</option>
+              <option value="weightMultiplierMinSkyLight">
+                WM-Min Sky Light
+              </option>
+              <option value="weightMultiplierMaxSkyLight">
+                WM-Max Sky Light
+              </option>
+              <option value="weightMultiplierMinWidth">WM-Min Width</option>
+              <option value="weightMultiplierMaxWidth">WM-Max Width</option>
+              <option value="weightMultiplierMinHeight">WM-Min Height</option>
+              <option value="weightMultiplierMaxHeight">WM-Max Height</option>
+              <option value="weightMultiplierMinDepth">WM-Min Depth</option>
+              <option value="weightMultiplierMaxDepth">WM-Max Depth</option>
+              <option value="weightMultiplierMinLureLevel">
+                WM-Min Lure Level
+              </option>
+              <option value="weightMultiplierMaxLureLevel">
+                WM-Max Lure Level
+              </option>
+              <option value="weightMultiplierTimeRange">WM-Time Range</option>
+              <option value="weightMultiplierFluidBlock">WM-Fluid Block</option>
+              <option value="weightMultiplierBobber">WM-Bobber</option>
+              <option value="weightMultiplierBait">WM-Bait</option>
+              <option value="weightMultiplierLabelMode">WM-Label Mode</option>
             </select>
 
             <input
@@ -709,6 +1131,38 @@ export default function UploadArea() {
               onClick={clearAll}
             >
               <X size={16} /> Clear All
+            </button>
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-yellow-600 rounded hover:bg-yellow-700 transition"
+              onClick={() => {
+                try {
+                  const saved = localStorage.getItem("spawn_reports");
+                  if (saved) {
+                    const reports = JSON.parse(saved);
+                    // Keep only the 10 most recent reports and limit spawns
+                    const cleanedReports = reports
+                      .slice(0, 10)
+                      .map((report) => ({
+                        ...report,
+                        data: report.data.slice(0, 250), // Keep only first 250 spawns per file
+                      }));
+                    localStorage.setItem(
+                      "spawn_reports",
+                      JSON.stringify(cleanedReports)
+                    );
+                    setFileReports(cleanedReports);
+                    updateStorageUsage();
+                    toast.success(
+                      "✅ Cleaned up storage - kept 10 most recent files with limited spawns."
+                    );
+                  }
+                } catch (err) {
+                  console.error("Manual cleanup failed:", err);
+                  toast.error("❌ Cleanup failed.");
+                }
+              }}
+            >
+              🧹 Clean Storage
             </button>
           </div>
 
