@@ -365,33 +365,50 @@ export default function SpawnPoolGenerator() {
     const originalFile = fileList[index];
     if (!originalFile) return;
 
-    // Find a unique name for the duplicate
-    let newName = `${originalFile.name}-copy`;
-    let counter = 1;
-    while (
-      fileList.some((f) => f.name.toLowerCase() === newName.toLowerCase())
-    ) {
-      newName = `${originalFile.name}-copy-${counter}`;
-      counter++;
-    }
+    (async () => {
+      // Generate a suggested name
+      let suggestedName = `${originalFile.name}-copy`;
+      let counter = 1;
+      while (
+        fileList.some(
+          (f) => f.name.toLowerCase() === suggestedName.toLowerCase()
+        )
+      ) {
+        suggestedName = `${originalFile.name}-copy-${counter}`;
+        counter++;
+      }
 
-    setFileList((prev) => {
-      const copy = JSON.parse(JSON.stringify(prev));
-      const duplicatedFile = {
-        ...originalFile,
-        name: newName,
-        lastEdited: Date.now(),
-        spawns: originalFile.spawns.map((spawn, spawnIndex) => ({
-          ...spawn,
-          id: spawn.id ? `${spawn.id}-copy` : `${newName}-${spawnIndex + 1}`,
-          pokemon: spawn.pokemon || newName,
+      const raw = await openPrompt({
+        title: "Duplicate File",
+        message: `Enter name for the duplicate of "${originalFile.name}.json":`,
+        placeholder: "filename",
+        defaultValue: suggestedName,
+      });
+      if (!raw) return;
+      const name = String(raw).trim();
+      if (!name) return alert("Filename cannot be empty.");
+      if (fileList.some((f) => f.name.toLowerCase() === name.toLowerCase())) {
+        return alert(`A file named "${name}.json" already exists.`);
+      }
+
+      setFileList((prev) => {
+        const copy = JSON.parse(JSON.stringify(prev));
+        const duplicatedFile = {
+          ...originalFile,
+          name: name,
           lastEdited: Date.now(),
-        })),
-      };
-      copy.push(duplicatedFile);
-      setActiveFileIndex(copy.length - 1);
-      return copy;
-    });
+          spawns: originalFile.spawns.map((spawn, spawnIndex) => ({
+            ...spawn,
+            id: spawn.id ? `${spawn.id}-copy` : `${name}-${spawnIndex + 1}`,
+            pokemon: name, // Always set pokemon name to match the new filename
+            lastEdited: Date.now(),
+          })),
+        };
+        copy.push(duplicatedFile);
+        setActiveFileIndex(copy.length - 1);
+        return copy;
+      });
+    })();
   }
 
   function importJsonFile() {
