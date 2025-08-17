@@ -105,6 +105,11 @@ export default function SpeciesScanner() {
     }
   };
 
+  // Update storage usage whenever species changes
+  useEffect(() => {
+    updateStorageUsage();
+  }, [species]);
+
   // Auto-cleanup storage when it gets too full
   const autoCleanupStorage = () => {
     if (storageUsage.percentage > 90) {
@@ -368,7 +373,6 @@ export default function SpeciesScanner() {
 
     setLoading(false);
     setUploadProgress({ current: 0, total: 0, fileName: "" });
-    updateStorageUsage(); // Update storage usage after saving
   };
 
   const paginated = filtered.slice(
@@ -448,7 +452,6 @@ export default function SpeciesScanner() {
     setSortBy("dex");
     setSortDirection("asc");
     localStorage.removeItem("species_data");
-    updateStorageUsage(); // Update storage usage after clearing
     toast.success("Species data cleared");
   };
 

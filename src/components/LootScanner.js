@@ -90,6 +90,11 @@ export default function LootScanner() {
     }
   };
 
+  // Update storage usage whenever fileReports changes
+  useEffect(() => {
+    updateStorageUsage();
+  }, [fileReports]);
+
   // Auto-cleanup storage when it gets too full
   const autoCleanupStorage = () => {
     if (storageUsage.percentage > 90) {
@@ -145,24 +150,39 @@ export default function LootScanner() {
 
       try {
         const parsed = await parseLootFromZip(file);
-        if (parsed.length === 0) {
+        if (parsed && parsed.length > 0) {
+          newReports.push({
+            id: crypto.randomUUID(),
+            name: file.name,
+            data: parsed,
+          });
+          console.log(
+            `✅ Successfully parsed ${file.name}: ${parsed.length} Pokémon with loot data`
+          );
+        } else {
+          console.warn(`⚠️ No loot data found in ${file.name}`);
           toast.error(`${file.name}: No loot data found.`);
-          continue;
         }
-
-        newReports.push({
-          id: crypto.randomUUID(),
-          name: file.name,
-          data: parsed,
-        });
 
         // Small delay to allow garbage collection between files
         if (i < newFiles.length - 1) {
           await new Promise((resolve) => setTimeout(resolve, 50));
         }
       } catch (err) {
-        toast.error(`Failed to parse ${file.name}`);
+        console.error(`❌ Failed to parse ${file.name}:`, err);
+        toast.error(`Failed to parse ${file.name} - check console for details`);
       }
+    }
+
+    // Show parsing results before state update
+    if (newReports.length > 0) {
+      const totalPokemon = newReports.reduce(
+        (sum, report) => sum + report.data.length,
+        0
+      );
+      toast.success(
+        `✅ Successfully parsed ${newReports.length} file(s) with ${totalPokemon} Pokémon loot data!`
+      );
     }
 
     setFileReports((prev) => {
@@ -244,7 +264,6 @@ export default function LootScanner() {
 
     setLoading(false);
     setUploadProgress({ current: 0, total: 0, fileName: "" });
-    updateStorageUsage(); // Update storage usage after saving
   };
 
   const handleInputChange = (e) => {
@@ -334,7 +353,6 @@ export default function LootScanner() {
     setFileReports([]);
     setSort({ column: "pokemon", direction: "asc" });
     localStorage.removeItem("loot_reports");
-    updateStorageUsage(); // Update storage usage after clearing
   };
 
   const SEARCH_FIELDS = [
