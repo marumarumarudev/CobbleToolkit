@@ -1,7 +1,6 @@
 import "./globals.css";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
-import Image from "next/image";
 import ClientNav from "@/components/ClientNav";
 import GlobalErrorFilters from "@/components/GlobalErrorFilters";
 

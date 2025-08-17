@@ -15,6 +15,7 @@ export default function ClientNav() {
     { name: "Loot Drop Scanner", path: "/loot-scanner" },
     { name: "Species Scanner", path: "/species-scanner" },
     { name: "Spawn Pool Generator", path: "/spawn-pool-generator" },
+    { name: "Trainer Scanner", path: "/trainer-scanner" },
   ];
 
   const isActive = (path) => pathname === path;

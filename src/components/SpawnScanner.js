@@ -3,7 +3,14 @@
 import { useState, useEffect, useRef } from "react";
 import { parseCobblemonZip } from "@/utils/spawnParser";
 import toast from "react-hot-toast";
-import { ChevronDown, ChevronUp, ChevronsUpDown, X } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
+  X,
+  Search,
+  Filter,
+} from "lucide-react";
 import Spinner from "./Spinner";
 
 export default function UploadArea() {
@@ -11,7 +18,9 @@ export default function UploadArea() {
   const [loading, setLoading] = useState(false);
   const [searchField, setSearchField] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [contextFilter, setContextFilter] = useState("all");
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [sort, setSort] = useState({ column: "bucket", direction: "asc" });
   const [uploadProgress, setUploadProgress] = useState({
     current: 0,
@@ -100,12 +109,11 @@ export default function UploadArea() {
     prevSearch.current = searchTerm;
   }, [searchTerm]);
 
-  const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
-
+  // Debounced search effect
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerm);
-    }, 200);
+    }, 300);
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
@@ -360,7 +368,7 @@ export default function UploadArea() {
       contextFilter === "all" || r.context === contextFilter;
 
     if (!matchesContext) return false;
-    if (!searchTerm) return true;
+    if (!debouncedSearch) return true;
 
     if (searchField === "all") {
       return [
@@ -483,13 +491,13 @@ export default function UploadArea() {
         .some(
           (value) =>
             typeof value === "string" &&
-            value.toLowerCase().includes(searchTerm.toLowerCase())
+            value.toLowerCase().includes(debouncedSearch.toLowerCase())
         );
     } else {
       const value = r[searchField];
       return (
         value &&
-        value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        value.toString().toLowerCase().includes(debouncedSearch.toLowerCase())
       );
     }
   });
@@ -540,7 +548,7 @@ export default function UploadArea() {
   // Reset to first page when search or filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, contextFilter, searchField]);
+  }, [debouncedSearch, contextFilter, searchField]);
 
   const handleFiles = async (files) => {
     if (loading) {
@@ -760,12 +768,135 @@ export default function UploadArea() {
     handleFiles(files);
   };
 
+  const clearSearch = () => {
+    setSearchTerm("");
+    setSearchField("all");
+    setCurrentPage(1);
+  };
+
   const clearAll = () => {
     setFileReports([]);
     setSort({ column: "pokemon", direction: "asc" });
     localStorage.removeItem("spawn_reports");
     updateStorageUsage(); // Update storage usage after clearing
   };
+
+  const SEARCH_FIELDS = [
+    { value: "all", label: "All Fields" },
+    { value: "pokemon", label: "Pokémon" },
+    { value: "bucket", label: "Rarity" },
+    { value: "level", label: "Level" },
+    { value: "weight", label: "Weight" },
+    { value: "context", label: "Context" },
+    { value: "presets", label: "Presets" },
+    { value: "biomes", label: "Biomes" },
+    { value: "dimensions", label: "Dimensions" },
+    { value: "structures", label: "Structures" },
+    { value: "neededNearbyBlocks", label: "Nearby Blocks" },
+    { value: "neededBaseBlocks", label: "Base Blocks" },
+    { value: "labels", label: "Labels" },
+    { value: "canSeeSky", label: "Can See Sky" },
+    { value: "isRaining", label: "Raining" },
+    { value: "isThundering", label: "Thundering" },
+    { value: "isSlimeChunk", label: "Slime Chunk" },
+    { value: "fluidIsSource", label: "Fluid Is Source" },
+    { value: "moonPhase", label: "Moon Phase" },
+    { value: "minX", label: "Min X" },
+    { value: "minY", label: "Min Y" },
+    { value: "minZ", label: "Min Z" },
+    { value: "maxX", label: "Max X" },
+    { value: "maxY", label: "Max Y" },
+    { value: "maxZ", label: "Max Z" },
+    { value: "minLight", label: "Min Light" },
+    { value: "maxLight", label: "Max Light" },
+    { value: "minSkyLight", label: "Min Sky Light" },
+    { value: "maxSkyLight", label: "Max Sky Light" },
+    { value: "minWidth", label: "Min Width" },
+    { value: "maxWidth", label: "Max Width" },
+    { value: "minHeight", label: "Min Height" },
+    { value: "maxHeight", label: "Max Height" },
+    { value: "minDepth", label: "Min Depth" },
+    { value: "maxDepth", label: "Max Depth" },
+    { value: "minLureLevel", label: "Min Lure Level" },
+    { value: "maxLureLevel", label: "Max Lure Level" },
+    { value: "timeRange", label: "Time Range" },
+    { value: "fluidBlock", label: "Fluid Block" },
+    { value: "bobber", label: "Bobber" },
+    { value: "bait", label: "Bait" },
+    { value: "labelMode", label: "Label Mode" },
+    { value: "lightLevel", label: "Light Level" },
+    { value: "antiBiomes", label: "Anti-Biomes" },
+    { value: "antiStructures", label: "Anti-Structures" },
+    { value: "antiDimensions", label: "Anti-Dimensions" },
+    { value: "antiNeededNearbyBlocks", label: "Anti-Nearby Blocks" },
+    { value: "antiNeededBaseBlocks", label: "Anti-Base Blocks" },
+    { value: "antiLabels", label: "Anti-Labels" },
+    { value: "antiCanSeeSky", label: "Anti-Can See Sky" },
+    { value: "antiIsRaining", label: "Anti-Raining" },
+    { value: "antiIsThundering", label: "Anti-Thundering" },
+    { value: "antiIsSlimeChunk", label: "Anti-Slime Chunk" },
+    { value: "antiFluidIsSource", label: "Anti-Fluid Is Source" },
+    { value: "antiMoonPhase", label: "Anti-Moon Phase" },
+    { value: "antiMinX", label: "Anti-Min X" },
+    { value: "antiMinY", label: "Anti-Min Y" },
+    { value: "antiMinZ", label: "Anti-Min Z" },
+    { value: "antiMaxX", label: "Anti-Max X" },
+    { value: "antiMaxY", label: "Anti-Max Y" },
+    { value: "antiMaxZ", label: "Anti-Max Z" },
+    { value: "antiMinLight", label: "Anti-Min Light" },
+    { value: "antiMaxLight", label: "Anti-Max Light" },
+    { value: "antiMinSkyLight", label: "Anti-Min Sky Light" },
+    { value: "antiMaxSkyLight", label: "Anti-Max Sky Light" },
+    { value: "antiMinWidth", label: "Anti-Min Width" },
+    { value: "antiMaxWidth", label: "Anti-Max Width" },
+    { value: "antiMinHeight", label: "Anti-Min Height" },
+    { value: "antiMaxHeight", label: "Anti-Max Height" },
+    { value: "antiMinDepth", label: "Anti-Min Depth" },
+    { value: "antiMaxDepth", label: "Anti-Max Depth" },
+    { value: "antiMinLureLevel", label: "Anti-Min Lure Level" },
+    { value: "antiMaxLureLevel", label: "Anti-Max Lure Level" },
+    { value: "antiTimeRange", label: "Anti-Time Range" },
+    { value: "antiFluidBlock", label: "Anti-Fluid Block" },
+    { value: "antiBobber", label: "Anti-Bobber" },
+    { value: "antiBait", label: "Anti-Bait" },
+    { value: "antiLabelMode", label: "Anti-Label Mode" },
+    { value: "weightMultiplierMultiplier", label: "Weight Multiplier" },
+    { value: "weightMultiplierBiomes", label: "WM-Biomes" },
+    { value: "weightMultiplierDimensions", label: "WM-Dimensions" },
+    { value: "weightMultiplierStructures", label: "WM-Structures" },
+    { value: "weightMultiplierNeededNearbyBlocks", label: "WM-Nearby Blocks" },
+    { value: "weightMultiplierNeededBaseBlocks", label: "WM-Base Blocks" },
+    { value: "weightMultiplierLabels", label: "WM-Labels" },
+    { value: "weightMultiplierCanSeeSky", label: "WM-Can See Sky" },
+    { value: "weightMultiplierIsRaining", label: "WM-Raining" },
+    { value: "weightMultiplierIsThundering", label: "WM-Thundering" },
+    { value: "weightMultiplierIsSlimeChunk", label: "WM-Slime Chunk" },
+    { value: "weightMultiplierFluidIsSource", label: "WM-Fluid Is Source" },
+    { value: "weightMultiplierMoonPhase", label: "WM-Moon Phase" },
+    { value: "weightMultiplierMinX", label: "WM-Min X" },
+    { value: "weightMultiplierMinY", label: "WM-Min Y" },
+    { value: "weightMultiplierMinZ", label: "WM-Min Z" },
+    { value: "weightMultiplierMaxX", label: "WM-Max X" },
+    { value: "weightMultiplierMaxY", label: "WM-Max Y" },
+    { value: "weightMultiplierMaxZ", label: "WM-Max Z" },
+    { value: "weightMultiplierMinLight", label: "WM-Min Light" },
+    { value: "weightMultiplierMaxLight", label: "WM-Max Light" },
+    { value: "weightMultiplierMinSkyLight", label: "WM-Min Sky Light" },
+    { value: "weightMultiplierMaxSkyLight", label: "WM-Max Sky Light" },
+    { value: "weightMultiplierMinWidth", label: "WM-Min Width" },
+    { value: "weightMultiplierMaxWidth", label: "WM-Max Width" },
+    { value: "weightMultiplierMinHeight", label: "WM-Min Height" },
+    { value: "weightMultiplierMaxHeight", label: "WM-Max Height" },
+    { value: "weightMultiplierMinDepth", label: "WM-Min Depth" },
+    { value: "weightMultiplierMaxDepth", label: "WM-Max Depth" },
+    { value: "weightMultiplierMinLureLevel", label: "WM-Min Lure Level" },
+    { value: "weightMultiplierMaxLureLevel", label: "WM-Max Lure Level" },
+    { value: "weightMultiplierTimeRange", label: "WM-Time Range" },
+    { value: "weightMultiplierFluidBlock", label: "WM-Fluid Block" },
+    { value: "weightMultiplierBobber", label: "WM-Bobber" },
+    { value: "weightMultiplierBait", label: "WM-Bait" },
+    { value: "weightMultiplierLabelMode", label: "WM-Label Mode" },
+  ];
 
   // Memory cleanup for Chrome
   const cleanupMemory = () => {
@@ -951,177 +1082,117 @@ export default function UploadArea() {
 
       {fileReports.length > 0 && (
         <>
-          {/* Search Controls */}
-          <div className="flex flex-col md:flex-row gap-2 items-center mb-6 w-full max-w-3xl">
-            <select
-              value={searchField}
-              onChange={(e) => setSearchField(e.target.value)}
-              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full md:w-1/3"
-            >
-              <option value="all">All Fields</option>
-              <option value="pokemon">Pokémon</option>
-              <option value="bucket">Rarity</option>
-              <option value="level">Level</option>
-              <option value="weight">Weight</option>
-              <option value="context">Context</option>
-              <option value="presets">Presets</option>
+          {/* Enhanced Search & Actions */}
+          <div className="w-full max-w-4xl mb-6">
+            {/* Main Search Bar */}
+            <div className="flex flex-col lg:flex-row gap-3 mb-4">
+              <div className="relative flex-1">
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={18}
+                />
+                <input
+                  type="text"
+                  placeholder="🔍 Search spawn data..."
+                  className="w-full pl-10 pr-4 py-3 bg-[#2c2c2c] border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {searchTerm && (
+                  <button
+                    onClick={clearSearch}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
 
-              {/* Condition fields */}
-              <option value="biomes">Biomes</option>
-              <option value="dimensions">Dimensions</option>
-              <option value="structures">Structures</option>
-              <option value="neededNearbyBlocks">Nearby Blocks</option>
-              <option value="neededBaseBlocks">Base Blocks</option>
-              <option value="labels">Labels</option>
-              <option value="canSeeSky">Can See Sky</option>
-              <option value="isRaining">Raining</option>
-              <option value="isThundering">Thundering</option>
-              <option value="isSlimeChunk">Slime Chunk</option>
-              <option value="fluidIsSource">Fluid Is Source</option>
-              <option value="moonPhase">Moon Phase</option>
-              <option value="minX">Min X</option>
-              <option value="minY">Min Y</option>
-              <option value="minZ">Min Z</option>
-              <option value="maxX">Max X</option>
-              <option value="maxY">Max Y</option>
-              <option value="maxZ">Max Z</option>
-              <option value="minLight">Min Light</option>
-              <option value="maxLight">Max Light</option>
-              <option value="minSkyLight">Min Sky Light</option>
-              <option value="maxSkyLight">Max Sky Light</option>
-              <option value="minWidth">Min Width</option>
-              <option value="maxWidth">Max Width</option>
-              <option value="minHeight">Min Height</option>
-              <option value="maxHeight">Max Height</option>
-              <option value="minDepth">Min Depth</option>
-              <option value="maxDepth">Max Depth</option>
-              <option value="minLureLevel">Min Lure Level</option>
-              <option value="maxLureLevel">Max Lure Level</option>
-              <option value="timeRange">Time Range</option>
-              <option value="fluidBlock">Fluid Block</option>
-              <option value="bobber">Bobber</option>
-              <option value="bait">Bait</option>
-              <option value="labelMode">Label Mode</option>
-              <option value="lightLevel">Light Level</option>
+              <button
+                onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+                className="flex items-center gap-2 px-4 py-3 bg-[#3a3a3a] hover:bg-[#4a4a4a] rounded-lg transition-colors duration-200 lg:w-auto w-full justify-center"
+              >
+                <Filter size={18} />
+                <span className="hidden sm:inline">Advanced</span>
+              </button>
+            </div>
 
-              {/* Anti-condition fields */}
-              <option value="antiBiomes">Anti-Biomes</option>
-              <option value="antiStructures">Anti-Structures</option>
-              <option value="antiDimensions">Anti-Dimensions</option>
-              <option value="antiNeededNearbyBlocks">Anti-Nearby Blocks</option>
-              <option value="antiNeededBaseBlocks">Anti-Base Blocks</option>
-              <option value="antiLabels">Anti-Labels</option>
-              <option value="antiCanSeeSky">Anti-Can See Sky</option>
-              <option value="antiIsRaining">Anti-Raining</option>
-              <option value="antiIsThundering">Anti-Thundering</option>
-              <option value="antiIsSlimeChunk">Anti-Slime Chunk</option>
-              <option value="antiFluidIsSource">Anti-Fluid Is Source</option>
-              <option value="antiMoonPhase">Anti-Moon Phase</option>
-              <option value="antiMinX">Anti-Min X</option>
-              <option value="antiMinY">Anti-Min Y</option>
-              <option value="antiMinZ">Anti-Min Z</option>
-              <option value="antiMaxX">Anti-Max X</option>
-              <option value="antiMaxY">Anti-Max Y</option>
-              <option value="antiMaxZ">Anti-Max Z</option>
-              <option value="antiMinLight">Anti-Min Light</option>
-              <option value="antiMaxLight">Anti-Max Light</option>
-              <option value="antiMinSkyLight">Anti-Min Sky Light</option>
-              <option value="antiMaxSkyLight">Anti-Max Sky Light</option>
-              <option value="antiMinWidth">Anti-Min Width</option>
-              <option value="antiMaxWidth">Anti-Max Width</option>
-              <option value="antiMinHeight">Anti-Min Height</option>
-              <option value="antiMaxHeight">Anti-Max Height</option>
-              <option value="antiMinDepth">Anti-Min Depth</option>
-              <option value="antiMaxDepth">Anti-Max Depth</option>
-              <option value="antiMinLureLevel">Anti-Min Lure Level</option>
-              <option value="antiMaxLureLevel">Anti-Max Lure Level</option>
-              <option value="antiTimeRange">Anti-Time Range</option>
-              <option value="antiFluidBlock">Anti-Fluid Block</option>
-              <option value="antiBobber">Anti-Bobber</option>
-              <option value="antiBait">Anti-Bait</option>
-              <option value="antiLabelMode">Anti-Label Mode</option>
+            {/* Advanced Search Options */}
+            {showAdvancedSearch && (
+              <div className="bg-[#2a2a2a] rounded-lg p-4 border border-gray-700/50 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Search Field
+                    </label>
+                    <select
+                      value={searchField}
+                      onChange={(e) => setSearchField(e.target.value)}
+                      className="w-full bg-[#3a3a3a] border border-gray-600 text-white p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      {SEARCH_FIELDS.map((field) => (
+                        <option key={field.value} value={field.value}>
+                          {field.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              {/* Weight multiplier fields */}
-              <option value="weightMultiplierMultiplier">
-                Weight Multiplier
-              </option>
-              <option value="weightMultiplierBiomes">WM-Biomes</option>
-              <option value="weightMultiplierDimensions">WM-Dimensions</option>
-              <option value="weightMultiplierStructures">WM-Structures</option>
-              <option value="weightMultiplierNeededNearbyBlocks">
-                WM-Nearby Blocks
-              </option>
-              <option value="weightMultiplierNeededBaseBlocks">
-                WM-Base Blocks
-              </option>
-              <option value="weightMultiplierLabels">WM-Labels</option>
-              <option value="weightMultiplierCanSeeSky">WM-Can See Sky</option>
-              <option value="weightMultiplierIsRaining">WM-Raining</option>
-              <option value="weightMultiplierIsThundering">
-                WM-Thundering
-              </option>
-              <option value="weightMultiplierIsSlimeChunk">
-                WM-Slime Chunk
-              </option>
-              <option value="weightMultiplierFluidIsSource">
-                WM-Fluid Is Source
-              </option>
-              <option value="weightMultiplierMoonPhase">WM-Moon Phase</option>
-              <option value="weightMultiplierMinX">WM-Min X</option>
-              <option value="weightMultiplierMinY">WM-Min Y</option>
-              <option value="weightMultiplierMinZ">WM-Min Z</option>
-              <option value="weightMultiplierMaxX">WM-Max X</option>
-              <option value="weightMultiplierMaxY">WM-Max Y</option>
-              <option value="weightMultiplierMaxZ">WM-Max Z</option>
-              <option value="weightMultiplierMinLight">WM-Min Light</option>
-              <option value="weightMultiplierMaxLight">WM-Max Light</option>
-              <option value="weightMultiplierMinSkyLight">
-                WM-Min Sky Light
-              </option>
-              <option value="weightMultiplierMaxSkyLight">
-                WM-Max Sky Light
-              </option>
-              <option value="weightMultiplierMinWidth">WM-Min Width</option>
-              <option value="weightMultiplierMaxWidth">WM-Max Width</option>
-              <option value="weightMultiplierMinHeight">WM-Min Height</option>
-              <option value="weightMultiplierMaxHeight">WM-Max Height</option>
-              <option value="weightMultiplierMinDepth">WM-Min Depth</option>
-              <option value="weightMultiplierMaxDepth">WM-Max Depth</option>
-              <option value="weightMultiplierMinLureLevel">
-                WM-Min Lure Level
-              </option>
-              <option value="weightMultiplierMaxLureLevel">
-                WM-Max Lure Level
-              </option>
-              <option value="weightMultiplierTimeRange">WM-Time Range</option>
-              <option value="weightMultiplierFluidBlock">WM-Fluid Block</option>
-              <option value="weightMultiplierBobber">WM-Bobber</option>
-              <option value="weightMultiplierBait">WM-Bait</option>
-              <option value="weightMultiplierLabelMode">WM-Label Mode</option>
-            </select>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Context Filter
+                    </label>
+                    <select
+                      value={contextFilter}
+                      onChange={(e) => setContextFilter(e.target.value)}
+                      className="w-full bg-[#3a3a3a] border border-gray-600 text-white p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="all">All Contexts</option>
+                      {availableContexts.map((ctx) => (
+                        <option key={ctx} value={ctx}>
+                          {ctx.charAt(0).toUpperCase() + ctx.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-            <input
-              type="text"
-              placeholder={`Search by ${
-                searchField === "all" ? "any field" : searchField
-              }...`}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full"
-            />
+                  <div className="flex items-end">
+                    <button
+                      onClick={clearSearch}
+                      className="w-full px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded transition-colors duration-200"
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
-            <select
-              value={contextFilter}
-              onChange={(e) => setContextFilter(e.target.value)}
-              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full md:w-1/3"
-            >
-              <option value="all">All Contexts</option>
-              {availableContexts.map((ctx) => (
-                <option key={ctx} value={ctx}>
-                  {ctx.charAt(0).toUpperCase() + ctx.slice(1)}
-                </option>
-              ))}
-            </select>
+            {/* Search Stats */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-400">
+              <div className="flex items-center gap-2">
+                <span>Results: {filteredData.length}</span>
+                <span className="text-gray-600">|</span>
+                <span>Files: {fileReports.filter((r) => !r.error).length}</span>
+                {debouncedSearch && (
+                  <>
+                    <span className="text-gray-600">|</span>
+                    <span className="text-blue-400">
+                      Matches: &quot;{debouncedSearch}&quot;
+                    </span>
+                  </>
+                )}
+              </div>
+
+              {debouncedSearch && (
+                <button
+                  onClick={clearSearch}
+                  className="text-blue-400 hover:text-blue-300 transition-colors text-sm"
+                >
+                  Clear Search
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Action Buttons */}
