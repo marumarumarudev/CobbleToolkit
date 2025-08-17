@@ -36,6 +36,7 @@ export default function SpeciesScanner() {
     total: 0,
     fileName: "",
   });
+
   const [storageUsage, setStorageUsage] = useState({
     used: 0,
     limit: 0,
@@ -251,34 +252,56 @@ export default function SpeciesScanner() {
 
       try {
         const parsed = await parseSpeciesAndSpawnFromZip(file);
-        allParsed.push(...parsed);
+        if (parsed && parsed.length > 0) {
+          allParsed.push(...parsed);
+          console.log(
+            `✅ Successfully parsed ${file.name}: ${parsed.length} species`
+          );
+        } else {
+          console.warn(`⚠️ No species data found in ${file.name}`);
+        }
 
         // Small delay to allow garbage collection between files
         if (i < valid.length - 1) {
           await new Promise((resolve) => setTimeout(resolve, 50));
         }
       } catch (e) {
-        console.error(e);
-        toast.error(`Failed to parse ${file.name}`);
+        console.error(`❌ Failed to parse ${file.name}:`, e);
+        toast.error(`Failed to parse ${file.name} - check console for details`);
       }
     }
 
     if (allParsed.length > 0) {
+      // Show parsing results
+      toast.success(`✅ Successfully parsed ${allParsed.length} species!`);
+
       // Progressive localStorage saving to prevent Chrome hanging
       try {
         // Auto-cleanup if storage is nearly full
         autoCleanupStorage();
 
+        // Always merge new data with existing data
+        const existingSpecies = species.length > 0 ? [...species] : [];
+        const mergedSpecies = [...existingSpecies, ...allParsed];
+
+        // Remove duplicates based on name and source file
+        const finalSpecies = mergedSpecies.filter(
+          (species, index, self) =>
+            index ===
+            self.findIndex(
+              (s) =>
+                s.name === species.name && s.sourceFile === species.sourceFile
+            )
+        );
+        const duplicateCount = mergedSpecies.length - finalSpecies.length;
+
         // Check storage size before saving
-        const dataSize = JSON.stringify(allParsed).length;
+        const dataSize = JSON.stringify(finalSpecies).length;
         const maxStorageSize = 5 * 1024 * 1024; // 5MB limit
 
         if (dataSize > maxStorageSize) {
           // If data is too large, try to save only recent species
-          const recentSpecies = allParsed.slice(
-            0,
-            Math.min(allParsed.length, 200)
-          ); // Keep only 200 most recent
+          const recentSpecies = finalSpecies.slice(-200); // Keep only 200 most recent
           const recentSize = JSON.stringify(recentSpecies).length;
 
           if (recentSize <= maxStorageSize) {
@@ -298,12 +321,24 @@ export default function SpeciesScanner() {
             );
           }
         } else {
-          // Normal save
-          localStorage.setItem("species_data", JSON.stringify(allParsed));
-          setSpecies(allParsed);
-          setFiltered(allParsed);
+          // Normal save - merged data
+          localStorage.setItem("species_data", JSON.stringify(finalSpecies));
+          setSpecies(finalSpecies);
+          setFiltered(finalSpecies);
         }
-        toast.success("Species data loaded!");
+
+        const newSpeciesCount = allParsed.length;
+        const totalSpeciesCount = finalSpecies.length;
+
+        if (duplicateCount > 0) {
+          toast.success(
+            `Species data updated! Added ${newSpeciesCount} new species (${duplicateCount} duplicates removed). Total: ${totalSpeciesCount}`
+          );
+        } else {
+          toast.success(
+            `Species data updated! Added ${newSpeciesCount} new species. Total: ${totalSpeciesCount}`
+          );
+        }
       } catch (err) {
         if (
           err instanceof DOMException &&
@@ -314,6 +349,7 @@ export default function SpeciesScanner() {
           toast.error(
             "❌ Storage full. Please clear old data before adding new ones."
           );
+          // Fallback to just the new data if storage fails
           setSpecies(allParsed);
           setFiltered(allParsed);
         } else {
@@ -321,6 +357,7 @@ export default function SpeciesScanner() {
           toast.error(
             "⚠️ Failed to save data. It will be lost on page refresh."
           );
+          // Fallback to just the new data if storage fails
           setSpecies(allParsed);
           setFiltered(allParsed);
         }
