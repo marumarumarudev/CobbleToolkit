@@ -94,6 +94,10 @@ export default function NextRegionGuidePage() {
             </a>
             .
           </p>
+          <p className="text-xs text-center opacity-50 italic">
+            You can summon the NPC via command:{" "}
+            <code>/summon rctmod:trainer_association</code>
+          </p>
         </div>
       </section>
 

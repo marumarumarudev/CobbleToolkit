@@ -30,6 +30,26 @@ export default function ItemsGuidePage() {
             <strong>Option B:</strong> Visit <strong>Department Stores</strong>{" "}
             in large villages. These often sell mob drop items directly.
           </li>
+          <li>
+            <strong>Option C:</strong> Visit{" "}
+            <a
+              href="https://wiki.cobblemon.com/index.php/Pok%C3%A9mon/Drops"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline"
+            >
+              Cobblemon Pokémon Drops
+            </a>
+            . This covers drops from the base Cobblemon mod only and does not
+            include datapacks.
+          </li>
+          <li>
+            <strong>Option D:</strong> Visit my{" "}
+            <a href="/loot-scanner" className="underline">
+              loot scanner tool
+            </a>{" "}
+            and drag & drop your datapacks to see their loot tables.
+          </li>
         </ul>
         {/* Department Store carousel */}
         <div className="mt-4">
