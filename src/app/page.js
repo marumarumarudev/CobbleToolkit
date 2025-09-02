@@ -10,6 +10,7 @@ export default function HomePage() {
     { name: "Trainer Scanner", path: "/trainer-scanner" },
     { name: "Spawn Pool Generator", path: "/spawn-pool-generator" },
     { name: "Recommended Stuff", path: "/recommended" },
+    { name: "Guides", path: "/guides" },
     { name: "Feedback Gallery", path: "/feedback-gallery" },
     { name: "FAQ", path: "/faq" },
   ];

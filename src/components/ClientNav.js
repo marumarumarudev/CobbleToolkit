@@ -72,6 +72,17 @@ export default function ClientNav() {
           </div>
 
           <Link
+            href="/guides"
+            className={`${
+              isActive("/guides")
+                ? "text-yellow-400"
+                : "text-gray-300 hover:text-yellow-400"
+            }`}
+          >
+            Guides
+          </Link>
+
+          <Link
             href="/recommended"
             className={`${
               isActive("/recommended")
@@ -121,6 +132,17 @@ export default function ClientNav() {
               {tool.name}
             </Link>
           ))}
+          <Link
+            href="/guides"
+            className={`block ${
+              isActive("/guides")
+                ? "text-yellow-400"
+                : "text-gray-300 hover:text-yellow-400"
+            }`}
+            onClick={() => setIsOpen(false)}
+          >
+            Guides
+          </Link>
           <Link
             href="/recommended"
             className={`block ${

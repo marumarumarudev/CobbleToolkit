@@ -76,10 +76,19 @@ export default function TrainerScanner() {
     handleFiles(files);
   };
 
+  // Normalize battle format: default to GEN_9_SINGLES when missing or UNKNOWN
+  const normalizeBattleFormat = (format) => {
+    if (!format) return "GEN_9_SINGLES";
+    const upper = String(format).toUpperCase();
+    if (upper === "UNKNOWN") return "GEN_9_SINGLES";
+    return upper;
+  };
+
   const allTrainers = fileReports.flatMap((report) =>
     report.data.map((trainer) => ({
       ...trainer,
       sourceFile: report.name,
+      effectiveBattleFormat: normalizeBattleFormat(trainer.battleFormat),
     }))
   );
 
@@ -88,7 +97,7 @@ export default function TrainerScanner() {
     const matchesSearch = [
       trainer.name,
       trainer.identity,
-      trainer.battleFormat,
+      trainer.effectiveBattleFormat,
       trainer.ai.type,
       ...trainer.team.map((p) => p.species),
       ...trainer.team.flatMap((p) => p.moveset),
@@ -97,7 +106,7 @@ export default function TrainerScanner() {
     ].some((val) => val?.toLowerCase().includes(searchTerm));
 
     const matchesFormat =
-      filterFormat === "all" || trainer.battleFormat === filterFormat;
+      filterFormat === "all" || trainer.effectiveBattleFormat === filterFormat;
     const matchesTeamSize =
       filterTeamSize === "all" ||
       (filterTeamSize === "small" && trainer.teamSize <= 3) ||
@@ -118,7 +127,7 @@ export default function TrainerScanner() {
       case "teamSize":
         return b.teamSize - a.teamSize;
       case "format":
-        return a.battleFormat.localeCompare(b.battleFormat);
+        return a.effectiveBattleFormat.localeCompare(b.effectiveBattleFormat);
       case "source":
         return a.sourceFile.localeCompare(b.sourceFile);
       default:
@@ -1369,8 +1378,6 @@ export default function TrainerScanner() {
               <option value="all">All Formats</option>
               <option value="GEN_9_SINGLES">Gen 9 Singles</option>
               <option value="GEN_9_DOUBLES">Gen 9 Doubles</option>
-              <option value="GEN_8_SINGLES">Gen 8 Singles</option>
-              <option value="GEN_8_DOUBLES">Gen 8 Doubles</option>
             </select>
 
             <select
@@ -1405,7 +1412,7 @@ export default function TrainerScanner() {
           </div>
 
           {/* Trainer List */}
-          <div className="w-full max-w-6xl space-y-4">
+          <div className="w-full max-w-6xl space-y-3">
             {paginatedTrainers.length === 0 ? (
               <div className="text-center p-8 text-gray-400">
                 No matching trainers found.
@@ -1423,44 +1430,44 @@ export default function TrainerScanner() {
                   >
                     {/* Trainer Header */}
                     <div
-                      className="p-6 cursor-pointer hover:bg-[#3a3a3a] transition-colors"
+                      className="p-4 cursor-pointer hover:bg-[#3a3a3a] transition-colors"
                       onClick={() => toggleTrainerExpanded(trainerId)}
                     >
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
                           <button className="text-gray-400 hover:text-white flex-shrink-0">
                             {isExpanded ? (
-                              <ChevronUp size={20} />
+                              <ChevronUp size={18} />
                             ) : (
-                              <ChevronDown size={20} />
+                              <ChevronDown size={18} />
                             )}
                           </button>
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-lg font-semibold mb-2">
+                            <h3 className="text-lg font-semibold mb-1 truncate">
                               {trainer.name}
                             </h3>
-                            <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400">
-                              <span className="whitespace-nowrap">
-                                Team: {trainer.teamSize} Pokémon
+                            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-400">
+                              <span className="bg-gray-700 px-2 py-0.5 rounded text-xs">
+                                {trainer.teamSize} Pokémon
                               </span>
-                              <span className="whitespace-nowrap">
-                                Avg Level: {trainer.averageLevel}
+                              <span className="bg-gray-700 px-2 py-0.5 rounded text-xs">
+                                Lv.{trainer.averageLevel}
                               </span>
-                              <span className="whitespace-nowrap">
-                                Max Level: {trainer.maxLevel}
+                              <span className="bg-gray-700 px-2 py-0.5 rounded text-xs">
+                                Max Lv.{trainer.maxLevel}
                               </span>
-                              <span className="bg-blue-600 px-3 py-1 rounded text-xs whitespace-nowrap">
-                                {trainer.battleFormat}
+                              <span className="bg-blue-600 px-2 py-0.5 rounded text-xs">
+                                {trainer.effectiveBattleFormat}
                               </span>
                               {trainer.ai.type && (
-                                <span className="bg-purple-600 px-3 py-1 rounded text-xs whitespace-nowrap">
+                                <span className="bg-purple-600 px-2 py-0.5 rounded text-xs">
                                   AI: {trainer.ai.type}
                                 </span>
                               )}
                             </div>
                           </div>
                         </div>
-                        <div className="text-sm text-gray-400 flex-shrink-0 ml-4">
+                        <div className="text-sm text-gray-400 flex-shrink-0 ml-3">
                           <span className="bg-gray-700 px-2 py-1 rounded text-xs">
                             {trainer.sourceFile}
                           </span>
@@ -1471,47 +1478,91 @@ export default function TrainerScanner() {
                     {/* Expanded Content */}
                     {isExpanded && (
                       <div className="border-t border-gray-700 p-4 bg-[#1e1e1e]">
-                        {/* AI Settings */}
-                        {trainer.ai.data && (
-                          <div className="mb-4">
-                            <h4 className="text-sm font-semibold text-gray-300 mb-2">
-                              AI Settings
-                            </h4>
-                            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
-                              {Object.entries(trainer.ai.data).map(
-                                ([key, value]) => (
-                                  <div
-                                    key={key}
-                                    className="bg-[#2c2c2c] p-2 rounded"
-                                  >
-                                    <div className="text-gray-400">{key}</div>
-                                    <div className="font-mono">{value}</div>
-                                  </div>
-                                )
-                              )}
+                        {/* Quick Stats Row */}
+                        <div className="grid grid-cols-4 gap-3 mb-4">
+                          <div className="bg-[#2c2c2c] p-2 rounded text-center">
+                            <div className="text-xs text-gray-400">
+                              Team Size
+                            </div>
+                            <div className="font-semibold text-blue-400">
+                              {trainer.teamSize}
                             </div>
                           </div>
-                        )}
-
-                        {/* Battle Rules */}
-                        {Object.keys(trainer.battleRules).length > 0 && (
-                          <div className="mb-4">
-                            <h4 className="text-sm font-semibold text-gray-300 mb-2">
-                              Battle Rules
-                            </h4>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                              {Object.entries(trainer.battleRules).map(
-                                ([key, value]) => (
-                                  <div
-                                    key={key}
-                                    className="bg-[#2c2c2c] p-2 rounded"
-                                  >
-                                    <div className="text-gray-400">{key}</div>
-                                    <div className="font-mono">{value}</div>
-                                  </div>
-                                )
-                              )}
+                          <div className="bg-[#2c2c2c] p-2 rounded text-center">
+                            <div className="text-xs text-gray-400">
+                              Avg Level
                             </div>
+                            <div className="font-semibold text-green-400">
+                              {trainer.averageLevel}
+                            </div>
+                          </div>
+                          <div className="bg-[#2c2c2c] p-2 rounded text-center">
+                            <div className="text-xs text-gray-400">
+                              Bag Items
+                            </div>
+                            <div className="font-semibold text-purple-400">
+                              {trainer.bag.length}
+                            </div>
+                          </div>
+                          <div className="bg-[#2c2c2c] p-2 rounded text-center">
+                            <div className="text-xs text-gray-400">
+                              Battle Rules
+                            </div>
+                            <div className="font-semibold text-orange-400">
+                              {Object.keys(trainer.battleRules).length}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* AI Settings & Battle Rules Side by Side */}
+                        {(trainer.ai.data ||
+                          Object.keys(trainer.battleRules).length > 0) && (
+                          <div className="grid md:grid-cols-2 gap-4 mb-4">
+                            {trainer.ai.data && (
+                              <div>
+                                <h4 className="text-sm font-semibold text-gray-300 mb-2">
+                                  AI Settings
+                                </h4>
+                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                  {Object.entries(trainer.ai.data).map(
+                                    ([key, value]) => (
+                                      <div
+                                        key={key}
+                                        className="bg-[#2c2c2c] p-2 rounded"
+                                      >
+                                        <div className="text-gray-400">
+                                          {key}
+                                        </div>
+                                        <div className="font-mono">{value}</div>
+                                      </div>
+                                    )
+                                  )}
+                                </div>
+                              </div>
+                            )}
+
+                            {Object.keys(trainer.battleRules).length > 0 && (
+                              <div>
+                                <h4 className="text-sm font-semibold text-gray-300 mb-2">
+                                  Battle Rules
+                                </h4>
+                                <div className="grid grid-cols-2 gap-2 text-xs">
+                                  {Object.entries(trainer.battleRules).map(
+                                    ([key, value]) => (
+                                      <div
+                                        key={key}
+                                        className="bg-[#2c2c2c] p-2 rounded"
+                                      >
+                                        <div className="text-gray-400">
+                                          {key}
+                                        </div>
+                                        <div className="font-mono">{value}</div>
+                                      </div>
+                                    )
+                                  )}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )}
 
@@ -1525,9 +1576,12 @@ export default function TrainerScanner() {
                               {trainer.bag.map((item, idx) => (
                                 <div
                                   key={idx}
-                                  className="bg-[#2c2c2c] px-3 py-1 rounded text-sm"
+                                  className="bg-[#2c2c2c] px-2 py-1 rounded text-sm"
                                 >
-                                  {item.item} x{item.quantity}
+                                  {item.item}{" "}
+                                  <span className="text-gray-400">
+                                    ×{item.quantity}
+                                  </span>
                                 </div>
                               ))}
                             </div>
@@ -1536,50 +1590,50 @@ export default function TrainerScanner() {
 
                         {/* Team */}
                         <div>
-                          <h4 className="text-sm font-semibold text-gray-300 mb-2">
+                          <h4 className="text-sm font-semibold text-gray-300 mb-3">
                             Team
                           </h4>
-                          <div className="grid gap-3">
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                             {trainer.team.map((pokemon, idx) => (
                               <div
                                 key={idx}
                                 className="bg-[#2c2c2c] p-3 rounded"
                               >
-                                <div className="flex items-center justify-between mb-2">
-                                  <div className="flex items-center gap-3">
-                                    {/* Pokémon Sprite */}
-                                    <Image
-                                      src={getPokemonSprite(pokemon.species)}
-                                      alt={pokemon.species}
-                                      width={48}
-                                      height={48}
-                                      className="w-8 h-8 md:w-12 md:h-12 rounded bg-[#1e1e1e] p-1"
-                                      onError={(e) => {
-                                        e.target.style.display = "none";
-                                      }}
-                                    />
-                                    <div className="flex items-center gap-2">
-                                      <span className="font-semibold">
+                                <div className="flex items-center gap-3 mb-2">
+                                  {/* Pokémon Sprite */}
+                                  <Image
+                                    src={getPokemonSprite(pokemon.species)}
+                                    alt={pokemon.species}
+                                    width={40}
+                                    height={40}
+                                    className="w-8 h-8 rounded bg-[#1e1e1e] p-1 flex-shrink-0"
+                                    onError={(e) => {
+                                      e.target.style.display = "none";
+                                    }}
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <span className="font-semibold text-sm">
                                         {pokemon.index}. {pokemon.species}
                                       </span>
                                       {getGenderIcon(pokemon.gender) &&
                                         getGenderIcon(pokemon.gender)}
-                                      <span className="text-sm text-gray-400">
+                                      <span className="text-xs text-gray-400">
                                         Lv.{pokemon.level}
                                       </span>
                                       {pokemon.shiny && (
-                                        <span className="text-yellow-400 text-sm">
+                                        <span className="text-yellow-400 text-xs">
                                           ✨
                                         </span>
                                       )}
                                     </div>
-                                  </div>
-                                  <div className="text-sm text-gray-400">
-                                    {pokemon.nature} • {pokemon.ability}
+                                    <div className="text-xs text-gray-400">
+                                      {pokemon.nature} • {pokemon.ability}
+                                    </div>
                                   </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div className="space-y-2 text-xs">
                                   {/* Moves */}
                                   <div>
                                     <div className="text-gray-400 mb-1">
@@ -1602,7 +1656,7 @@ export default function TrainerScanner() {
                                     <div className="text-gray-400 mb-1">
                                       Stats & Items:
                                     </div>
-                                    <div className="space-y-1 text-xs">
+                                    <div className="space-y-1">
                                       {pokemon.evSpread && (
                                         <div>EVs: {pokemon.evSpread}</div>
                                       )}
