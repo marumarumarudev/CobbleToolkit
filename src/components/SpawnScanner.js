@@ -996,14 +996,14 @@ export default function UploadArea() {
         </p>
         <br />
         <p className="text-gray-300 text-sm text-center mt-2">
-          View spawn tags like <code>#cobblemon:is_arid</code> in the{" "}
+          View biome tags like <code>#cobblemon:is_arid</code> in the{" "}
           <a
-            href="https://wiki.cobblemon.com/index.php/Pok%C3%A9mon/Spawning/Spawn_Definitions"
+            href="https://gitlab.com/cable-mc/cobblemon/-/blob/main/docs/cobblemon-tags/1.6.1/BiomeTags.md"
             className="text-blue-400 underline hover:text-blue-300"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Cobblemon Spawn Definitions Wiki
+            Cobblemon Biome Tags in GitLab
           </a>
           .
         </p>

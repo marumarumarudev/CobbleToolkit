@@ -41,6 +41,22 @@ export default function CobbleverseOverviewPage() {
             How to Get Specific Pokémon
           </Link>
         </li>
+        <li>
+          <Link
+            className="text-yellow-400 hover:underline"
+            href="/guides/cobbleverse/farming"
+          >
+            Farming Guide
+          </Link>
+        </li>
+        <li>
+          <Link
+            className="text-yellow-400 hover:underline"
+            href="/guides/cobbleverse/cobbreeding"
+          >
+            Cobbreeding Guide
+          </Link>
+        </li>
       </ul>
     </div>
   );

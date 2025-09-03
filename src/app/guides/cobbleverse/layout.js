@@ -12,6 +12,8 @@ export default function CobbleverseLayout({ children }) {
     { name: "Items", href: "/guides/cobbleverse/items" },
     { name: "Gym Leaders", href: "/guides/cobbleverse/gym-leaders" },
     { name: "How to Get Pokémon", href: "/guides/cobbleverse/how-to-get" },
+    { name: "Farming", href: "/guides/cobbleverse/farming" },
+    { name: "Cobbreeding", href: "/guides/cobbleverse/cobbreeding" },
   ];
 
   return (

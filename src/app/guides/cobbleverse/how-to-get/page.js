@@ -6,25 +6,57 @@ import { useState } from "react";
 import React from "react";
 
 export default function HowToGetPokemonPage() {
-  return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">How to Get Specific Pokémon</h1>
-      <p className="text-gray-300">
-        This list only shows the most commonly asked in the LUMYVERSE Discord
-        server. Visit the{" "}
-        <a
-          href="https://www.lumyverse.com/cobbleverse/exclusive-structures-in-cobbleverse/"
-          className="text-blue-400 underline"
-        >
-          COBBLEVERSE Wiki
-        </a>{" "}
-        for more information.
-      </p>
+  const [activeTab, setActiveTab] = useState("mew");
 
-      {/* Mewtwo */}
-      <details>
-        <summary>Kanto Series: Mewtwo</summary>
-        <div className="p-4 text-gray-300 space-y-6">
+  const pokemonData = {
+    mew: {
+      title: "Mythical: Mew",
+      series: "Mythical",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Must be in <b>Kanto Series</b>.
+            </li>
+            <li>
+              Craft the <b>Origin Fossil</b> to obtain Mew.
+            </li>
+            <li>
+              To craft it, you need:
+              <ul className="list-disc list-inside ml-6">
+                <li>
+                  <b>Ancient Origin Ball</b> — obtained by defeating{" "}
+                  <b>Kanto Champion Blue</b>.
+                </li>
+                <li>
+                  <b>Ancient DNA</b> — dropped once by{" "}
+                  <b>Gym Leader Giovanni</b> OR found in a chest inside{" "}
+                  <b>Mew’s Temple</b> (Jungle biome).
+                </li>
+                <li>
+                  <b>5 Fossils</b> — any kind of fossil works.
+                </li>
+              </ul>
+            </li>
+            <li>
+              Combine these items to craft the <b>Origin Fossil</b> and place it{" "}
+              in <b>Mew’s Altar</b> to summon Mew.
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:mythical/mew</code>
+          </p>
+          <MewImageSlider />
+        </div>
+      ),
+    },
+    mewtwo: {
+      title: "Kanto Series: Mewtwo",
+      series: "Kanto Series",
+      levelCap: "90+",
+      content: (
+        <div className="space-y-6">
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Kanto Series</b> with level cap 90+ (check trainer
@@ -53,7 +85,7 @@ export default function HowToGetPokemonPage() {
             </li>
             <li>
               Rocket Tower variant with Meowth Balloon drops a{" "}
-              <b>Radiant Cloning Catalyst</b> (guaranteed Mewtwo).
+              <b>Radiant Cloning Catalyst</b> (guaranteed Shiny Mewtwo).
             </li>
             <li>
               Combine <b>Ancient DNA</b> + <b>Cloning Catalyst</b> in a Fossil
@@ -65,12 +97,14 @@ export default function HowToGetPokemonPage() {
           </p>
           <MewtwoImageSlider />
         </div>
-      </details>
-
-      {/* Lugia */}
-      <details>
-        <summary>Johto Series: Lugia</summary>
-        <div className="p-4 text-gray-300 space-y-6">
+      ),
+    },
+    lugia: {
+      title: "Johto Series: Lugia",
+      series: "Johto Series",
+      levelCap: "70+",
+      content: (
+        <div className="space-y-6">
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Johto Series</b> with level cap 70+ (check trainer
@@ -90,10 +124,10 @@ export default function HowToGetPokemonPage() {
               Secrets inside the tower:
               <ul className="list-disc list-inside ml-6">
                 <li>
-                  Hidden <b>Corrupted Shards</b>.
+                  Hidden <b>Corrupted Shards</b> to craft Shadow Soul Stone.
                 </li>
                 <li>
-                  <b>Synthetic Matrix</b> behind a lectern.
+                  <b>Synthetic Matrix</b> behind a lectern for Armored Mewtwo.
                 </li>
               </ul>
             </li>
@@ -109,12 +143,14 @@ export default function HowToGetPokemonPage() {
           </p>
           <LugiaImageSlider />
         </div>
-      </details>
-
-      {/* Ho-oh */}
-      <details>
-        <summary>Johto Series: Ho-oh</summary>
-        <div className="p-4 text-gray-300 space-y-6">
+      ),
+    },
+    hooh: {
+      title: "Johto Series: Ho-oh",
+      series: "Johto Series",
+      levelCap: "60+",
+      content: (
+        <div className="space-y-6">
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Johto Series</b> with level cap 60+ (check trainer
@@ -142,12 +178,14 @@ export default function HowToGetPokemonPage() {
           </p>
           <HoohImageSlider />
         </div>
-      </details>
-
-      {/* Kyogre */}
-      <details>
-        <summary>Hoenn Series: Kyogre</summary>
-        <div className="p-4 text-gray-300 space-y-6">
+      ),
+    },
+    kyogre: {
+      title: "Hoenn Series: Kyogre",
+      series: "Hoenn Series",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Hoenn Series</b>.
@@ -175,15 +213,16 @@ export default function HowToGetPokemonPage() {
             Use <code>/locate structure cobbleverse:legendary/kyogre</code>
           </p>
 
-          {/* Image Slider */}
           <KyogreImageSlider />
         </div>
-      </details>
-
-      {/* Groudon */}
-      <details>
-        <summary>Hoenn Series: Groudon</summary>
-        <div className="p-4 text-gray-300 space-y-6">
+      ),
+    },
+    groudon: {
+      title: "Hoenn Series: Groudon",
+      series: "Hoenn Series",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Hoenn Series</b>.
@@ -218,10 +257,260 @@ export default function HowToGetPokemonPage() {
             Use <code>/locate structure cobbleverse:legendary/groudon</code>
           </p>
 
-          {/* Image Slider */}
           <GroudonImageSlider />
         </div>
-      </details>
+      ),
+    },
+    zygarde: {
+      title: "Legendary: Zygarde",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              You can get <b>Zygarde Cells</b> by brushing suspicious sand in{" "}
+              <b>Archaeological Sites</b>, looting <b>Chests</b>,{" "}
+              <b>Wishing Weald Chests</b>, and barrels in <b>Observatories</b>.
+            </li>
+            <li>
+              <b>Zygarde Cores</b> can be found in <b>Mossy Oubliette Ruins</b>{" "}
+              and <b>Crumbling Arch Ruins</b>.
+            </li>
+            <li>
+              To assemble Zygarde parts, you need a <b>Zygarde Cube</b> and a{" "}
+              <b>Reassembly Unit</b>.
+            </li>
+          </ul>
+
+          {/* Static banner image */}
+          <div className="relative h-48 sm:h-64 md:h-80 w-full overflow-hidden rounded-2xl shadow-lg">
+            <Image
+              src="/guides/zygarde.png"
+              alt="Where to get Zygarde"
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
+              className="object-cover"
+            />
+          </div>
+          <ZygardeImageSlider />
+
+          {/* Description block */}
+          <div className="space-y-3 border-t border-gray-700 pt-4">
+            <h3 className="font-semibold text-lg">Reassembly Unit</h3>
+            <p>
+              The Reassembly Unit is a block used with the Zygarde Cube to
+              create Zygarde. It functions somewhat similarly to a{" "}
+              <b>Resurrection Machine</b>.
+            </p>
+            <h4 className="font-medium">How to Use</h4>
+            <p>
+              Right-click the Reassembly Unit with a <b>Zygarde Cube</b>{" "}
+              containing a set number of Zygarde Cells and Cores. The result
+              depends on how many are stored in the cube.
+            </p>
+            <p>
+              When the cube has the correct number of Cells and Cores,
+              right-click the Reassembly Unit again to begin the process. The
+              fusion takes time to complete based on the form:
+            </p>
+            <table className="w-full text-sm text-gray-200 border border-gray-700 rounded-lg overflow-hidden">
+              <thead className="bg-gray-800 text-gray-100">
+                <tr>
+                  <th className="px-2 py-1 border border-gray-700">
+                    Cell Count
+                  </th>
+                  <th className="px-2 py-1 border border-gray-700">
+                    Core Count
+                  </th>
+                  <th className="px-2 py-1 border border-gray-700">Form %</th>
+                  <th className="px-2 py-1 border border-gray-700">Ability</th>
+                  <th className="px-2 py-1 border border-gray-700">
+                    Wait Time
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="px-2 py-1 border border-gray-700">9</td>
+                  <td className="px-2 py-1 border border-gray-700">1</td>
+                  <td className="px-2 py-1 border border-gray-700">10%</td>
+                  <td className="px-2 py-1 border border-gray-700">
+                    Aura Break
+                  </td>
+                  <td className="px-2 py-1 border border-gray-700">2 min</td>
+                </tr>
+                <tr>
+                  <td className="px-2 py-1 border border-gray-700">49</td>
+                  <td className="px-2 py-1 border border-gray-700">1</td>
+                  <td className="px-2 py-1 border border-gray-700">50%</td>
+                  <td className="px-2 py-1 border border-gray-700">
+                    Aura Break
+                  </td>
+                  <td className="px-2 py-1 border border-gray-700">5 min</td>
+                </tr>
+                <tr>
+                  <td className="px-2 py-1 border border-gray-700">95</td>
+                  <td className="px-2 py-1 border border-gray-700">5</td>
+                  <td className="px-2 py-1 border border-gray-700">50%</td>
+                  <td className="px-2 py-1 border border-gray-700">
+                    Power Construct
+                  </td>
+                  <td className="px-2 py-1 border border-gray-700">10 min</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>
+              Once the process finishes, right-click the Reassembly Unit with
+              any <b>Pokéball</b> to receive your Zygarde.
+            </p>
+            <p className="text-xs opacity-70 italic">
+              Assembled Zygarde has a small chance of being shiny (1 in 4096).
+            </p>
+            <p className="text-xs opacity-50 italic">
+              Credit: Mega Showdown Wiki
+            </p>
+          </div>
+        </div>
+      ),
+    },
+    calyrex: {
+      title: "Legendary: Calyrex",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              No series required — these structures can be found immediately in
+              the world.
+            </li>
+            <li>
+              Find their respective <b>carrots</b> and throw it into:
+              <ul className="list-disc list-inside ml-6">
+                <li>
+                  The <b>Coffin</b> for <b>Spectrier</b>.
+                </li>
+                <li>
+                  The <b>Trough</b> for <b>Glastrier</b>.
+                </li>
+              </ul>
+            </li>
+            <li>
+              You’ll receive <b>Calyrex</b> for each structure, allowing you to
+              create both Rider forms.
+            </li>
+            <li>
+              Locate <b>Calyrex’s Crown</b> in a barrel:
+              <ul className="list-disc list-inside ml-6">
+                <li>
+                  Found within one of the surrounding <b>ice spires</b>{" "}
+                  (Glastrier).
+                </li>
+                <li>
+                  Found under a bed of <b>podzol with 3 blue mushrooms</b>{" "}
+                  (Spectrier).
+                </li>
+              </ul>
+            </li>
+            <li>
+              Place the <b>Calyrex’s Crown</b> atop the <b>Calyrex statue</b> to
+              complete the ritual.
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:crown_cemetery</code> for
+            Spectrier, or <code>/locate structure cobbleverse:crown_spire</code>{" "}
+            for Glastrier.
+          </p>
+          <CalyrexImageSlider />
+        </div>
+      ),
+    },
+    cosplay_pikachu: {
+      title: "Special: Cosplay Pikachu",
+      series: "Special Forms",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              New <b>Cosplay Pikachu</b> forms now spawn naturally in the world.
+            </li>
+            <li>To obtain one, you must catch a newly spawned wild Pikachu.</li>
+            <li>
+              The <b>Pika Case</b> will <u>not</u> work on Pikachu already
+              caught, unless you use commands:
+              <p className="mt-1 text-sm bg-gray-900/50 p-2 rounded">
+                <code>/pokeedit 1 cosplay=cosplay</code>
+              </p>
+              (Put Pikachu in the first slot of your party before running it.)
+            </li>
+          </ul>
+
+          <h4 className="font-medium">Spawn Locations</h4>
+          <ul className="list-disc list-inside ml-6 space-y-1">
+            <li>
+              <b>Rockstar Cosplay</b> — Badlands
+            </li>
+            <li>
+              <b>PhD Cosplay</b> — Jungle
+            </li>
+            <li>
+              <b>Libre Cosplay</b> — Savanna
+            </li>
+            <li>
+              <b>Belle Cosplay</b> — Sunflower Plains
+            </li>
+            <li>
+              <b>Popstar Cosplay</b> — Cherry Grove
+            </li>
+            <li>
+              <b>Standard Cosplay</b> — Thunder Weather Forests
+            </li>
+          </ul>
+
+          <CosplayPikachuImageSlider />
+        </div>
+      ),
+    },
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="text-center space-y-4">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+          How to Get Specific Pokémon
+        </h1>
+        <p className="text-gray-300 max-w-2xl mx-auto">
+          This list only shows the most commonly asked in the LUMYVERSE Discord
+          server. Visit the{" "}
+          <a
+            href="https://www.lumyverse.com/cobbleverse/exclusive-structures-in-cobbleverse/"
+            className="text-blue-400 underline hover:text-blue-300 transition-colors"
+          >
+            COBBLEVERSE Wiki
+          </a>{" "}
+          for more information.
+        </p>
+      </div>
+
+      <div className="relative">
+        <TabsCarousel
+          items={pokemonData}
+          activeKey={activeTab}
+          onSelect={setActiveTab}
+        />
+
+        {/* Scroll Indicators */}
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-gray-900 to-transparent pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-900 to-transparent pointer-events-none" />
+      </div>
+
+      {/* Tab Content with Modern Card Design */}
+      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl">
+        <div className="p-6">{pokemonData[activeTab].content}</div>
+      </div>
     </div>
   );
 }
@@ -301,6 +590,91 @@ function ImageCarousel({ images }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* === TABS CAROUSEL (5 per view) === */
+function TabsCarousel({ items, activeKey, onSelect }) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    dragFree: true,
+  });
+
+  const scrollPrev = React.useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
+
+  const scrollNext = React.useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
+
+  const canPrev = emblaApi ? emblaApi.canScrollPrev() : false;
+  const canNext = emblaApi ? emblaApi.canScrollNext() : false;
+
+  // Re-render on select to update button disabled states
+  React.useEffect(() => {
+    if (!emblaApi) return;
+    const rerender = () => {
+      // no-op, just trigger React state update via setState pattern
+      // by using a dummy state if needed in the future
+    };
+    emblaApi.on("select", rerender);
+    emblaApi.on("reInit", rerender);
+    return () => {
+      emblaApi.off("select", rerender);
+      emblaApi.off("reInit", rerender);
+    };
+  }, [emblaApi]);
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={scrollPrev}
+        disabled={!canPrev}
+        className="absolute left-1 top-1/2 -translate-y-1/2 z-10 rounded-full bg-black/40 text-white px-2 py-1 backdrop-blur disabled:opacity-40"
+        aria-label="Previous tabs"
+      >
+        ‹
+      </button>
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex">
+          {Object.entries(items).map(([key, data]) => (
+            <div
+              className="flex-[0_0_50%] sm:flex-[0_0_33.3333%] md:flex-[0_0_25%] lg:flex-[0_0_20%] pr-2"
+              key={key}
+            >
+              <button
+                onClick={() => onSelect(key)}
+                className={`w-full h-16 px-4 sm:px-5 md:px-6 py-2 rounded-xl font-semibold transition-all duration-200 ${
+                  activeKey === key
+                    ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25"
+                    : "bg-gray-700/50 text-gray-300 hover:bg-gray-600/70 hover:text-white backdrop-blur-sm"
+                }`}
+              >
+                <div className="flex flex-col items-center justify-center space-y-1 leading-none">
+                  <span className="text-xs sm:text-sm font-medium truncate max-w-[8.5rem] sm:max-w-[9.5rem]">
+                    {data.title.split(": ")[1]}
+                  </span>
+                  <span className="text-[10px] sm:text-xs opacity-70 truncate max-w-[8.5rem] sm:max-w-[9.5rem]">
+                    {data.series}
+                  </span>
+                </div>
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={scrollNext}
+        disabled={!canNext}
+        className="absolute right-1 top-1/2 -translate-y-1/2 z-10 rounded-full bg-black/40 text-white px-2 py-1 backdrop-blur disabled:opacity-40"
+        aria-label="Next tabs"
+      >
+        ›
+      </button>
     </div>
   );
 }
@@ -416,6 +790,145 @@ function GroudonImageSlider() {
       src: "/guides/groudon-secret-2.png",
       alt: "Groudon Secret",
       credit: "skeleton",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function ZygardeImageSlider() {
+  const images = [
+    {
+      src: "/guides/mossy-oubliette-ruins.png",
+      alt: "Ruins",
+      credit: "Cobblemon",
+    },
+    {
+      src: "/guides/crumbling-arch-ruins.png",
+      alt: "Ruins",
+      credit: "Cobblemon",
+    },
+    {
+      src: "/guides/archaeological-site.png",
+      alt: "Dig Site",
+      credit: "Mega Showdown",
+    },
+    {
+      src: "/guides/observatory.png",
+      alt: "Observatory",
+      credit: "Mega Showdown",
+    },
+    {
+      src: "/guides/wishing-weald.png",
+      alt: "Wishing Weald",
+      credit: "Mega Showdown",
+    },
+    {
+      src: "/guides/reassembly-unit.png",
+      alt: "Reassembly Unit",
+      credit: "Mega Showdown",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function CosplayPikachuImageSlider() {
+  const images = [
+    {
+      src: "/guides/cosplay-rockstar.png",
+      alt: "Rockstar Pikachu",
+      credit: "maru",
+    },
+    {
+      src: "/guides/cosplay-phd.png",
+      alt: "PhD Pikachu",
+      credit: "maru",
+    },
+    {
+      src: "/guides/cosplay-libre.png",
+      alt: "Libre Pikachu",
+      credit: "maru",
+    },
+    {
+      src: "/guides/cosplay-belle.png",
+      alt: "Belle Pikachu",
+      credit: "maru",
+    },
+    {
+      src: "/guides/cosplay-popstar.png",
+      alt: "Popstar Cosplay Pikachu",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function MewImageSlider() {
+  const images = [
+    {
+      src: "/guides/origin-fossil.jpg",
+      alt: "Origin Fossil crafting recipe",
+      credit: "COBBLEVERSE",
+    },
+    {
+      src: "/guides/mew-temple.webp",
+      alt: "Mew’s Temple in Jungle biome",
+      credit: "COBBLEVERSE",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function CalyrexImageSlider() {
+  const images = [
+    {
+      src: "/guides/glastrier.png",
+      alt: "Glastrier",
+      credit: "skeleton",
+    },
+    {
+      src: "/guides/glastrier-1.png",
+      alt: "Glastrier",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/glastrier-2.png",
+      alt: "Glastrier",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/glastrier-3.png",
+      alt: "Glastrier",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/glastrier-4.png",
+      alt: "Glastrier",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/spectrier.png",
+      alt: "Spectrier",
+      credit: "skeleton",
+    },
+    {
+      src: "/guides/spectrier-1.png",
+      alt: "Spectrier",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/spectrier-2.png",
+      alt: "Spectrier",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/spectrier-3.png",
+      alt: "Spectrier",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/spectrier-4.png",
+      alt: "Spectrier",
+      credit: "doctor",
     },
   ];
   return <ImageCarousel images={images} />;
