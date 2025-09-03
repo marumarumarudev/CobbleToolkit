@@ -417,6 +417,10 @@ export default function HowToGetPokemonPage() {
               Place the <b>Calyrex’s Crown</b> atop the <b>Calyrex statue</b> to
               complete the ritual.
             </li>
+            <li>
+              Craft <b>Reins of Unity</b> to fuse Calyrex and
+              Spectrier/Glastrier.
+            </li>
           </ul>
           <p className="text-xs opacity-50 italic">
             Use <code>/locate structure cobbleverse:crown_cemetery</code> for
