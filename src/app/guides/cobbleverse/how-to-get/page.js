@@ -520,8 +520,9 @@ function ImageCarousel({ images }) {
   const [emblaRef] = useEmblaCarousel({ loop: true });
   const [fullscreen, setFullscreen] = useState(null);
 
-  // Add Escape key handler to close fullscreen
+  // Scoped Escape handler: active only when fullscreen is open
   React.useEffect(() => {
+    if (!fullscreen) return;
     const onKeyDown = (event) => {
       if (event.key === "Escape") {
         setFullscreen(null);
@@ -529,7 +530,17 @@ function ImageCarousel({ images }) {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [fullscreen]);
+
+  // Prevent background scroll while fullscreen
+  React.useEffect(() => {
+    if (!fullscreen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [fullscreen]);
 
   return (
     <div className="space-y-2">
@@ -544,6 +555,7 @@ function ImageCarousel({ images }) {
               <button
                 className="relative h-64 sm:h-80 md:h-96 w-full overflow-hidden rounded-2xl"
                 onClick={() => setFullscreen(img)}
+                aria-label="Open image in fullscreen"
               >
                 <Image
                   src={img.src}
@@ -572,16 +584,36 @@ function ImageCarousel({ images }) {
           onClick={() => setFullscreen(null)}
           role="dialog"
           aria-modal="true"
+          aria-label="Image preview"
         >
           <div
             className="relative w-full max-w-6xl h-[80vh]"
             onClick={(e) => e.stopPropagation()}
           >
+            <button
+              type="button"
+              onClick={() => setFullscreen(null)}
+              aria-label="Close fullscreen"
+              className="absolute top-2 right-2 z-10 inline-flex items-center justify-center rounded-md bg-black/60 hover:bg-black/70 text-white p-2"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-5 h-5"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
             <Image
               src={fullscreen.src}
               alt={fullscreen.alt}
               fill
-              sizes="100vw"
+              sizes="(min-width: 1024px) 80vw, 100vw"
               className="object-contain rounded-lg"
             />
             <p className="absolute inset-x-0 bottom-2 mx-auto w-fit bg-black/50 backdrop-blur px-3 py-1 rounded text-gray-100 text-sm">

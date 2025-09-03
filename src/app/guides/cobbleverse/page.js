@@ -12,7 +12,7 @@ export default function CobbleverseOverviewPage() {
         <li>
           <Link
             className="text-yellow-400 hover:underline italic"
-            href="/guides/cobbleverse/reset"
+            href="/guides/cobbleverse/progress"
           >
             &quot;How to proceed to next region?&quot;
           </Link>
@@ -55,6 +55,14 @@ export default function CobbleverseOverviewPage() {
             href="/guides/cobbleverse/cobbreeding"
           >
             Cobbreeding Guide
+          </Link>
+        </li>
+        <li>
+          <Link
+            className="text-yellow-400 hover:underline"
+            href="/guides/cobbleverse/spawnrates"
+          >
+            Increasing Spawn Rates
           </Link>
         </li>
       </ul>

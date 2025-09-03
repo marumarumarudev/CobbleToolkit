@@ -1,114 +1,104 @@
 "use client";
 
-import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
-import { useState } from "react";
 import React from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import { useState, useEffect } from "react";
 
-export default function ItemsGuidePage() {
+export default function SpawnRateGuidePage() {
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Where to Get Items?</h1>
+      <h1 className="text-3xl font-bold">Increase Cobblemon Spawn Rate</h1>
       <p className="text-gray-300">
-        In Cobbleverse, mobs are disabled by default. Here’s how you can obtain
-        items that are usually mob drops, as well as where to find special or
-        gimmick items.
+        There are multiple ways to increase Pokémon spawn rates in Cobbleverse,
+        from food buffs to manual datapack edits.
       </p>
 
+      {/* CobbleCuisine Section */}
       <section className="space-y-3">
-        <h2 className="font-semibold">Mob Drops</h2>
+        <h2 className="font-semibold">Boost with CobbleCuisine</h2>
         <p className="text-gray-300">
-          You may notice there are no mobs spawning in the modpack. This is
-          because the <code>MobsBeGone</code> mod removes them.
-        </p>
-        <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
-          <li>
-            <strong>Option A:</strong> Remove the <code>MobsBeGone</code> mod
-            from your modlist to re-enable mobs.
-          </li>
-          <li>
-            <strong>Option B:</strong> Visit <strong>Department Stores</strong>{" "}
-            in large villages. These often sell mob drop items directly.
-          </li>
-          <li>
-            <strong>Option C:</strong> Visit{" "}
-            <a
-              href="https://wiki.cobblemon.com/index.php/Pok%C3%A9mon/Drops"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              Cobblemon Pokémon Drops
-            </a>
-            . This covers drops from the base Cobblemon mod only and does not
-            include datapacks.
-          </li>
-          <li>
-            <strong>Option D:</strong> Visit my{" "}
-            <a href="/loot-scanner" className="underline">
-              loot scanner tool
-            </a>{" "}
-            and drag & drop your datapacks to see their loot tables.
-          </li>
-        </ul>
-        {/* Department Store carousel */}
-        <div className="mt-4">
-          <DepartmentStoreSlider />
-        </div>
-        <p className="text-xs text-center opacity-50 italic">
-          Use <code>/locate structure bca:village/large</code>
-        </p>
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="font-semibold">Special Items</h2>
-        <p className="text-gray-300">
-          Many unique Cobbleverse items can be found in department stores,
-          structures, or through crafting. Use the links below for full lists:
-        </p>
-        <ul className="list-disc list-inside pl-4 space-y-1 text-blue-400">
-          <li>
-            <a
-              href="https://www.lumyverse.com/cobbleverse/special-items-where-find-them/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              Special Items – Where to Find Them
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://www.lumyverse.com/cobbleverse/craft-cobbleverse-items/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline"
-            >
-              Crafting Cobbleverse Items
-            </a>
-          </li>
-        </ul>
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="font-semibold">Gimmick Items</h2>
-        <p className="text-gray-300">
-          Items like <strong>Mega Stones</strong>, <strong>Keystones</strong>,
-          and <strong>Wishing Stars</strong> are available in Cobbleverse.
-        </p>
-        <p className="text-gray-300">
-          A detailed community-maintained resource can be found here:
+          Open your inventory and type{" "}
+          <code className="bg-gray-800 px-1 rounded">@cobblecuisine</code> in
+          the searchbar below. This mod adds different food you can craft that
+          grant buffs such as <strong>type spawn boosts</strong>,{" "}
+          <strong>egg group boosts</strong>, <strong>EV yield buffs</strong>,
+          and even <strong>shiny rate boosts</strong>.
         </p>
         <a
-          href="https://megashowdown.miraheze.org/wiki/Main_Page"
+          href="https://modrinth.com/mod/cobblecuisine"
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-400 underline"
         >
-          Mega Showdown Wiki
+          CobbleCuisine on Modrinth
         </a>
+
+        {/* Carousel for CobbleCuisine images */}
+        <div className="mt-4">
+          <CobbleCuisineSlider />
+        </div>
       </section>
 
+      {/* Datapack Editing Section */}
+      <section className="space-y-3">
+        <h2 className="font-semibold">Manual Spawn Rate Editing</h2>
+        <p className="text-gray-300">
+          You can manually change spawn rates by editing datapacks or configs.
+          There are also community addons that improve spawns directly.
+        </p>
+
+        <h3 className="font-semibold text-lg">Editing Datapack</h3>
+        <p className="text-gray-300">
+          Navigate to:{" "}
+          <code className="bg-gray-800 px-1 rounded">
+            installation_folder &gt; datapacks &gt; COBBLEVERSE-DP
+          </code>
+          . Use <strong>WinRAR</strong>, <strong>7zip</strong>, or another tool
+          to open it. Game must be closed for changes to apply.
+        </p>
+        <p className="text-gray-300">
+          Inside:{" "}
+          <code className="bg-gray-800 px-1 rounded">
+            data\cobblemon\spawn_pool_world
+          </code>{" "}
+          look for the Pokémon you want to modify (ex:{" "}
+          <strong>Marshadow</strong>).
+        </p>
+        <p className="text-gray-300">
+          You can increase spawn chance by raising its{" "}
+          <code className="bg-gray-800 px-1 rounded">weight</code> or adjusting
+          the rarity bucket. Use any text editor (e.g. Notepad, VSCode), but in
+          this guide, I am using Notepad++.
+        </p>
+
+        <DatapackNavigationSlider />
+
+        <h3 className="font-semibold text-lg">Editing Spawn Buckets</h3>
+        <p className="text-gray-300">
+          Navigate to:{" "}
+          <code className="bg-gray-800 px-1 rounded">
+            installation_folder &gt; config &gt; cobblemon &gt; main.json
+          </code>{" "}
+          and set <code>&quot;exportSpawnConfig&quot;: true</code>.
+        </p>
+        <p className="text-gray-300">
+          Relaunch the game once, then exit. A new folder{" "}
+          <code className="bg-gray-800 px-1 rounded">spawning</code> will appear
+          inside <code>config/cobblemon</code>. Open{" "}
+          <code className="bg-gray-800 px-1 rounded">
+            best-spawner-config.json
+          </code>
+          .
+        </p>
+        <p className="text-gray-300">
+          Change bucket weights as you like (must add up to 100).
+        </p>
+
+        <ExportSpawnConfig />
+      </section>
+
+      {/* Footer */}
       <div className="p-4 text-gray-300 border-t border-gray-700 space-y-2">
         <p>
           💬 Still stuck? Join the{" "}
@@ -139,25 +129,23 @@ export default function ItemsGuidePage() {
   );
 }
 
-/* === IMAGE SLIDERS WITH FULLSCREEN === */
+/* === REUSABLE COMPONENTS === */
 function ImageCarousel({ images }) {
   const [emblaRef] = useEmblaCarousel({ loop: true });
   const [fullscreen, setFullscreen] = useState(null);
 
-  // Scoped Escape handler: active only when fullscreen is open
-  React.useEffect(() => {
+  useEffect(() => {
     if (!fullscreen) return;
-    const onKeyDown = (event) => {
+    function onKeyDown(event) {
       if (event.key === "Escape") {
         setFullscreen(null);
       }
-    };
+    }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [fullscreen]);
 
-  // Prevent background scroll while fullscreen
-  React.useEffect(() => {
+  useEffect(() => {
     if (!fullscreen) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -171,7 +159,6 @@ function ImageCarousel({ images }) {
       <div
         className="relative overflow-hidden rounded-2xl shadow-lg cursor-grab active:cursor-grabbing select-none w-full h-64 sm:h-80 md:h-96"
         ref={emblaRef}
-        aria-label="Image carousel. Swipe or scroll to navigate."
       >
         <div className="flex h-full">
           {images.map((img, idx) => (
@@ -185,9 +172,8 @@ function ImageCarousel({ images }) {
                   src={img.src}
                   alt={img.alt}
                   fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
+                  sizes="100vw"
                   className="object-cover"
-                  priority={idx === 0}
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-black/40 backdrop-blur px-3 py-2 text-sm text-gray-100">
                   <span className="font-medium">Credit:</span> {img.credit}
@@ -196,13 +182,8 @@ function ImageCarousel({ images }) {
             </div>
           ))}
         </div>
-        <div className="pointer-events-none absolute top-2 right-2 inline-flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
-          <span className="opacity-80">Swipe or scroll</span>
-          <span aria-hidden>↔</span>
-        </div>
       </div>
 
-      {/* Fullscreen modal */}
       {fullscreen && (
         <div
           className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4"
@@ -251,22 +232,54 @@ function ImageCarousel({ images }) {
   );
 }
 
-function DepartmentStoreSlider() {
+function CobbleCuisineSlider() {
   const images = [
     {
-      src: "/guides/department-store-1.png",
-      alt: "Department Store",
-      credit: "doctor",
+      src: "/guides/cobblecuisine-1.png",
+      alt: "CobbleCuisine food buffs",
+      credit: "CobbleCuisine, maru",
     },
     {
-      src: "/guides/department-store-2.png",
-      alt: "Department Store",
-      credit: "doctor",
+      src: "/guides/cobblecuisine-2.png",
+      alt: "CobbleCuisine",
+      credit: "CobbleCuisine, maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function DatapackNavigationSlider() {
+  const images = [
+    {
+      src: "/guides/spawnrate-1.png",
+      alt: "Spawnrate",
+      credit: "maru",
     },
     {
-      src: "/guides/department-store-3.png",
-      alt: "Department Store",
-      credit: "doctor",
+      src: "/guides/spawnrate-2.png",
+      alt: "Spawnrate",
+      credit: "maru",
+    },
+    {
+      src: "/guides/spawnrate-3.png",
+      alt: "Spawnrate",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function ExportSpawnConfig() {
+  const images = [
+    {
+      src: "/guides/spawnrate-4.png",
+      alt: "Spawnrate",
+      credit: "maru",
+    },
+    {
+      src: "/guides/spawnrate-5.png",
+      alt: "Spawnrate",
+      credit: "maru",
     },
   ];
   return <ImageCarousel images={images} />;

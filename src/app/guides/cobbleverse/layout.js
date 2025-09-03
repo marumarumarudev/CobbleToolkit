@@ -8,12 +8,13 @@ export default function CobbleverseLayout({ children }) {
 
   const items = [
     { name: "Overview", href: "/guides/cobbleverse" },
-    { name: "Progress", href: "/guides/cobbleverse/reset" },
+    { name: "Progress", href: "/guides/cobbleverse/progress" },
     { name: "Items", href: "/guides/cobbleverse/items" },
     { name: "Gym Leaders", href: "/guides/cobbleverse/gym-leaders" },
     { name: "How to Get Pokémon", href: "/guides/cobbleverse/how-to-get" },
     { name: "Farming", href: "/guides/cobbleverse/farming" },
     { name: "Cobbreeding", href: "/guides/cobbleverse/cobbreeding" },
+    { name: "Spawnrates", href: "/guides/cobbleverse/spawnrates" },
   ];
 
   return (

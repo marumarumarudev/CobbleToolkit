@@ -69,7 +69,8 @@ export default function NextRegionGuidePage() {
         </p>
         <p className="text-gray-300">
           You can also swap your trainer cards to this NPC to go back to the
-          previous regions.
+          previous regions. It will reset your level cap to 25 so keep that in
+          mind.
         </p>
         <div className="mt-4">
           <div className="relative h-64 sm:h-80 md:h-96 w-full overflow-hidden rounded-2xl shadow-lg">

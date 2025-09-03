@@ -85,6 +85,77 @@ export default function FarmingGuidePage() {
         </div>
       </section>
 
+      {/* EXP Farming */}
+      <section className="space-y-3">
+        <h2 className="font-semibold">Farming Pokémon EXP</h2>
+        <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
+          <li>
+            Battle <strong>wild Pokémon</strong> and{" "}
+            <strong>trainer NPCs</strong>. Make sure your{" "}
+            <strong>Trainer Card</strong> is in your inventory (not in a
+            backpack or chest) so trainers spawn around you.
+          </li>
+          <li>
+            Loot <strong>structures</strong> for <strong>EXP Candies</strong>{" "}
+            and <strong>Rare Candies</strong>.
+          </li>
+          <li>
+            You can <strong>buy EXP Candies</strong> in{" "}
+            <strong>Department Stores</strong>. See the{" "}
+            <a
+              href="/guides/cobbleverse/items"
+              className="text-blue-400 underline"
+            >
+              Items Guide
+            </a>{" "}
+            for where to find them.
+          </li>
+        </ul>
+      </section>
+
+      {/* CobbleDollars */}
+      <section className="space-y-3">
+        <h2 className="font-semibold">How to Farm CobbleDollars</h2>
+        <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
+          <li>
+            Defeating <strong>wild Pokémon</strong> and{" "}
+            <strong>trainer NPCs</strong> gives CobbleDollars. Higher-level
+            trainers reward more.
+          </li>
+          <li>
+            <strong>Sell items</strong> to a CobbleDollar merchant. Look for one
+            in a <strong>Department Store</strong> and interact by
+            right-clicking (or shift-right-click). Open the shop and press the{" "}
+            <strong>Bank</strong> button near your inventory.
+          </li>
+          <li>
+            You can turn an <strong>unemployed villager</strong> into a
+            CobbleDollar merchant by placing a <strong>Display Case</strong>{" "}
+            near the villager so it takes the job.
+          </li>
+          <li>
+            The list of sellable items depends on your config file at{" "}
+            <code>
+              installation folder &gt; config &gt; cobbledollars &gt; bank.json
+            </code>
+            .
+          </li>
+        </ul>
+
+        <div className="relative mt-4 h-64 sm:h-80 md:h-96 w-full overflow-hidden rounded-2xl shadow-lg">
+          <Image
+            src="/guides/bank.png"
+            alt="CobbleDollars bank screen"
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
+            className="object-cover"
+          />
+          <div className="absolute inset-x-0 bottom-0 bg-black/40 backdrop-blur text-center px-3 py-2 text-sm text-gray-100">
+            CobbleDollars merchant bank UI
+          </div>
+        </div>
+      </section>
+
       <div className="p-4 text-gray-300 border-t border-gray-700 space-y-2">
         <p>
           💬 Still stuck? Join the{" "}
