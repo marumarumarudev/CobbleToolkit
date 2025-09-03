@@ -766,6 +766,11 @@ function LugiaImageSlider() {
       credit: "doctor",
     },
     {
+      src: "/guides/synthetic-matrix.png",
+      alt: "Synthetic Matrix",
+      credit: "doctor, Soggy&Wet",
+    },
+    {
       src: "/guides/whirl-island.png",
       alt: "Whirl Island where Lugia spawns",
       credit: "doctor",
