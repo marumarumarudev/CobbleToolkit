@@ -12,7 +12,7 @@ export default function CobbleverseOverviewPage() {
         <li>
           <Link
             className="text-yellow-400 hover:underline italic"
-            href="/guides/cobbleverse/progress"
+            href="/guides/cobbleverse/progression"
           >
             &quot;How to proceed to next region?&quot;
           </Link>

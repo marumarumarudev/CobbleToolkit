@@ -302,7 +302,7 @@ export default function HowToGetPokemonPage() {
             </li>
             <li>
               <b>Sky Pillar Lantern</b> (left side as you walk in): Hidden chest
-              containing <b>Draonium-Z</b>. (thanks @₮ØⱤ₦₳ĐØ)
+              containing <b>Dragonium-Z</b>. (thanks @₮ØⱤ₦₳ĐØ)
             </li>
           </ul>
           <p className="text-xs opacity-50 italic">
