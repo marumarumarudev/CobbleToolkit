@@ -99,6 +99,9 @@ export default function FarmingGuidePage() {
             Loot <strong>structures</strong> for <strong>EXP Candies</strong>{" "}
             and <strong>Rare Candies</strong>.
           </li>
+          <p className="text-xs opacity-50 italic">
+            <b>Ancient Cities</b> are the best in my opinion.
+          </p>
           <li>
             You can <strong>buy EXP Candies</strong> in{" "}
             <strong>Department Stores</strong>. See the{" "}
@@ -124,8 +127,8 @@ export default function FarmingGuidePage() {
           <li>
             <strong>Relic Coin Farming (Pasture Loot):</strong> If you built a{" "}
             <span className="text-yellow-300">Gimmighoul farm</span>, you’ll get{" "}
-            <code>relic_coin</code>. Convert these into{" "}
-            <code>relic_coin_pouch</code> and then <code>relic_coin_sack</code>{" "}
+            <code>Relic Coins</code>. Convert these into{" "}
+            <code>Relic Coin Pouch</code> and then <code>Relic Coin Sack</code>{" "}
             for maximum profit.
             <br />
             💰 <em>(Prices: Coin = 50, Pouch = 475, Sack = 4500)</em>
@@ -143,15 +146,15 @@ export default function FarmingGuidePage() {
           </li>
           <li>
             <strong>Potions & Vitamins:</strong> Sell potions, revives and
-            vitamins (hp_up, protein, etc.) — they’re in the default bank.json
+            vitamins (hp up, protein, etc.) — they’re in the default bank.json
             and can be consistent revenue.
           </li>
         </ul>
 
         <p className="text-gray-300">
           ⚖️ <span className="font-semibold">Recommended priority:</span> Relic
-          Coin farms &gt; String duper trades &gt; Villager stick/emerald
-          trading &gt; Selling potions/vitamins.
+          Coin farms &gt; Selling potions/vitamins &gt; Villager stick/emerald
+          trading &gt; String Duper Trades.
         </p>
 
         {/* New subsection: Where to find bank.json */}

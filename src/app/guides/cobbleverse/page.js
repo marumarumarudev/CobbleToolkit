@@ -62,7 +62,7 @@ export default function CobbleverseOverviewPage() {
             className="text-yellow-400 hover:underline"
             href="/guides/cobbleverse/spawnrates"
           >
-            Increasing Spawn Rates
+            Spawn Rates
           </Link>
         </li>
       </ul>

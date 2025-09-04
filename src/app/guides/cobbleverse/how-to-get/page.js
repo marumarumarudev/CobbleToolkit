@@ -133,8 +133,8 @@ export default function HowToGetPokemonPage() {
             </li>
             <li>
               Defeat <b>Admin Apollo</b> to obtain <b>Shadow Heart</b> and a{" "}
-              <b>recipe</b> for crafting <b>Shadow Soul Stone</b> (used to turn
-              Lugia into Shadow Form).
+              <b>recipe</b> for crafting <b>Shadow Soul Stone</b>. (used to turn
+              Lugia into Shadow Form)
             </li>
           </ul>
           <p className="text-xs opacity-50 italic">
@@ -250,6 +250,7 @@ export default function HowToGetPokemonPage() {
                   you’ll find a <b>Precipice Blades TM</b> and a{" "}
                   <b>Nether Star</b>.
                 </li>
+                <li>Groudon’s also has a raw megastone. (thanks azera)</li>
               </ul>
             </li>
           </ul>
@@ -258,6 +259,90 @@ export default function HowToGetPokemonPage() {
           </p>
 
           <GroudonImageSlider />
+        </div>
+      ),
+    },
+    rayquaza: {
+      title: "Hoenn Series: Rayquaza",
+      series: "Hoenn Series",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Must be in <b>Hoenn Series</b>.
+            </li>
+            <li>
+              Head to the <b>Sky Pillar</b>. (Deep Ocean Biome)
+            </li>
+            <li>
+              The <b>Emerald Emblem</b> to craft Rayquaza’s spawn item is
+              located in the room with the crafters, hidden behind the chest.
+            </li>
+          </ul>
+
+          <h4 className="font-medium">Secrets Inside Sky Pillar</h4>
+          <ul className="list-disc list-inside ml-6 space-y-1">
+            <li>
+              <b>Kyogre Chamber</b>: A hidden room with a{" "}
+              <b>Shiny Kyogre plushie</b> and coins in the pond. Access it
+              through a trapdoor. <u>Warning:</u> the chest is trapped!
+            </li>
+            <li>
+              <b>Groudon Chamber</b>: A chest with <b>Fire Resistance Potion</b>{" "}
+              under one of the blackstones.
+            </li>
+            <li>
+              <b>Dragon Chamber</b>: A chest with a <b>TM</b> in the 1-block
+              space under the floor.
+            </li>
+            <li>
+              <b>Dragon Chamber Statue</b>: A chest with <b>Dragon’s Breath</b>{" "}
+              hidden in the dragon statue’s mouth.
+            </li>
+            <li>
+              <b>Sky Pillar Lantern</b> (left side as you walk in): Hidden chest
+              containing <b>Draonium-Z</b>. (thanks @₮ØⱤ₦₳ĐØ)
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:sky_pillar</code>
+          </p>
+
+          <RayquazaImageSlider />
+        </div>
+      ),
+    },
+    deoxys: {
+      title: "Hoenn Series: Deoxys",
+      series: "Hoenn Series",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Structure only generates when <b>Hoenn</b> is activated.
+            </li>
+            <li>
+              Travel to the <b>End</b> and locate the massive{" "}
+              <b>Meteorite structures</b>.
+            </li>
+            <li>
+              Dig within the <b>Mega Meteorite blocks</b> to uncover Deoxys’
+              summon item and the hidden altar.
+            </li>
+            <li>
+              Scattered across the End island are{" "}
+              <b>Form-changing Meteorites</b> that allow Deoxys to switch
+              between its <b>Normal, Attack, Defense,</b> and <b>Speed</b>{" "}
+              forms.
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:mythical/deoxys</code>
+          </p>
+
+          <DeoxysImageSlider />
         </div>
       ),
     },
@@ -290,7 +375,7 @@ export default function HowToGetPokemonPage() {
               alt="Where to get Zygarde"
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
-              className="object-cover"
+              className="object-cover max-w-full"
             />
           </div>
           <ZygardeImageSlider />
@@ -481,7 +566,7 @@ export default function HowToGetPokemonPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-3xl mx-auto px-3 overflow-x-hidden">
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
           How to Get Specific Pokémon
@@ -499,7 +584,7 @@ export default function HowToGetPokemonPage() {
         </p>
       </div>
 
-      <div className="relative">
+      <div className="relative overflow-hidden mx-auto max-w-3xl w-full">
         <TabsCarousel
           items={pokemonData}
           activeKey={activeTab}
@@ -512,8 +597,10 @@ export default function HowToGetPokemonPage() {
       </div>
 
       {/* Tab Content with Modern Card Design */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl">
-        <div className="p-6">{pokemonData[activeTab].content}</div>
+      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl mx-auto max-w-3xl w-full">
+        <div className="p-4 sm:p-5 md:p-6">
+          {pokemonData[activeTab].content}
+        </div>
       </div>
     </div>
   );
@@ -555,17 +642,15 @@ function ImageCarousel({ images }) {
       >
         <div className="flex">
           {images.map((img, idx) => (
-            <div className="flex-[0_0_100%]" key={idx}>
+            <div className="flex-[0_0_100%] h-52 sm:h-64 md:h-80" key={idx}>
               <button
-                className="relative h-64 sm:h-80 md:h-96 w-full overflow-hidden rounded-2xl"
+                className="relative w-full h-full overflow-hidden rounded-2xl"
                 onClick={() => setFullscreen(img)}
-                aria-label="Open image in fullscreen"
               >
                 <Image
                   src={img.src}
                   alt={img.alt}
                   fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
                   className="object-cover"
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-black/40 backdrop-blur px-3 py-2 text-sm text-gray-100">
@@ -576,7 +661,7 @@ function ImageCarousel({ images }) {
           ))}
         </div>
         <div className="pointer-events-none absolute top-2 right-2 inline-flex items-center gap-1 rounded-full bg-black/50 px-2 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
-          <span className="opacity-80">Swipe or scroll</span>
+          <span className="opacity-80">Swipe</span>
           <span aria-hidden>↔</span>
         </div>
       </div>
@@ -674,18 +759,18 @@ function TabsCarousel({ items, activeKey, onSelect }) {
       >
         ‹
       </button>
-      <div className="overflow-hidden" ref={emblaRef}>
+      <div className="overflow-hidden w-full" ref={emblaRef}>
         <div className="flex">
           {Object.entries(items).map(([key, data]) => (
             <div
-              className="flex-[0_0_50%] sm:flex-[0_0_33.3333%] md:flex-[0_0_25%] lg:flex-[0_0_20%] pr-2"
+              className="flex-[0_0_60%] sm:flex-[0_0_40%] md:flex-[0_0_33.3333%] lg:flex-[0_0_33.3333%] pr-2"
               key={key}
             >
               <button
                 onClick={() => onSelect(key)}
-                className={`w-full h-16 px-4 sm:px-5 md:px-6 py-2 rounded-xl font-semibold transition-all duration-200 ${
+                className={`w-full h-14 sm:h-16 px-3 sm:px-4 md:px-5 py-2 rounded-xl font-semibold transition-all duration-200 ${
                   activeKey === key
-                    ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25"
+                    ? "bg-gradient-to-r from-blue-400 to-purple-400 text-white shadow-lg shadow-purple-500/25"
                     : "bg-gray-700/50 text-gray-300 hover:bg-gray-600/70 hover:text-white backdrop-blur-sm"
                 }`}
               >
@@ -970,6 +1055,63 @@ function CalyrexImageSlider() {
       src: "/guides/spectrier-4.png",
       alt: "Spectrier",
       credit: "doctor",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function RayquazaImageSlider() {
+  const images = [
+    {
+      src: "/guides/emerald-emblem.png",
+      alt: "Emerald Emblem",
+      credit: "skeleton",
+    },
+    {
+      src: "/guides/kyogre-plush.png",
+      alt: "Kyogre Chamber secret room",
+      credit: "skeleton",
+    },
+    {
+      src: "/guides/skypillar-1.png",
+      alt: "Secret chest",
+      credit: "skeleton",
+    },
+    {
+      src: "/guides/skypillar-2.png",
+      alt: "Secret chest",
+      credit: "skeleton",
+    },
+    {
+      src: "/guides/skypillar-3.png",
+      alt: "Secret chest",
+      credit: "skeleton",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function DeoxysImageSlider() {
+  const images = [
+    {
+      src: "/guides/deoxys-island.png",
+      alt: "End island with scattered meteorites",
+      credit: "skeleton, doctor",
+    },
+    {
+      src: "/guides/deoxys-meteorite.png",
+      alt: "Mega Meteorite in the End",
+      credit: "skeleton, doctor",
+    },
+    {
+      src: "/guides/deoxys-item.png",
+      alt: "Hidden altar inside the meteorite",
+      credit: "skeleton, doctor",
+    },
+    {
+      src: "/guides/deoxys-form-meteorite.png",
+      alt: "Form-changing meteorite block",
+      credit: "skeleton, doctor",
     },
   ];
   return <ImageCarousel images={images} />;

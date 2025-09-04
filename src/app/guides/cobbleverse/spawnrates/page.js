@@ -98,6 +98,76 @@ export default function SpawnRateGuidePage() {
         <ExportSpawnConfig />
       </section>
 
+      {/* Spawn Influence Section */}
+      <section className="space-y-3">
+        <h2 className="font-semibold">Spawn Influence: Nearby Blocks</h2>
+        <p className="text-gray-300">
+          Certain Pokémon only spawn if <strong>specific blocks</strong> are
+          nearby (e.g., flowers, stone variants, water). This mechanic is often
+          overlooked but makes a huge difference when trying to target specific
+          spawns.
+        </p>
+        <div className="rounded-2xl overflow-hidden shadow-lg">
+          <Image
+            src="/guides/spawn-influence.png"
+            alt="Cobblemon spawn influence conditions"
+            width={1200}
+            height={800}
+            className="w-full h-auto"
+          />
+          <p className="text-xs opacity-50 italic px-2 py-1">Credit: doctor</p>
+        </div>
+      </section>
+
+      {/* External Resources Section */}
+      <section className="space-y-3">
+        <h2 className="font-semibold">Additional Spawn Resources</h2>
+        <p className="text-gray-300">
+          If you want to explore spawn data in more detail, here are two useful
+          resources:
+        </p>
+        <ul className="list-disc list-inside space-y-2 text-gray-300">
+          <li>
+            📊{" "}
+            <a
+              href="https://docs.google.com/spreadsheets/d/16JrrEp919HVn8YE0AtmeAu6_tPkMkKqEmRzMlKW442A/edit?gid=0#gid=0"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 underline"
+            >
+              Official Cobblemon Spawn Spreadsheet
+            </a>{" "}
+            — shows spawns for the <strong>base Cobblemon mod</strong>.
+          </li>
+          <li>
+            📖{" "}
+            <a
+              href="https://www.lumyverse.com/cobbleverse/all-pokemon-in-cobbleverse/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 underline"
+            >
+              Official COBBLEVERSE Wiki
+            </a>{" "}
+            — shows all spawns for the <strong>COBBLEVERSE modpack</strong>.
+          </li>
+          <li>
+            🔍{" "}
+            <a
+              href="https://cobble-toolkit.vercel.app/spawn-scanner"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 underline"
+            >
+              Cobble Toolkit Spawn Scanner
+            </a>{" "}
+            — scans Pokémon spawns directly from{" "}
+            <strong>datapacks like Cobbleverse</strong>, so you can see the
+            custom spawns added in this modpack in detail.
+          </li>
+        </ul>
+      </section>
+
       {/* Footer */}
       <div className="p-4 text-gray-300 border-t border-gray-700 space-y-2">
         <p>
