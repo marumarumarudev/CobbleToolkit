@@ -1,7 +1,11 @@
-"use client";
-
 import Image from "next/image";
 import React from "react";
+
+export const metadata = {
+  title: "Farming | CobbleToolkit",
+  description:
+    "Tips and Guides for farming EXP, items, and money in COBBLEVERSE",
+};
 
 export default function FarmingGuidePage() {
   return (

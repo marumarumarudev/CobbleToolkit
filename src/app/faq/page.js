@@ -1,3 +1,8 @@
+export const metadata = {
+  title: "FAQ | CobbleToolkit",
+  description: "Common questions about this toolkit and how it works.",
+};
+
 export default function FAQPage() {
   const faqs = [
     {

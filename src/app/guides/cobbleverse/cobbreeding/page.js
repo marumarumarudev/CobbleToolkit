@@ -1,7 +1,9 @@
-"use client";
-
-import Image from "next/image";
 import React from "react";
+
+export const metadata = {
+  title: "Cobbreeding Guide | CobbleToolkit",
+  description: "Player-written Guide for Cobbreeding",
+};
 
 export default function BreedingGuidePage() {
   return (

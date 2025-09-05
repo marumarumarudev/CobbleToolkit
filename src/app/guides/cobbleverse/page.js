@@ -1,5 +1,10 @@
 import Link from "next/link";
 
+export const metadata = {
+  title: "Guides | CobbleToolkit",
+  description: "COBBLEVERSE Guides",
+};
+
 export default function CobbleverseOverviewPage() {
   return (
     <div>
@@ -20,17 +25,17 @@ export default function CobbleverseOverviewPage() {
         <li>
           <Link
             className="text-yellow-400 hover:underline"
-            href="/guides/cobbleverse/items"
+            href="/guides/cobbleverse/gym-leaders"
           >
-            Items Guide
+            Locating Gym Leaders
           </Link>
         </li>
         <li>
           <Link
             className="text-yellow-400 hover:underline"
-            href="/guides/cobbleverse/gym-leaders"
+            href="/guides/cobbleverse/items"
           >
-            Locating Gym Leaders
+            Items Guide
           </Link>
         </li>
         <li>

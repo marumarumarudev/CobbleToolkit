@@ -6,6 +6,7 @@ import { parseTrainersFromZip } from "@/utils/trainerParser";
 import Spinner from "./Spinner";
 import { X, ChevronDown, ChevronUp, Mars, Venus } from "lucide-react";
 import Image from "next/image";
+import Head from "next/head";
 
 export default function TrainerScanner() {
   const [fileReports, setFileReports] = useState([]);
@@ -1321,428 +1322,445 @@ export default function TrainerScanner() {
   );
 
   return (
-    <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-8 flex flex-col items-center">
-      <header className="text-center mb-10">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2">
-          Cobblemon Trainer Scanner
-        </h1>
-        <p className="text-gray-300 max-w-2xl mx-auto">
-          Upload Cobblemon datapacks (.zip or .jar) to scan trainer teams, AI
-          settings, and battle configurations.
-        </p>
-        <p className="text-gray-300 text-sm text-center mt-2">
-          Analyzes trainer files from <code>data/*/trainers/*.json</code>.
-        </p>
-      </header>
-
-      {/* Upload Area */}
-      <div
-        className="border-2 border-dashed border-gray-600 rounded p-6 w-full max-w-2xl text-center bg-[#2c2c2c] hover:bg-[#3a3a3a] transition cursor-pointer mb-8"
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => {
-          e.preventDefault();
-          const files = Array.from(e.dataTransfer.files).filter((f) =>
-            f.name.toLowerCase().match(/\.(zip|jar)$/)
-          );
-          if (!files.length) return toast.error("Only .zip or .jar allowed.");
-          handleFiles(files);
-        }}
-        onClick={() => document.getElementById("trainerInput").click()}
-      >
-        <p className="text-gray-300 text-lg">📦 Drag and drop files here</p>
-        <p className="text-sm text-gray-500">or click to select files</p>
-        <input
-          id="trainerInput"
-          type="file"
-          multiple
-          accept=".zip,.jar"
-          onChange={(e) => {
-            handleInputChange(e);
-            e.target.value = "";
-          }}
-          className="hidden"
+    <>
+      <Head>
+        <title>Trainer Scanner | CobbleToolkit</title>
+        <meta
+          name="description"
+          content="Scans trainers from RCT Mod for their team, rules, etc."
         />
-      </div>
+      </Head>
+      <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-8 flex flex-col items-center">
+        <header className="text-center mb-10">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            Cobblemon Trainer Scanner
+          </h1>
+          <p className="text-gray-300 max-w-2xl mx-auto">
+            Upload Cobblemon datapacks (.zip or .jar) to scan trainer teams, AI
+            settings, and battle configurations.
+          </p>
+          <p className="text-gray-300 text-sm text-center mt-2">
+            Analyzes trainer files from <code>data/*/trainers/*.json</code>.
+          </p>
+        </header>
 
-      {loading && (
-        <div className="mb-4 flex items-center gap-2 text-blue-400">
-          <Spinner />
-          <span>Parsing trainer data...</span>
+        {/* Upload Area */}
+        <div
+          className="border-2 border-dashed border-gray-600 rounded p-6 w-full max-w-2xl text-center bg-[#2c2c2c] hover:bg-[#3a3a3a] transition cursor-pointer mb-8"
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            const files = Array.from(e.dataTransfer.files).filter((f) =>
+              f.name.toLowerCase().match(/\.(zip|jar)$/)
+            );
+            if (!files.length) return toast.error("Only .zip or .jar allowed.");
+            handleFiles(files);
+          }}
+          onClick={() => document.getElementById("trainerInput").click()}
+        >
+          <p className="text-gray-300 text-lg">📦 Drag and drop files here</p>
+          <p className="text-sm text-gray-500">or click to select files</p>
+          <input
+            id="trainerInput"
+            type="file"
+            multiple
+            accept=".zip,.jar"
+            onChange={(e) => {
+              handleInputChange(e);
+              e.target.value = "";
+            }}
+            className="hidden"
+          />
         </div>
-      )}
 
-      {allTrainers.length > 0 && (
-        <>
-          {/* Search & Filters */}
-          <div className="flex flex-col md:flex-row gap-2 items-center mb-6 w-full max-w-4xl">
-            <input
-              type="text"
-              placeholder="🔍 Search trainers, Pokémon, moves..."
-              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full"
-              value={globalSearch}
-              onChange={(e) => setGlobalSearch(e.target.value)}
-            />
-
-            <select
-              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full md:w-1/4"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-            >
-              <option value="name">Sort by Name</option>
-              <option value="level">Sort by Level</option>
-              <option value="teamSize">Sort by Team Size</option>
-              <option value="format">Sort by Format</option>
-              <option value="source">Sort by Source</option>
-            </select>
-
-            <select
-              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full md:w-1/4"
-              value={filterFormat}
-              onChange={(e) => setFilterFormat(e.target.value)}
-            >
-              <option value="all">All Formats</option>
-              <option value="GEN_9_SINGLES">Gen 9 Singles</option>
-              <option value="GEN_9_DOUBLES">Gen 9 Doubles</option>
-            </select>
-
-            <select
-              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full md:w-1/4"
-              value={filterTeamSize}
-              onChange={(e) => setFilterTeamSize(e.target.value)}
-            >
-              <option value="all">All Team Sizes</option>
-              <option value="small">Small (1-3)</option>
-              <option value="medium">Medium (4-5)</option>
-              <option value="large">Large (6+)</option>
-            </select>
+        {loading && (
+          <div className="mb-4 flex items-center gap-2 text-blue-400">
+            <Spinner />
+            <span>Parsing trainer data...</span>
           </div>
+        )}
 
-          {/* Clear Button */}
-          <div className="flex flex-wrap gap-2 justify-center mb-6">
-            <button
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition"
-              onClick={() => {
-                setFileReports([]);
-                try {
-                  localStorage.removeItem("trainer_reports");
-                } catch {}
-                setPersistenceDisabled(false);
-              }}
-            >
-              <X size={16} /> Clear All
-            </button>
-          </div>
+        {allTrainers.length > 0 && (
+          <>
+            {/* Search & Filters */}
+            <div className="flex flex-col md:flex-row gap-2 items-center mb-6 w-full max-w-4xl">
+              <input
+                type="text"
+                placeholder="🔍 Search trainers, Pokémon, moves..."
+                className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full"
+                value={globalSearch}
+                onChange={(e) => setGlobalSearch(e.target.value)}
+              />
 
-          {/* Results Summary */}
-          <div className="text-center mb-4 text-gray-300">
-            Showing {paginatedTrainers.length} of {sorted.length} trainers
-            {globalSearch && ` matching "${globalSearch}"`}
-            {persistenceDisabled && (
-              <div className="text-xs text-red-400 mt-1">
-                Local persistence disabled due to storage limits.
-              </div>
-            )}
-          </div>
+              <select
+                className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full md:w-1/4"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="name">Sort by Name</option>
+                <option value="level">Sort by Level</option>
+                <option value="teamSize">Sort by Team Size</option>
+                <option value="format">Sort by Format</option>
+                <option value="source">Sort by Source</option>
+              </select>
 
-          {/* Trainer List */}
-          <div className="w-full max-w-6xl space-y-3">
-            {paginatedTrainers.length === 0 ? (
-              <div className="text-center p-8 text-gray-400">
-                No matching trainers found.
-              </div>
-            ) : (
-              paginatedTrainers.map((trainer, index) => {
-                // Use a more unique key that includes the index to prevent duplicates
-                const trainerId = `${trainer.identity}-${trainer.sourceFile}-${index}`;
-                const isExpanded = expandedTrainers[trainerId];
+              <select
+                className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full md:w-1/4"
+                value={filterFormat}
+                onChange={(e) => setFilterFormat(e.target.value)}
+              >
+                <option value="all">All Formats</option>
+                <option value="GEN_9_SINGLES">Gen 9 Singles</option>
+                <option value="GEN_9_DOUBLES">Gen 9 Doubles</option>
+              </select>
 
-                return (
-                  <div
-                    key={trainerId}
-                    className="bg-[#2c2c2c] border border-gray-700 rounded-lg overflow-hidden"
-                  >
-                    {/* Trainer Header */}
+              <select
+                className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full md:w-1/4"
+                value={filterTeamSize}
+                onChange={(e) => setFilterTeamSize(e.target.value)}
+              >
+                <option value="all">All Team Sizes</option>
+                <option value="small">Small (1-3)</option>
+                <option value="medium">Medium (4-5)</option>
+                <option value="large">Large (6+)</option>
+              </select>
+            </div>
+
+            {/* Clear Button */}
+            <div className="flex flex-wrap gap-2 justify-center mb-6">
+              <button
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition"
+                onClick={() => {
+                  setFileReports([]);
+                  try {
+                    localStorage.removeItem("trainer_reports");
+                  } catch {}
+                  setPersistenceDisabled(false);
+                }}
+              >
+                <X size={16} /> Clear All
+              </button>
+            </div>
+
+            {/* Results Summary */}
+            <div className="text-center mb-4 text-gray-300">
+              Showing {paginatedTrainers.length} of {sorted.length} trainers
+              {globalSearch && ` matching "${globalSearch}"`}
+              {persistenceDisabled && (
+                <div className="text-xs text-red-400 mt-1">
+                  Local persistence disabled due to storage limits.
+                </div>
+              )}
+            </div>
+
+            {/* Trainer List */}
+            <div className="w-full max-w-6xl space-y-3">
+              {paginatedTrainers.length === 0 ? (
+                <div className="text-center p-8 text-gray-400">
+                  No matching trainers found.
+                </div>
+              ) : (
+                paginatedTrainers.map((trainer, index) => {
+                  // Use a more unique key that includes the index to prevent duplicates
+                  const trainerId = `${trainer.identity}-${trainer.sourceFile}-${index}`;
+                  const isExpanded = expandedTrainers[trainerId];
+
+                  return (
                     <div
-                      className="p-4 cursor-pointer hover:bg-[#3a3a3a] transition-colors"
-                      onClick={() => toggleTrainerExpanded(trainerId)}
+                      key={trainerId}
+                      className="bg-[#2c2c2c] border border-gray-700 rounded-lg overflow-hidden"
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <button className="text-gray-400 hover:text-white flex-shrink-0">
-                            {isExpanded ? (
-                              <ChevronUp size={18} />
-                            ) : (
-                              <ChevronDown size={18} />
-                            )}
-                          </button>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-lg font-semibold mb-1 truncate">
-                              {trainer.name}
-                            </h3>
-                            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-400">
-                              <span className="bg-gray-700 px-2 py-0.5 rounded text-xs">
-                                {trainer.teamSize} Pokémon
-                              </span>
-                              <span className="bg-gray-700 px-2 py-0.5 rounded text-xs">
-                                Lv.{trainer.averageLevel}
-                              </span>
-                              <span className="bg-gray-700 px-2 py-0.5 rounded text-xs">
-                                Max Lv.{trainer.maxLevel}
-                              </span>
-                              <span className="bg-blue-600 px-2 py-0.5 rounded text-xs">
-                                {trainer.effectiveBattleFormat}
-                              </span>
-                              {trainer.ai.type && (
-                                <span className="bg-purple-600 px-2 py-0.5 rounded text-xs">
-                                  AI: {trainer.ai.type}
-                                </span>
+                      {/* Trainer Header */}
+                      <div
+                        className="p-4 cursor-pointer hover:bg-[#3a3a3a] transition-colors"
+                        onClick={() => toggleTrainerExpanded(trainerId)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <button className="text-gray-400 hover:text-white flex-shrink-0">
+                              {isExpanded ? (
+                                <ChevronUp size={18} />
+                              ) : (
+                                <ChevronDown size={18} />
                               )}
+                            </button>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-lg font-semibold mb-1 truncate">
+                                {trainer.name}
+                              </h3>
+                              <div className="flex flex-wrap items-center gap-2 text-sm text-gray-400">
+                                <span className="bg-gray-700 px-2 py-0.5 rounded text-xs">
+                                  {trainer.teamSize} Pokémon
+                                </span>
+                                <span className="bg-gray-700 px-2 py-0.5 rounded text-xs">
+                                  Lv.{trainer.averageLevel}
+                                </span>
+                                <span className="bg-gray-700 px-2 py-0.5 rounded text-xs">
+                                  Max Lv.{trainer.maxLevel}
+                                </span>
+                                <span className="bg-blue-600 px-2 py-0.5 rounded text-xs">
+                                  {trainer.effectiveBattleFormat}
+                                </span>
+                                {trainer.ai.type && (
+                                  <span className="bg-purple-600 px-2 py-0.5 rounded text-xs">
+                                    AI: {trainer.ai.type}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="text-sm text-gray-400 flex-shrink-0 ml-3">
-                          <span className="bg-gray-700 px-2 py-1 rounded text-xs">
-                            {trainer.sourceFile}
-                          </span>
+                          <div className="text-sm text-gray-400 flex-shrink-0 ml-3">
+                            <span className="bg-gray-700 px-2 py-1 rounded text-xs">
+                              {trainer.sourceFile}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Expanded Content */}
-                    {isExpanded && (
-                      <div className="border-t border-gray-700 p-4 bg-[#1e1e1e]">
-                        {/* Quick Stats Row */}
-                        <div className="grid grid-cols-4 gap-3 mb-4">
-                          <div className="bg-[#2c2c2c] p-2 rounded text-center">
-                            <div className="text-xs text-gray-400">
-                              Team Size
-                            </div>
-                            <div className="font-semibold text-blue-400">
-                              {trainer.teamSize}
-                            </div>
-                          </div>
-                          <div className="bg-[#2c2c2c] p-2 rounded text-center">
-                            <div className="text-xs text-gray-400">
-                              Avg Level
-                            </div>
-                            <div className="font-semibold text-green-400">
-                              {trainer.averageLevel}
-                            </div>
-                          </div>
-                          <div className="bg-[#2c2c2c] p-2 rounded text-center">
-                            <div className="text-xs text-gray-400">
-                              Bag Items
-                            </div>
-                            <div className="font-semibold text-purple-400">
-                              {trainer.bag.length}
-                            </div>
-                          </div>
-                          <div className="bg-[#2c2c2c] p-2 rounded text-center">
-                            <div className="text-xs text-gray-400">
-                              Battle Rules
-                            </div>
-                            <div className="font-semibold text-orange-400">
-                              {Object.keys(trainer.battleRules).length}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* AI Settings & Battle Rules Side by Side */}
-                        {(trainer.ai.data ||
-                          Object.keys(trainer.battleRules).length > 0) && (
-                          <div className="grid md:grid-cols-2 gap-4 mb-4">
-                            {trainer.ai.data && (
-                              <div>
-                                <h4 className="text-sm font-semibold text-gray-300 mb-2">
-                                  AI Settings
-                                </h4>
-                                <div className="grid grid-cols-2 gap-2 text-xs">
-                                  {Object.entries(trainer.ai.data).map(
-                                    ([key, value]) => (
-                                      <div
-                                        key={key}
-                                        className="bg-[#2c2c2c] p-2 rounded"
-                                      >
-                                        <div className="text-gray-400">
-                                          {key}
-                                        </div>
-                                        <div className="font-mono">{value}</div>
-                                      </div>
-                                    )
-                                  )}
-                                </div>
+                      {/* Expanded Content */}
+                      {isExpanded && (
+                        <div className="border-t border-gray-700 p-4 bg-[#1e1e1e]">
+                          {/* Quick Stats Row */}
+                          <div className="grid grid-cols-4 gap-3 mb-4">
+                            <div className="bg-[#2c2c2c] p-2 rounded text-center">
+                              <div className="text-xs text-gray-400">
+                                Team Size
                               </div>
-                            )}
-
-                            {Object.keys(trainer.battleRules).length > 0 && (
-                              <div>
-                                <h4 className="text-sm font-semibold text-gray-300 mb-2">
-                                  Battle Rules
-                                </h4>
-                                <div className="grid grid-cols-2 gap-2 text-xs">
-                                  {Object.entries(trainer.battleRules).map(
-                                    ([key, value]) => (
-                                      <div
-                                        key={key}
-                                        className="bg-[#2c2c2c] p-2 rounded"
-                                      >
-                                        <div className="text-gray-400">
-                                          {key}
-                                        </div>
-                                        <div className="font-mono">{value}</div>
-                                      </div>
-                                    )
-                                  )}
-                                </div>
+                              <div className="font-semibold text-blue-400">
+                                {trainer.teamSize}
                               </div>
-                            )}
+                            </div>
+                            <div className="bg-[#2c2c2c] p-2 rounded text-center">
+                              <div className="text-xs text-gray-400">
+                                Avg Level
+                              </div>
+                              <div className="font-semibold text-green-400">
+                                {trainer.averageLevel}
+                              </div>
+                            </div>
+                            <div className="bg-[#2c2c2c] p-2 rounded text-center">
+                              <div className="text-xs text-gray-400">
+                                Bag Items
+                              </div>
+                              <div className="font-semibold text-purple-400">
+                                {trainer.bag.length}
+                              </div>
+                            </div>
+                            <div className="bg-[#2c2c2c] p-2 rounded text-center">
+                              <div className="text-xs text-gray-400">
+                                Battle Rules
+                              </div>
+                              <div className="font-semibold text-orange-400">
+                                {Object.keys(trainer.battleRules).length}
+                              </div>
+                            </div>
                           </div>
-                        )}
 
-                        {/* Bag Items */}
-                        {trainer.bag.length > 0 && (
-                          <div className="mb-4">
-                            <h4 className="text-sm font-semibold text-gray-300 mb-2">
-                              Bag Items
+                          {/* AI Settings & Battle Rules Side by Side */}
+                          {(trainer.ai.data ||
+                            Object.keys(trainer.battleRules).length > 0) && (
+                            <div className="grid md:grid-cols-2 gap-4 mb-4">
+                              {trainer.ai.data && (
+                                <div>
+                                  <h4 className="text-sm font-semibold text-gray-300 mb-2">
+                                    AI Settings
+                                  </h4>
+                                  <div className="grid grid-cols-2 gap-2 text-xs">
+                                    {Object.entries(trainer.ai.data).map(
+                                      ([key, value]) => (
+                                        <div
+                                          key={key}
+                                          className="bg-[#2c2c2c] p-2 rounded"
+                                        >
+                                          <div className="text-gray-400">
+                                            {key}
+                                          </div>
+                                          <div className="font-mono">
+                                            {value}
+                                          </div>
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              {Object.keys(trainer.battleRules).length > 0 && (
+                                <div>
+                                  <h4 className="text-sm font-semibold text-gray-300 mb-2">
+                                    Battle Rules
+                                  </h4>
+                                  <div className="grid grid-cols-2 gap-2 text-xs">
+                                    {Object.entries(trainer.battleRules).map(
+                                      ([key, value]) => (
+                                        <div
+                                          key={key}
+                                          className="bg-[#2c2c2c] p-2 rounded"
+                                        >
+                                          <div className="text-gray-400">
+                                            {key}
+                                          </div>
+                                          <div className="font-mono">
+                                            {value}
+                                          </div>
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Bag Items */}
+                          {trainer.bag.length > 0 && (
+                            <div className="mb-4">
+                              <h4 className="text-sm font-semibold text-gray-300 mb-2">
+                                Bag Items
+                              </h4>
+                              <div className="flex flex-wrap gap-2">
+                                {trainer.bag.map((item, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="bg-[#2c2c2c] px-2 py-1 rounded text-sm"
+                                  >
+                                    {item.item}{" "}
+                                    <span className="text-gray-400">
+                                      ×{item.quantity}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Team */}
+                          <div>
+                            <h4 className="text-sm font-semibold text-gray-300 mb-3">
+                              Team
                             </h4>
-                            <div className="flex flex-wrap gap-2">
-                              {trainer.bag.map((item, idx) => (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                              {trainer.team.map((pokemon, idx) => (
                                 <div
                                   key={idx}
-                                  className="bg-[#2c2c2c] px-2 py-1 rounded text-sm"
+                                  className="bg-[#2c2c2c] p-3 rounded"
                                 >
-                                  {item.item}{" "}
-                                  <span className="text-gray-400">
-                                    ×{item.quantity}
-                                  </span>
+                                  <div className="flex items-center gap-3 mb-2">
+                                    {/* Pokémon Sprite */}
+                                    <Image
+                                      src={getPokemonSprite(pokemon.species)}
+                                      alt={pokemon.species}
+                                      width={40}
+                                      height={40}
+                                      className="w-8 h-8 rounded bg-[#1e1e1e] p-1 flex-shrink-0"
+                                      onError={(e) => {
+                                        e.target.style.display = "none";
+                                      }}
+                                    />
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <span className="font-semibold text-sm">
+                                          {pokemon.index}. {pokemon.species}
+                                        </span>
+                                        {getGenderIcon(pokemon.gender) &&
+                                          getGenderIcon(pokemon.gender)}
+                                        <span className="text-xs text-gray-400">
+                                          Lv.{pokemon.level}
+                                        </span>
+                                        {pokemon.shiny && (
+                                          <span className="text-yellow-400 text-xs">
+                                            ✨
+                                          </span>
+                                        )}
+                                      </div>
+                                      <div className="text-xs text-gray-400">
+                                        {pokemon.nature} • {pokemon.ability}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="space-y-2 text-xs">
+                                    {/* Moves */}
+                                    <div>
+                                      <div className="text-gray-400 mb-1">
+                                        Moves:
+                                      </div>
+                                      <div className="flex flex-wrap gap-1">
+                                        {pokemon.moveset.map(
+                                          (move, moveIdx) => (
+                                            <span
+                                              key={moveIdx}
+                                              className="bg-[#1e1e1e] px-2 py-1 rounded text-xs"
+                                            >
+                                              {move}
+                                            </span>
+                                          )
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    {/* Stats & Items */}
+                                    <div>
+                                      <div className="text-gray-400 mb-1">
+                                        Stats & Items:
+                                      </div>
+                                      <div className="space-y-1">
+                                        {pokemon.evSpread && (
+                                          <div>EVs: {pokemon.evSpread}</div>
+                                        )}
+                                        {Object.keys(pokemon.ivs).length >
+                                          0 && (
+                                          <div>
+                                            IVs:{" "}
+                                            {Object.entries(pokemon.ivs)
+                                              .map(
+                                                ([stat, iv]) =>
+                                                  `${stat.toUpperCase()}: ${iv}`
+                                              )
+                                              .join(", ")}
+                                          </div>
+                                        )}
+                                        {pokemon.heldItem && (
+                                          <div>
+                                            Item:{" "}
+                                            {Array.isArray(pokemon.heldItem)
+                                              ? pokemon.heldItem.join(", ")
+                                              : pokemon.heldItem}
+                                          </div>
+                                        )}
+                                        {Object.keys(pokemon.gimmicks).length >
+                                          0 && (
+                                          <div>
+                                            Gimmicks:{" "}
+                                            {JSON.stringify(pokemon.gimmicks)}
+                                          </div>
+                                        )}
+                                        {pokemon.aspects.length > 0 && (
+                                          <div>
+                                            Aspects:{" "}
+                                            {pokemon.aspects.join(", ")}
+                                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
                               ))}
                             </div>
                           </div>
-                        )}
-
-                        {/* Team */}
-                        <div>
-                          <h4 className="text-sm font-semibold text-gray-300 mb-3">
-                            Team
-                          </h4>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {trainer.team.map((pokemon, idx) => (
-                              <div
-                                key={idx}
-                                className="bg-[#2c2c2c] p-3 rounded"
-                              >
-                                <div className="flex items-center gap-3 mb-2">
-                                  {/* Pokémon Sprite */}
-                                  <Image
-                                    src={getPokemonSprite(pokemon.species)}
-                                    alt={pokemon.species}
-                                    width={40}
-                                    height={40}
-                                    className="w-8 h-8 rounded bg-[#1e1e1e] p-1 flex-shrink-0"
-                                    onError={(e) => {
-                                      e.target.style.display = "none";
-                                    }}
-                                  />
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <span className="font-semibold text-sm">
-                                        {pokemon.index}. {pokemon.species}
-                                      </span>
-                                      {getGenderIcon(pokemon.gender) &&
-                                        getGenderIcon(pokemon.gender)}
-                                      <span className="text-xs text-gray-400">
-                                        Lv.{pokemon.level}
-                                      </span>
-                                      {pokemon.shiny && (
-                                        <span className="text-yellow-400 text-xs">
-                                          ✨
-                                        </span>
-                                      )}
-                                    </div>
-                                    <div className="text-xs text-gray-400">
-                                      {pokemon.nature} • {pokemon.ability}
-                                    </div>
-                                  </div>
-                                </div>
-
-                                <div className="space-y-2 text-xs">
-                                  {/* Moves */}
-                                  <div>
-                                    <div className="text-gray-400 mb-1">
-                                      Moves:
-                                    </div>
-                                    <div className="flex flex-wrap gap-1">
-                                      {pokemon.moveset.map((move, moveIdx) => (
-                                        <span
-                                          key={moveIdx}
-                                          className="bg-[#1e1e1e] px-2 py-1 rounded text-xs"
-                                        >
-                                          {move}
-                                        </span>
-                                      ))}
-                                    </div>
-                                  </div>
-
-                                  {/* Stats & Items */}
-                                  <div>
-                                    <div className="text-gray-400 mb-1">
-                                      Stats & Items:
-                                    </div>
-                                    <div className="space-y-1">
-                                      {pokemon.evSpread && (
-                                        <div>EVs: {pokemon.evSpread}</div>
-                                      )}
-                                      {Object.keys(pokemon.ivs).length > 0 && (
-                                        <div>
-                                          IVs:{" "}
-                                          {Object.entries(pokemon.ivs)
-                                            .map(
-                                              ([stat, iv]) =>
-                                                `${stat.toUpperCase()}: ${iv}`
-                                            )
-                                            .join(", ")}
-                                        </div>
-                                      )}
-                                      {pokemon.heldItem && (
-                                        <div>
-                                          Item:{" "}
-                                          {Array.isArray(pokemon.heldItem)
-                                            ? pokemon.heldItem.join(", ")
-                                            : pokemon.heldItem}
-                                        </div>
-                                      )}
-                                      {Object.keys(pokemon.gimmicks).length >
-                                        0 && (
-                                        <div>
-                                          Gimmicks:{" "}
-                                          {JSON.stringify(pokemon.gimmicks)}
-                                        </div>
-                                      )}
-                                      {pokemon.aspects.length > 0 && (
-                                        <div>
-                                          Aspects: {pokemon.aspects.join(", ")}
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })
-            )}
-          </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
 
-          {/* Pagination Controls */}
-          {totalPages > 1 && <PaginationControls />}
-        </>
-      )}
-    </div>
+            {/* Pagination Controls */}
+            {totalPages > 1 && <PaginationControls />}
+          </>
+        )}
+      </div>
+    </>
   );
 }

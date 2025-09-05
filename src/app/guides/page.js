@@ -1,5 +1,10 @@
 import Link from "next/link";
 
+export const metadata = {
+  title: "Guides | CobbleToolkit",
+  description: "COBBLEVERSE Guides",
+};
+
 export default function GuidesIndexPage() {
   const packs = [
     {

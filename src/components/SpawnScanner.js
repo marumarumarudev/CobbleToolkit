@@ -12,6 +12,7 @@ import {
   Filter,
 } from "lucide-react";
 import Spinner from "./Spinner";
+import Head from "next/head";
 
 export default function UploadArea() {
   const [fileReports, setFileReports] = useState([]);
@@ -985,431 +986,447 @@ export default function UploadArea() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-8 flex flex-col items-center">
-      <header className="text-center mb-10">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2">
-          Cobblemon Spawn Pool Scanner
-        </h1>
-        <p className="text-gray-300 max-w-2xl mx-auto">
-          Analyze Cobblemon spawn pools (.zip & .jar) to view Pokémon rarities,
-          biomes, structures, and more.
-        </p>
-        <br />
-        <p className="text-gray-300 text-sm text-center mt-2">
-          View biome tags like <code>#cobblemon:is_arid</code> in the{" "}
-          <a
-            href="https://gitlab.com/cable-mc/cobblemon/-/blob/main/docs/cobblemon-tags/1.6.1/BiomeTags.md"
-            className="text-blue-400 underline hover:text-blue-300"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Cobblemon Biome Tags in GitLab
-          </a>
-          .
-        </p>
-      </header>
+    <>
+      <Head>
+        <title>Spawn Scanner | CobbleToolkit</title>
+        <meta name="description" content="Scans cobblemon spawns in detail" />
+      </Head>
+      <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-8 flex flex-col items-center">
+        <header className="text-center mb-10">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            Cobblemon Spawn Pool Scanner
+          </h1>
+          <p className="text-gray-300 max-w-2xl mx-auto">
+            Analyze Cobblemon spawn pools (.zip & .jar) to view Pokémon
+            rarities, biomes, structures, and more.
+          </p>
+          <br />
+          <p className="text-gray-300 text-sm text-center mt-2">
+            View biome tags like <code>#cobblemon:is_arid</code> in the{" "}
+            <a
+              href="https://gitlab.com/cable-mc/cobblemon/-/blob/main/docs/cobblemon-tags/1.6.1/BiomeTags.md"
+              className="text-blue-400 underline hover:text-blue-300"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Cobblemon Biome Tags in GitLab
+            </a>
+            .
+          </p>
+        </header>
 
-      {/* Upload Area */}
-      <div
-        className="border-2 border-dashed border-gray-600 rounded p-6 w-full max-w-2xl text-center bg-[#2c2c2c] hover:bg-[#3a3a3a] transition cursor-pointer mb-8"
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => {
-          e.preventDefault();
-          const files = Array.from(e.dataTransfer.files).filter(
-            (file) => file.name.endsWith(".zip") || file.name.endsWith(".jar")
-          );
-          if (files.length === 0) {
-            toast.error("Only .zip files are supported.");
-            return;
-          }
-          handleFiles(files);
-        }}
-        onClick={() => document.getElementById("fileInput").click()}
-      >
-        <p className="text-gray-300 text-lg">
-          📦 Drag and drop .zip files here
-        </p>
-        <p className="text-sm text-gray-500 mt-1">or click to select files</p>
-        <p className="text-xs text-gray-600 mt-2">
-          ⚠️ Maximum file size: 150MB. Large files may take longer to process.
-        </p>
-        <p className="text-xs text-gray-500 mt-1">
-          💡 Tip: Large files consume more storage. Consider clearing old
-          reports if you encounter issues.
-        </p>
-        <input
-          id="fileInput"
-          type="file"
-          multiple
-          accept=".zip,.jar"
-          onChange={(e) => {
-            handleInputChange(e);
-            e.target.value = "";
+        {/* Upload Area */}
+        <div
+          className="border-2 border-dashed border-gray-600 rounded p-6 w-full max-w-2xl text-center bg-[#2c2c2c] hover:bg-[#3a3a3a] transition cursor-pointer mb-8"
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            const files = Array.from(e.dataTransfer.files).filter(
+              (file) => file.name.endsWith(".zip") || file.name.endsWith(".jar")
+            );
+            if (files.length === 0) {
+              toast.error("Only .zip files are supported.");
+              return;
+            }
+            handleFiles(files);
           }}
-          className="hidden"
-        />
-      </div>
-
-      {loading && (
-        <div className="mb-4 flex flex-col items-center gap-2 text-blue-400">
-          <div className="flex items-center gap-2">
-            <Spinner />
-            <span>
-              {uploadProgress.total > 1
-                ? `Processing file ${uploadProgress.current} of ${uploadProgress.total}...`
-                : "Parsing file..."}
-            </span>
-          </div>
-          {uploadProgress.fileName && (
-            <div className="text-sm text-gray-400">
-              Current: {uploadProgress.fileName}
-            </div>
-          )}
-          {uploadProgress.total > 1 && (
-            <div className="w-64 bg-gray-700 rounded-full h-2">
-              <div
-                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                style={{
-                  width: `${
-                    (uploadProgress.current / uploadProgress.total) * 100
-                  }%`,
-                }}
-              ></div>
-            </div>
-          )}
+          onClick={() => document.getElementById("fileInput").click()}
+        >
+          <p className="text-gray-300 text-lg">
+            📦 Drag and drop .zip files here
+          </p>
+          <p className="text-sm text-gray-500 mt-1">or click to select files</p>
+          <p className="text-xs text-gray-600 mt-2">
+            ⚠️ Maximum file size: 150MB. Large files may take longer to process.
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            💡 Tip: Large files consume more storage. Consider clearing old
+            reports if you encounter issues.
+          </p>
+          <input
+            id="fileInput"
+            type="file"
+            multiple
+            accept=".zip,.jar"
+            onChange={(e) => {
+              handleInputChange(e);
+              e.target.value = "";
+            }}
+            className="hidden"
+          />
         </div>
-      )}
 
-      {fileReports.length > 0 && (
-        <>
-          {/* Enhanced Search & Actions */}
-          <div className="w-full max-w-4xl mb-6">
-            {/* Main Search Bar */}
-            <div className="flex flex-col lg:flex-row gap-3 mb-4">
-              <div className="relative flex-1">
-                <Search
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                  size={18}
-                />
-                <input
-                  type="text"
-                  placeholder="🔍 Search spawn data..."
-                  className="w-full pl-10 pr-4 py-3 bg-[#2c2c2c] border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                {searchTerm && (
+        {loading && (
+          <div className="mb-4 flex flex-col items-center gap-2 text-blue-400">
+            <div className="flex items-center gap-2">
+              <Spinner />
+              <span>
+                {uploadProgress.total > 1
+                  ? `Processing file ${uploadProgress.current} of ${uploadProgress.total}...`
+                  : "Parsing file..."}
+              </span>
+            </div>
+            {uploadProgress.fileName && (
+              <div className="text-sm text-gray-400">
+                Current: {uploadProgress.fileName}
+              </div>
+            )}
+            {uploadProgress.total > 1 && (
+              <div className="w-64 bg-gray-700 rounded-full h-2">
+                <div
+                  className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                  style={{
+                    width: `${
+                      (uploadProgress.current / uploadProgress.total) * 100
+                    }%`,
+                  }}
+                ></div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {fileReports.length > 0 && (
+          <>
+            {/* Enhanced Search & Actions */}
+            <div className="w-full max-w-4xl mb-6">
+              {/* Main Search Bar */}
+              <div className="flex flex-col lg:flex-row gap-3 mb-4">
+                <div className="relative flex-1">
+                  <Search
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    size={18}
+                  />
+                  <input
+                    type="text"
+                    placeholder="🔍 Search spawn data..."
+                    className="w-full pl-10 pr-4 py-3 bg-[#2c2c2c] border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={clearSearch}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+                  className="flex items-center gap-2 px-4 py-3 bg-[#3a3a3a] hover:bg-[#4a4a4a] rounded-lg transition-colors duration-200 lg:w-auto w-full justify-center"
+                >
+                  <Filter size={18} />
+                  <span className="hidden sm:inline">Advanced</span>
+                </button>
+              </div>
+
+              {/* Advanced Search Options */}
+              {showAdvancedSearch && (
+                <div className="bg-[#2a2a2a] rounded-lg p-4 border border-gray-700/50 mb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Search Field
+                      </label>
+                      <select
+                        value={searchField}
+                        onChange={(e) => setSearchField(e.target.value)}
+                        className="w-full bg-[#3a3a3a] border border-gray-600 text-white p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        {SEARCH_FIELDS.map((field) => (
+                          <option key={field.value} value={field.value}>
+                            {field.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Context Filter
+                      </label>
+                      <select
+                        value={contextFilter}
+                        onChange={(e) => setContextFilter(e.target.value)}
+                        className="w-full bg-[#3a3a3a] border border-gray-600 text-white p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      >
+                        <option value="all">All Contexts</option>
+                        {availableContexts.map((ctx) => (
+                          <option key={ctx} value={ctx}>
+                            {ctx.charAt(0).toUpperCase() + ctx.slice(1)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="flex items-end">
+                      <button
+                        onClick={clearSearch}
+                        className="w-full px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded transition-colors duration-200"
+                      >
+                        Clear Filters
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Search Stats */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-400">
+                <div className="flex items-center gap-2">
+                  <span>Results: {filteredData.length}</span>
+                  <span className="text-gray-600">|</span>
+                  <span>
+                    Files: {fileReports.filter((r) => !r.error).length}
+                  </span>
+                  {debouncedSearch && (
+                    <>
+                      <span className="text-gray-600">|</span>
+                      <span className="text-blue-400">
+                        Matches: &quot;{debouncedSearch}&quot;
+                      </span>
+                    </>
+                  )}
+                </div>
+
+                {debouncedSearch && (
                   <button
                     onClick={clearSearch}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                    className="text-blue-400 hover:text-blue-300 transition-colors text-sm"
                   >
-                    <X size={16} />
+                    Clear Search
                   </button>
                 )}
               </div>
+            </div>
 
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-2 justify-center mb-6">
               <button
-                onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
-                className="flex items-center gap-2 px-4 py-3 bg-[#3a3a3a] hover:bg-[#4a4a4a] rounded-lg transition-colors duration-200 lg:w-auto w-full justify-center"
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition"
+                onClick={clearAll}
               >
-                <Filter size={18} />
-                <span className="hidden sm:inline">Advanced</span>
+                <X size={16} /> Clear All
+              </button>
+              <button
+                className="flex items-center gap-2 px-4 py-2 bg-yellow-600 rounded hover:bg-yellow-700 transition"
+                onClick={() => {
+                  try {
+                    const saved = localStorage.getItem("spawn_reports");
+                    if (saved) {
+                      const reports = JSON.parse(saved);
+                      // Keep only the 10 most recent reports and limit spawns
+                      const cleanedReports = reports
+                        .slice(0, 10)
+                        .map((report) => ({
+                          ...report,
+                          data: report.data.slice(0, 250), // Keep only first 250 spawns per file
+                        }));
+                      localStorage.setItem(
+                        "spawn_reports",
+                        JSON.stringify(cleanedReports)
+                      );
+                      setFileReports(cleanedReports);
+                      updateStorageUsage();
+                      toast.success(
+                        "✅ Cleaned up storage - kept 10 most recent files with limited spawns."
+                      );
+                    }
+                  } catch (err) {
+                    console.error("Manual cleanup failed:", err);
+                    toast.error("❌ Cleanup failed.");
+                  }
+                }}
+              >
+                🧹 Clean Storage
               </button>
             </div>
 
-            {/* Advanced Search Options */}
-            {showAdvancedSearch && (
-              <div className="bg-[#2a2a2a] rounded-lg p-4 border border-gray-700/50 mb-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Search Field
-                    </label>
-                    <select
-                      value={searchField}
-                      onChange={(e) => setSearchField(e.target.value)}
-                      className="w-full bg-[#3a3a3a] border border-gray-600 text-white p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      {SEARCH_FIELDS.map((field) => (
-                        <option key={field.value} value={field.value}>
-                          {field.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Context Filter
-                    </label>
-                    <select
-                      value={contextFilter}
-                      onChange={(e) => setContextFilter(e.target.value)}
-                      className="w-full bg-[#3a3a3a] border border-gray-600 text-white p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="all">All Contexts</option>
-                      {availableContexts.map((ctx) => (
-                        <option key={ctx} value={ctx}>
-                          {ctx.charAt(0).toUpperCase() + ctx.slice(1)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="flex items-end">
-                    <button
-                      onClick={clearSearch}
-                      className="w-full px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded transition-colors duration-200"
-                    >
-                      Clear Filters
-                    </button>
-                  </div>
+            {/* Storage Usage Indicator */}
+            <div className="flex flex-col items-center gap-2 mb-4">
+              <div className="text-sm text-gray-400">
+                Storage Usage:{" "}
+                {Math.round((storageUsage.used / 1024 / 1024) * 100) / 100}MB /{" "}
+                {Math.round((storageUsage.limit / 1024 / 1024) * 100) / 100}MB
+              </div>
+              <div className="w-64 bg-gray-700 rounded-full h-2">
+                <div
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    storageUsage.percentage > 80
+                      ? "bg-red-500"
+                      : storageUsage.percentage > 60
+                      ? "bg-yellow-500"
+                      : "bg-green-500"
+                  }`}
+                  style={{
+                    width: `${Math.min(storageUsage.percentage, 100)}%`,
+                  }}
+                ></div>
+              </div>
+              {storageUsage.percentage > 80 && (
+                <div className="text-xs text-yellow-400">
+                  ⚠️ Storage nearly full. Consider clearing old reports.
                 </div>
-              </div>
-            )}
-
-            {/* Search Stats */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-400">
-              <div className="flex items-center gap-2">
-                <span>Results: {filteredData.length}</span>
-                <span className="text-gray-600">|</span>
-                <span>Files: {fileReports.filter((r) => !r.error).length}</span>
-                {debouncedSearch && (
-                  <>
-                    <span className="text-gray-600">|</span>
-                    <span className="text-blue-400">
-                      Matches: &quot;{debouncedSearch}&quot;
-                    </span>
-                  </>
-                )}
-              </div>
-
-              {debouncedSearch && (
-                <button
-                  onClick={clearSearch}
-                  className="text-blue-400 hover:text-blue-300 transition-colors text-sm"
-                >
-                  Clear Search
-                </button>
               )}
             </div>
-          </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-2 justify-center mb-6">
-            <button
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition"
-              onClick={clearAll}
-            >
-              <X size={16} /> Clear All
-            </button>
-            <button
-              className="flex items-center gap-2 px-4 py-2 bg-yellow-600 rounded hover:bg-yellow-700 transition"
-              onClick={() => {
-                try {
-                  const saved = localStorage.getItem("spawn_reports");
-                  if (saved) {
-                    const reports = JSON.parse(saved);
-                    // Keep only the 10 most recent reports and limit spawns
-                    const cleanedReports = reports
-                      .slice(0, 10)
-                      .map((report) => ({
-                        ...report,
-                        data: report.data.slice(0, 250), // Keep only first 250 spawns per file
-                      }));
-                    localStorage.setItem(
-                      "spawn_reports",
-                      JSON.stringify(cleanedReports)
-                    );
-                    setFileReports(cleanedReports);
-                    updateStorageUsage();
-                    toast.success(
-                      "✅ Cleaned up storage - kept 10 most recent files with limited spawns."
-                    );
+            {/* Results Summary */}
+            <div className="text-center mb-4 text-gray-300">
+              Showing {filteredData.length} spawn entries from{" "}
+              {fileReports.filter((r) => !r.error).length} files
+              {searchTerm && (
+                <span className="text-blue-400">
+                  {" "}
+                  • {filteredData.length} matches for &ldquo;{searchTerm}&rdquo;
+                </span>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Unified Spawn Data Table */}
+        {filteredData.length > 0 && (
+          <div className="w-full max-w-7xl mx-auto">
+            <div className="overflow-hidden rounded-lg border border-gray-700/50 bg-[#2a2a2a]">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-gradient-to-r from-gray-800/50 to-gray-700/50">
+                      {visibleColumns.map(({ key, label, sortable }) => (
+                        <th
+                          key={key}
+                          onClick={sortable ? () => toggleSort(key) : undefined}
+                          className={`p-3 text-left font-medium text-gray-300 border-b border-gray-700/50 ${
+                            sortable
+                              ? "cursor-pointer hover:bg-gray-700/30 transition-colors duration-200"
+                              : ""
+                          } group`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span>{label}</span>
+                            {sort.column === key ? (
+                              sort.direction === "asc" ? (
+                                <ChevronUp
+                                  size={14}
+                                  className="text-blue-400"
+                                />
+                              ) : (
+                                <ChevronDown
+                                  size={14}
+                                  className="text-blue-400"
+                                />
+                              )
+                            ) : sortable ? (
+                              <ChevronsUpDown
+                                size={14}
+                                className="text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                              />
+                            ) : null}
+                          </div>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-700/30">
+                    {paginatedData.map((spawn, idx) => (
+                      <tr
+                        key={`${spawn.pokemon}-${spawn.sourceFile}-${idx}`}
+                        className="bg-gray-800/20 hover:bg-gray-700/30 transition-colors duration-150"
+                      >
+                        {visibleColumns.map(({ key }) => {
+                          const value = spawn[key];
+                          const isArray = Array.isArray(value);
+                          const isRarity = key === "bucket";
+
+                          return (
+                            <td key={key} className="p-3">
+                              {isRarity ? (
+                                <span
+                                  className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getRarityColor(
+                                    value
+                                  )}`}
+                                >
+                                  {value}
+                                </span>
+                              ) : isArray ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {value.map((item, i) => (
+                                    <span
+                                      key={i}
+                                      className="px-2 py-1 bg-gray-700/50 rounded text-xs"
+                                    >
+                                      {item}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : key === "sourceFile" ? (
+                                <span className="text-xs text-gray-400 font-mono">
+                                  {value}
+                                </span>
+                              ) : (
+                                <span className="text-gray-300">
+                                  {value?.toString() ?? ""}
+                                </span>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Pagination */}
+            {filteredData.length > PAGE_SIZE && (
+              <div className="mt-6 flex justify-center items-center gap-4">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-sm transition-colors duration-200"
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+                <span className="text-gray-300 text-sm">
+                  Page {currentPage} /{" "}
+                  {Math.ceil(filteredData.length / PAGE_SIZE)}
+                </span>
+                <button
+                  onClick={() =>
+                    setCurrentPage((p) =>
+                      Math.min(
+                        Math.ceil(filteredData.length / PAGE_SIZE),
+                        p + 1
+                      )
+                    )
                   }
-                } catch (err) {
-                  console.error("Manual cleanup failed:", err);
-                  toast.error("❌ Cleanup failed.");
-                }
-              }}
-            >
-              🧹 Clean Storage
-            </button>
-          </div>
-
-          {/* Storage Usage Indicator */}
-          <div className="flex flex-col items-center gap-2 mb-4">
-            <div className="text-sm text-gray-400">
-              Storage Usage:{" "}
-              {Math.round((storageUsage.used / 1024 / 1024) * 100) / 100}MB /{" "}
-              {Math.round((storageUsage.limit / 1024 / 1024) * 100) / 100}MB
-            </div>
-            <div className="w-64 bg-gray-700 rounded-full h-2">
-              <div
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  storageUsage.percentage > 80
-                    ? "bg-red-500"
-                    : storageUsage.percentage > 60
-                    ? "bg-yellow-500"
-                    : "bg-green-500"
-                }`}
-                style={{ width: `${Math.min(storageUsage.percentage, 100)}%` }}
-              ></div>
-            </div>
-            {storageUsage.percentage > 80 && (
-              <div className="text-xs text-yellow-400">
-                ⚠️ Storage nearly full. Consider clearing old reports.
+                  className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-sm transition-colors duration-200"
+                  disabled={
+                    currentPage === Math.ceil(filteredData.length / PAGE_SIZE)
+                  }
+                >
+                  Next
+                </button>
               </div>
             )}
           </div>
+        )}
 
-          {/* Results Summary */}
-          <div className="text-center mb-4 text-gray-300">
-            Showing {filteredData.length} spawn entries from{" "}
-            {fileReports.filter((r) => !r.error).length} files
-            {searchTerm && (
-              <span className="text-blue-400">
-                {" "}
-                • {filteredData.length} matches for &ldquo;{searchTerm}&rdquo;
-              </span>
-            )}
+        {/* No Results Message */}
+        {fileReports.length > 0 && filteredData.length === 0 && (
+          <div className="text-center py-12 text-gray-400">
+            <div className="text-6xl mb-4">🔍</div>
+            <h3 className="text-xl font-medium mb-2">No spawn data found</h3>
+            <p className="text-gray-500">
+              Try adjusting your search terms or filters
+            </p>
           </div>
-        </>
-      )}
-
-      {/* Unified Spawn Data Table */}
-      {filteredData.length > 0 && (
-        <div className="w-full max-w-7xl mx-auto">
-          <div className="overflow-hidden rounded-lg border border-gray-700/50 bg-[#2a2a2a]">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-gradient-to-r from-gray-800/50 to-gray-700/50">
-                    {visibleColumns.map(({ key, label, sortable }) => (
-                      <th
-                        key={key}
-                        onClick={sortable ? () => toggleSort(key) : undefined}
-                        className={`p-3 text-left font-medium text-gray-300 border-b border-gray-700/50 ${
-                          sortable
-                            ? "cursor-pointer hover:bg-gray-700/30 transition-colors duration-200"
-                            : ""
-                        } group`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span>{label}</span>
-                          {sort.column === key ? (
-                            sort.direction === "asc" ? (
-                              <ChevronUp size={14} className="text-blue-400" />
-                            ) : (
-                              <ChevronDown
-                                size={14}
-                                className="text-blue-400"
-                              />
-                            )
-                          ) : sortable ? (
-                            <ChevronsUpDown
-                              size={14}
-                              className="text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                            />
-                          ) : null}
-                        </div>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-700/30">
-                  {paginatedData.map((spawn, idx) => (
-                    <tr
-                      key={`${spawn.pokemon}-${spawn.sourceFile}-${idx}`}
-                      className="bg-gray-800/20 hover:bg-gray-700/30 transition-colors duration-150"
-                    >
-                      {visibleColumns.map(({ key }) => {
-                        const value = spawn[key];
-                        const isArray = Array.isArray(value);
-                        const isRarity = key === "bucket";
-
-                        return (
-                          <td key={key} className="p-3">
-                            {isRarity ? (
-                              <span
-                                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getRarityColor(
-                                  value
-                                )}`}
-                              >
-                                {value}
-                              </span>
-                            ) : isArray ? (
-                              <div className="flex flex-wrap gap-1">
-                                {value.map((item, i) => (
-                                  <span
-                                    key={i}
-                                    className="px-2 py-1 bg-gray-700/50 rounded text-xs"
-                                  >
-                                    {item}
-                                  </span>
-                                ))}
-                              </div>
-                            ) : key === "sourceFile" ? (
-                              <span className="text-xs text-gray-400 font-mono">
-                                {value}
-                              </span>
-                            ) : (
-                              <span className="text-gray-300">
-                                {value?.toString() ?? ""}
-                              </span>
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Pagination */}
-          {filteredData.length > PAGE_SIZE && (
-            <div className="mt-6 flex justify-center items-center gap-4">
-              <button
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-sm transition-colors duration-200"
-                disabled={currentPage === 1}
-              >
-                Previous
-              </button>
-              <span className="text-gray-300 text-sm">
-                Page {currentPage} /{" "}
-                {Math.ceil(filteredData.length / PAGE_SIZE)}
-              </span>
-              <button
-                onClick={() =>
-                  setCurrentPage((p) =>
-                    Math.min(Math.ceil(filteredData.length / PAGE_SIZE), p + 1)
-                  )
-                }
-                className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded text-sm transition-colors duration-200"
-                disabled={
-                  currentPage === Math.ceil(filteredData.length / PAGE_SIZE)
-                }
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* No Results Message */}
-      {fileReports.length > 0 && filteredData.length === 0 && (
-        <div className="text-center py-12 text-gray-400">
-          <div className="text-6xl mb-4">🔍</div>
-          <h3 className="text-xl font-medium mb-2">No spawn data found</h3>
-          <p className="text-gray-500">
-            Try adjusting your search terms or filters
-          </p>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }

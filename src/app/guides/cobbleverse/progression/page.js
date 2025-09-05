@@ -1,5 +1,10 @@
 import Image from "next/image";
 
+export const metadata = {
+  title: "Progression | CobbleToolkit",
+  description: "How region progression works in COBBLEVERSE.",
+};
+
 export default function NextRegionGuidePage() {
   return (
     <div className="space-y-6">
@@ -110,10 +115,10 @@ export default function NextRegionGuidePage() {
           quitting and rejoining your world.
         </p>
         <p className="text-gray-300">
-          <strong>Important:</strong> You will not lose your world or builds.
-          Only your <strong>level cap resets</strong>, so you’ll need to build a
-          new team for the next region. The new structures will generate in new,
-          unloaded chunks.
+          <strong>Important:</strong> You will not lose your world, builds or
+          pokemon. Only your <strong>level cap resets</strong>, so you’ll need
+          to build a new team for the next region. The new structures will
+          generate in new, unloaded chunks.
         </p>
       </section>
 
