@@ -17,6 +17,7 @@ export default function TrainerScanner() {
   const [expandedTrainers, setExpandedTrainers] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 20;
+  const [persistenceDisabled, setPersistenceDisabled] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("trainer_reports");
@@ -29,6 +30,30 @@ export default function TrainerScanner() {
       }
     }
   }, []);
+
+  const safePersistReports = (updatedReports) => {
+    if (persistenceDisabled) return;
+    try {
+      const payload = JSON.stringify(updatedReports);
+      // Guard against very large payloads (~5MB localStorage limits in many browsers)
+      // Skip persisting if over ~4.5MB to avoid QuotaExceededError
+      if (payload.length > 4_500_000) {
+        setPersistenceDisabled(true);
+        toast.error(
+          "Too much data to save locally. Persistence disabled for this session."
+        );
+        return;
+      }
+      localStorage.setItem("trainer_reports", payload);
+    } catch (err) {
+      // Most likely QuotaExceededError in production or restricted environments
+      console.error("Failed to persist trainer reports:", err);
+      setPersistenceDisabled(true);
+      toast.error(
+        "Storage quota exceeded. Data won't be saved between refreshes."
+      );
+    }
+  };
 
   const handleFiles = async (files) => {
     if (loading) return toast.error("Still parsing...");
@@ -61,7 +86,7 @@ export default function TrainerScanner() {
 
     setFileReports((prev) => {
       const updated = [...newReports, ...prev];
-      localStorage.setItem("trainer_reports", JSON.stringify(updated));
+      safePersistReports(updated);
       return updated;
     });
 
@@ -1398,7 +1423,10 @@ export default function TrainerScanner() {
               className="flex items-center gap-2 px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition"
               onClick={() => {
                 setFileReports([]);
-                localStorage.removeItem("trainer_reports");
+                try {
+                  localStorage.removeItem("trainer_reports");
+                } catch {}
+                setPersistenceDisabled(false);
               }}
             >
               <X size={16} /> Clear All
@@ -1409,6 +1437,11 @@ export default function TrainerScanner() {
           <div className="text-center mb-4 text-gray-300">
             Showing {paginatedTrainers.length} of {sorted.length} trainers
             {globalSearch && ` matching "${globalSearch}"`}
+            {persistenceDisabled && (
+              <div className="text-xs text-red-400 mt-1">
+                Local persistence disabled due to storage limits.
+              </div>
+            )}
           </div>
 
           {/* Trainer List */}

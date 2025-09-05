@@ -14,12 +14,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
-  title: "CobbleToolkit",
-  description:
-    "A collection of browser-based tools for analyzing and understanding Cobblemon datapacks.",
-};
-
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>

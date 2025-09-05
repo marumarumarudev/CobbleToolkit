@@ -1,8 +1,3 @@
-export const metadata = {
-  title: "Guides | CobbleToolkit",
-  description: "Guides for Cobblemon modpacks including Cobbleverse.",
-};
-
 export default function GuidesLayout({ children }) {
   return (
     <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-10 sm:px-6 sm:py-12 flex flex-col items-center">
