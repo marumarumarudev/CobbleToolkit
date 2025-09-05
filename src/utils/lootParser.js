@@ -126,9 +126,14 @@ export async function parseLootFromZip(file) {
     let successCount = 0;
     let errorCount = 0;
 
-    const speciesFiles = Object.keys(zip.files).filter((path) =>
-      path.match(/^data\/[^/]+\/species\/[^/]+\/[^/]+\.json$/)
-    );
+    const speciesFiles = Object.keys(zip.files).filter((rawPath) => {
+      const normalized = rawPath.replace(/\\/g, "/");
+      const dataIndex = normalized.indexOf("data/");
+      if (dataIndex === -1) return false;
+      const rel = normalized.slice(dataIndex);
+      // Match any depth under species or species_additions
+      return /^data\/[^/]+\/(species|species_additions)\/.+\.json$/.test(rel);
+    });
 
     for (const path of speciesFiles) {
       try {
@@ -138,7 +143,9 @@ export async function parseLootFromZip(file) {
         let jsonStr = await zipEntry.async("string");
         const data = parseJsonWithFallbacks(jsonStr, path);
 
-        if (data && data.name) {
+        if (data && (data.name || data.target)) {
+          const displayName =
+            data.name || (data.target ? data.target.split(":").pop() : null);
           const drops = (data?.drops?.entries || []).map((entry) => ({
             item: entry.item || "unknown_item",
             quantity: entry.quantityRange || 1,
@@ -147,7 +154,7 @@ export async function parseLootFromZip(file) {
 
           if (drops.length > 0) {
             results.push({
-              name: data.name,
+              name: displayName || "unknown_pokemon",
               namespace: path.split("/")[1],
               pokedexNumber: data.nationalPokedexNumber ?? null,
               drops,
