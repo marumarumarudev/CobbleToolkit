@@ -114,11 +114,21 @@ export default function BreedingGuidePage() {
           </li>
           <li>
             <strong>Masuda Method:</strong> Parents from different{" "}
-            <strong>original trainers</strong>.
+            <strong>original trainers</strong>. <br />
+            <span className="italic text-sm text-gray-400">
+              (⚠️ Not enabled by default — add <code>&quot;masuda&quot;</code>{" "}
+              to <code>shinyMethod</code> in{" "}
+              <code>config/cobbreeding/main.json</code>.)
+            </span>
           </li>
           <li>
             <strong>Crystal Method:</strong> Shiny parent(s) increase the odds
-            further.
+            further. <br />
+            <span className="italic text-sm text-gray-400">
+              (⚠️ Not enabled by default — add <code>&quot;crystal&quot;</code>{" "}
+              to <code>shinyMethod</code> in{" "}
+              <code>config/cobbreeding/main.json</code>.)
+            </span>
           </li>
         </ul>
         <p className="text-gray-300 italic">
@@ -173,6 +183,35 @@ export default function BreedingGuidePage() {
             The other holds Everstone (if you want its nature passed down).
           </li>
           <li>Hidden Abilities are RNG — use Ability Patch if unlucky.</li>
+        </ul>
+      </section>
+
+      {/* Config & Pro Tips */}
+      <section className="space-y-3">
+        <h2 className="font-semibold">⚙️ Config & Pro Tips</h2>
+        <p className="text-gray-300">
+          The config file is located at:{" "}
+          <code>
+            installation folder &gt; config &gt; cobbreeding &gt; main.json
+          </code>
+        </p>
+        <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
+          <li>
+            <code>&quot;eggCheckTicks&quot;</code>: Lower this to reduce time
+            between egg checks.
+          </li>
+          <li>
+            <code>&quot;eggCheckChance&quot;</code>: Set to <code>1.0</code> to
+            guarantee an egg each check (default <code>0.5</code> = 50/50).
+          </li>
+          <li>
+            <code>&quot;eggHatchMultiplier&quot;</code>: Set to <code>0.0</code>{" "}
+            for instant hatching, or lower than <code>1.0</code> to reduce hatch
+            time.{" "}
+            <span className="italic text-sm text-gray-400">
+              (Does not affect eggs already generated before the change.)
+            </span>
+          </li>
         </ul>
       </section>
 
