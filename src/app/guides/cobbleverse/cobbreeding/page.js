@@ -116,9 +116,13 @@ export default function BreedingGuidePage() {
             <strong>Masuda Method:</strong> Parents from different{" "}
             <strong>original trainers</strong>.
           </li>
+          <li>
+            <strong>Crystal Method:</strong> Shiny parent(s) increase the odds
+            further.
+          </li>
         </ul>
         <p className="text-gray-300 italic">
-          Masuda + shiny parents + Always = near-guaranteed shiny odds with the
+          Masuda + Shiny parents + Always = near-guaranteed shiny odds with the
           right setup.
         </p>
       </section>

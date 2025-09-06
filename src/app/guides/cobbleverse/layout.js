@@ -107,7 +107,7 @@ export default function CobbleverseLayout({ children }) {
               </div>
               <div className="flex justify-between">
                 <span>Last Updated:</span>
-                <span className="text-yellow-400">Recently</span>
+                <span className="text-yellow-400">Sept. 6, 2025</span>
               </div>
             </div>
           </div>
