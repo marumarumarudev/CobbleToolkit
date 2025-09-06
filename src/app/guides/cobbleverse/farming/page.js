@@ -21,13 +21,30 @@ export default function FarmingGuidePage() {
           Shoutout to <span className="font-bold">azera</span> for making a
           helpful video on basic Cobbleverse farms. Watch it here:
         </p>
+
+        {/* YouTube Embed */}
+        <div
+          className="relative w-full max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-lg"
+          style={{ paddingTop: "56.25%" }}
+        >
+          <iframe
+            src="https://www.youtube.com/embed/oB1DEezaAIo?si=XejyqfCsqAXiVnwS"
+            title="Cobbleverse Basic Farms - azera"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            className="absolute top-0 left-0 w-full h-full"
+            style={{ border: "none" }}
+          ></iframe>
+        </div>
+
+        {/* Fallback direct link */}
         <a
-          href="https://youtu.be/JY5MJzGRBWY?si=CAabRy9eWZNoqZJg"
+          href="https://youtu.be/oB1DEezaAIo?si=XejyqfCsqAXiVnwS"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-400 underline"
+          className="text-blue-400 underline block mt-2"
         >
-          Cobbleverse Basic Farms (YouTube)
+          Watch on YouTube
         </a>
       </section>
 

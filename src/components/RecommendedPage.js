@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { recommendedResources } from "@/data/recommendedData";
 import ResourceSection from "@/components/ResourceSection";
 import Head from "next/head";
@@ -15,6 +15,10 @@ export default function RecommendedPage() {
   ];
   const [activeCategory, setActiveCategory] = useState("all");
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    document.title = "Recommended Stuff | CobbleToolkit";
+  }, []);
 
   const categoryLabels = {
     all: "All",

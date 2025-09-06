@@ -23,45 +23,74 @@ export default function BreedingGuidePage() {
         <span className="font-medium">requiem</span>.
       </p>
 
+      {/* Pasture Blocks */}
+      <section className="space-y-3">
+        <h2 className="font-semibold">Pasture Blocks</h2>
+        <p className="text-gray-300">
+          Cobbleverse uses the <strong>Cobbreeding</strong> mod. Pokémon
+          compatible for breeding must be placed inside{" "}
+          <strong>Pasture Blocks</strong>. By default, they have a{" "}
+          <strong>50% chance every 10 minutes</strong> to produce an egg, but in{" "}
+          <strong>Cobbleverse</strong> this interval is{" "}
+          <strong>7 minutes</strong>.
+        </p>
+        <p className="text-gray-300">
+          Eggs appear behind the pasture block. Right-click the bottom of the
+          block to collect them. Pasture blocks can also connect to{" "}
+          <strong>storage blocks via hoppers</strong>, making an automated egg
+          farm possible.
+        </p>
+        <p className="text-gray-300">
+          Each interval, the pasture block looks for{" "}
+          <strong>two compatible parents</strong>. For best results, use one
+          pasture per breeding pair — otherwise, parents are chosen randomly if
+          more than two are inside.
+        </p>
+      </section>
+
       {/* IVs Section */}
       <section className="space-y-3">
         <h2 className="font-semibold">IV Inheritance</h2>
         <p className="text-gray-300">
-          Each offspring inherits <strong>3 random IVs</strong> from the parents
-          (out of 12 possible IVs combined from both). The rest are randomized.
+          Without any held items, offspring inherit{" "}
+          <strong>3 random IVs</strong> from the 12 total IVs of both parents.
+          The rest are randomized.
         </p>
         <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
           <li>
             <strong>Power Bands:</strong> Lock a specific IV from the parent
-            holding it. (Ex: Def Power Band guarantees DEF IV from that parent.)
+            holding it. (Ex: Def Power Band guarantees DEF IV.)
           </li>
           <li>
             <strong>Destiny Knot:</strong> Ensures{" "}
-            <strong>5 out of 12 IVs</strong> are inherited between both parents.
+            <strong>5 out of 12 IVs</strong> are inherited.
           </li>
-          <li>
-            Only <strong>one IV</strong> will always remain random.
-          </li>
+          <li>Only one IV will always remain random.</li>
         </ul>
         <p className="text-gray-300 italic">
-          ⚠️ Don’t give both parents Power Bands — only one will be chosen
-          (50/50).
+          ⚠️ Don’t give both parents Power Bands — only one is chosen (50/50).
+        </p>
+        <p className="text-gray-300">
+          Strategy: use Power Bands if your Pokémon has only 1 IV. Switch to
+          Destiny Knot once it reaches 2 IVs or more. You can also combine a
+          Destiny Knot + one Power Band to guarantee one stat while passing
+          others.
         </p>
       </section>
 
-      {/* Breeding Method */}
+      {/* Practical Breeding */}
       <section className="space-y-3">
         <h2 className="font-semibold">Practical Breeding Example</h2>
         <p className="text-gray-300">
           Start with an Eevee with 3 perfect IVs. Give one parent a{" "}
           <strong>Destiny Knot</strong> and connect your{" "}
-          <span className="font-medium">Pasture Block</span> to a hopper/chest
-          system. Eggs will collect in the chest:
+          <span className="font-medium">Pasture Block</span> to a hopper/chest.
+          Eggs will collect in the chest:
         </p>
         <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
           <li>Discard eggs with 2 IVs or less.</li>
-          <li>Hatch 3+ IV eggs and add them back into the breeding pool.</li>
-          <li>Repeat until reaching 5 IVs → then 6 IVs.</li>
+          <li>Hatch 3+ IV eggs and recycle them into the pool.</li>
+          <li>Repeat until you reach 5 IVs, then 6 IVs.</li>
         </ul>
         <p className="text-gray-300">
           Power Bands are only useful early when parents have low/no IVs.
@@ -76,25 +105,21 @@ export default function BreedingGuidePage() {
           <strong>Cobbleverse</strong>: <strong>1/2048</strong>.
         </p>
         <p className="text-gray-300">
-          Breeding can increase this rate using shiny multipliers (default 16x
-          in Cobbleverse):
+          Breeding multiplies these odds. In Cobbleverse, shiny chance is{" "}
+          <strong>16×</strong> by default:
         </p>
         <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
           <li>
-            <strong>Always:</strong> Enabled by default in Cobbleverse. Every
-            breed = 16/2048.
+            <strong>Always:</strong> Every breed = 16/2048 chance.
           </li>
           <li>
-            <strong>Masuda Method:</strong> Parents from different trainers.
-          </li>
-          <li>
-            <strong>Crystal Method:</strong> Shiny parent(s) increase the odds
-            further.
+            <strong>Masuda Method:</strong> Parents from different{" "}
+            <strong>original trainers</strong>.
           </li>
         </ul>
         <p className="text-gray-300 italic">
-          With config tweaks, Masuda + 2 shiny parents + Always = absurd shiny
-          odds (essentially guaranteed).
+          Masuda + shiny parents + Always = near-guaranteed shiny odds with the
+          right setup.
         </p>
       </section>
 
@@ -102,40 +127,36 @@ export default function BreedingGuidePage() {
       <section className="space-y-3">
         <h2 className="font-semibold">Hidden Abilities</h2>
         <p className="text-gray-300">
-          Only <strong>female</strong> Pokémon pass down Hidden Abilities (HAs),
+          Only <strong>female Pokémon</strong> pass down Hidden Abilities (HAs),
           and only by chance:
         </p>
         <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
-          <li>3 regular abilities → 10% chance.</li>
-          <li>2 regular abilities → 20% chance.</li>
+          <li>3 regular abilities → 10% chance</li>
+          <li>2 regular abilities → 20% chance</li>
           <li>
-            Female HA → <strong>60% chance</strong>.
+            Female with HA → <strong>60% chance</strong>
           </li>
         </ul>
         <p className="text-gray-300">
           Items like <strong>Ability Patch</strong> or{" "}
-          <strong>Ability Capsule</strong> can set abilities directly, so
-          farming HAs isn’t mandatory.
+          <strong>Ability Capsule</strong> can set abilities directly.
         </p>
       </section>
 
       {/* Natures */}
       <section className="space-y-3">
         <h2 className="font-semibold">Natures</h2>
-        <p className="text-gray-300">
-          Natures affect stat growth. For example:
-        </p>
+        <p className="text-gray-300">Natures affect stat growth. Example:</p>
         <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
           <li>
-            <strong>Jolly:</strong> +Speed, –SpA (good for physical attackers).
+            <strong>Jolly:</strong> +Speed, –SpA
           </li>
           <li>
-            <strong>Timid:</strong> +Speed, –Atk (good for special attackers).
+            <strong>Timid:</strong> +Speed, –Atk
           </li>
         </ul>
         <p className="text-gray-300">
-          To lock nature: give the desired-nature parent an{" "}
-          <strong>Everstone</strong>.
+          To lock a nature: give the parent an <strong>Everstone</strong>.
         </p>
       </section>
 
@@ -145,10 +166,9 @@ export default function BreedingGuidePage() {
         <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
           <li>One parent holds Destiny Knot.</li>
           <li>
-            The other parent holds Everstone (only if nature is the one you
-            want).
+            The other holds Everstone (if you want its nature passed down).
           </li>
-          <li>Hidden Abilities are RNG — use Ability Patch later if needed.</li>
+          <li>Hidden Abilities are RNG — use Ability Patch if unlucky.</li>
         </ul>
       </section>
 
@@ -179,7 +199,7 @@ export default function BreedingGuidePage() {
           >
             LUMYVERSE Discord
           </a>{" "}
-          for more tips, or visit the{" "}
+          or visit the{" "}
           <a
             href="https://www.lumyverse.com/cobbleverse"
             target="_blank"

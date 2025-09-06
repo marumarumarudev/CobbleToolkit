@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect } from "react";
 
 export default function HomePage() {
   const availableTools = [
@@ -14,6 +15,10 @@ export default function HomePage() {
     { name: "Feedback Gallery", path: "/feedback-gallery" },
     { name: "FAQ", path: "/faq" },
   ];
+
+  useEffect(() => {
+    document.title = "CobbleToolkit";
+  }, []);
 
   const upcomingTools = ["buh", "wuh", "guh"];
 

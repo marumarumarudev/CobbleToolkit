@@ -3,7 +3,16 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, ChevronDown } from "lucide-react";
+import {
+  Menu,
+  ChevronDown,
+  X,
+  Wrench,
+  BookOpen,
+  Star,
+  MessageSquare,
+  HelpCircle,
+} from "lucide-react";
 
 export default function ClientNav() {
   const pathname = usePathname();
@@ -18,163 +27,147 @@ export default function ClientNav() {
     { name: "Trainer Scanner", path: "/trainer-scanner" },
   ];
 
+  const navItems = [
+    { name: "Guides", path: "/guides", icon: BookOpen },
+    { name: "Recommended Stuff", path: "/recommended", icon: Star },
+    { name: "Feedback", path: "/feedback-gallery", icon: MessageSquare },
+    { name: "FAQ", path: "/faq", icon: HelpCircle },
+  ];
+
   const isActive = (path) => pathname === path;
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#121212] border-b border-[#333] px-4 py-4 shadow-md">
+    <nav className="sticky top-0 z-50 bg-[#121212]/95 backdrop-blur-md border-b border-[#333]/50 px-4 py-4 shadow-lg">
       <div className="max-w-6xl mx-auto flex justify-between items-center">
         <Link
           href="/"
-          className={`font-mono text-lg font-semibold ${
+          className={`font-mono text-lg font-semibold transition-all duration-200 ${
             pathname === "/"
               ? "text-yellow-400"
               : "hover:text-yellow-400 text-white"
           }`}
         >
-          CobbleToolkit
+          <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+            CobbleToolkit
+          </span>
         </Link>
 
         {/* Mobile menu toggle */}
         <button
-          className="sm:hidden text-yellow-400"
+          className="sm:hidden text-yellow-400 hover:text-yellow-300 transition-colors p-2"
           onClick={() => setIsOpen(!isOpen)}
         >
-          <Menu size={24} />
+          {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 
-        {/* Desktop */}
+        {/* Desktop Navigation */}
         <div className="hidden sm:flex items-center space-x-6 text-sm font-mono">
+          {/* Tools Dropdown */}
           <div className="relative group">
             <button
               onClick={() => setToolsOpen(!toolsOpen)}
-              className="flex items-center gap-1 hover:text-yellow-400"
+              className="flex items-center gap-1 hover:text-yellow-400 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-[#2a2a2a]/50"
             >
-              Tools <ChevronDown size={16} />
+              <Wrench size={16} />
+              Tools
+              <ChevronDown
+                size={16}
+                className={`transition-transform duration-200 ${
+                  toolsOpen ? "rotate-180" : ""
+                }`}
+              />
             </button>
             {toolsOpen && (
-              <div className="absolute bg-[#1c1c1c] border border-[#333] mt-2 rounded shadow-md z-10 w-48">
-                {tools.map((tool) => (
-                  <Link
-                    key={tool.path}
-                    href={tool.path}
-                    onClick={() => setToolsOpen(false)} // Close dropdown
-                    className={`block px-4 py-2 text-sm ${
-                      isActive(tool.path)
-                        ? "text-yellow-400"
-                        : "text-gray-300 hover:text-yellow-400 hover:bg-[#2c2c2c]"
-                    }`}
-                  >
-                    {tool.name}
-                  </Link>
-                ))}
+              <div className="absolute bg-[#1c1c1c] border border-[#333] mt-2 rounded-xl shadow-xl z-10 w-56 overflow-hidden">
+                <div className="p-2">
+                  {tools.map((tool) => (
+                    <Link
+                      key={tool.path}
+                      href={tool.path}
+                      onClick={() => setToolsOpen(false)}
+                      className={`block px-3 py-2.5 text-sm rounded-lg transition-all duration-200 ${
+                        isActive(tool.path)
+                          ? "text-yellow-400 bg-yellow-400/10"
+                          : "text-gray-300 hover:text-yellow-400 hover:bg-[#2c2c2c]"
+                      }`}
+                    >
+                      {tool.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
           </div>
 
-          <Link
-            href="/guides"
-            className={`${
-              isActive("/guides")
-                ? "text-yellow-400"
-                : "text-gray-300 hover:text-yellow-400"
-            }`}
-          >
-            Guides
-          </Link>
-
-          <Link
-            href="/recommended"
-            className={`${
-              isActive("/recommended")
-                ? "text-yellow-400"
-                : "text-gray-300 hover:text-yellow-400"
-            }`}
-          >
-            Recommended Stuff
-          </Link>
-          <Link
-            href="/feedback-gallery"
-            className={`${
-              isActive("/feedback-gallery")
-                ? "text-yellow-400"
-                : "text-gray-300 hover:text-yellow-400"
-            }`}
-          >
-            Feedback
-          </Link>
-          <Link
-            href="/faq"
-            className={`${
-              isActive("/faq")
-                ? "text-yellow-400"
-                : "text-gray-300 hover:text-yellow-400"
-            }`}
-          >
-            FAQ
-          </Link>
+          {/* Other Navigation Items */}
+          {navItems.map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <Link
+                key={item.path}
+                href={item.path}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                  isActive(item.path)
+                    ? "text-yellow-400 bg-yellow-400/10"
+                    : "text-gray-300 hover:text-yellow-400 hover:bg-[#2a2a2a]/50"
+                }`}
+              >
+                <IconComponent size={16} />
+                {item.name}
+              </Link>
+            );
+          })}
         </div>
       </div>
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="sm:hidden px-4 mt-2 space-y-2 font-mono text-sm">
-          {tools.map((tool) => (
-            <Link
-              key={tool.path}
-              href={tool.path}
-              className={`block ${
-                isActive(tool.path)
-                  ? "text-yellow-400"
-                  : "text-gray-300 hover:text-yellow-400"
-              }`}
-              onClick={() => setIsOpen(false)} // Close mobile menu
-            >
-              {tool.name}
-            </Link>
-          ))}
-          <Link
-            href="/guides"
-            className={`block ${
-              isActive("/guides")
-                ? "text-yellow-400"
-                : "text-gray-300 hover:text-yellow-400"
-            }`}
-            onClick={() => setIsOpen(false)}
-          >
-            Guides
-          </Link>
-          <Link
-            href="/recommended"
-            className={`block ${
-              isActive("/recommended")
-                ? "text-yellow-400"
-                : "text-gray-300 hover:text-yellow-400"
-            }`}
-            onClick={() => setIsOpen(false)}
-          >
-            Recommended Stuff
-          </Link>
-          <Link
-            href="/feedback-gallery"
-            className={`block ${
-              isActive("/feedback-gallery")
-                ? "text-yellow-400"
-                : "text-gray-300 hover:text-yellow-400"
-            }`}
-            onClick={() => setIsOpen(false)}
-          >
-            Feedback Gallery
-          </Link>
-          <Link
-            href="/faq"
-            className={`${
-              isActive("/faq")
-                ? "text-yellow-400"
-                : "text-gray-300 hover:text-yellow-400"
-            }`}
-          >
-            FAQ
-          </Link>
+        <div className="sm:hidden mt-4 space-y-2 font-mono text-sm bg-[#1c1c1c] rounded-xl p-4 border border-[#333]">
+          {/* Tools Section */}
+          <div className="mb-4">
+            <div className="flex items-center gap-2 text-yellow-400 font-semibold mb-2 px-2">
+              <Wrench size={16} />
+              Tools
+            </div>
+            <div className="space-y-1 ml-4">
+              {tools.map((tool) => (
+                <Link
+                  key={tool.path}
+                  href={tool.path}
+                  className={`block px-3 py-2 rounded-lg transition-colors ${
+                    isActive(tool.path)
+                      ? "text-yellow-400 bg-yellow-400/10"
+                      : "text-gray-300 hover:text-yellow-400 hover:bg-[#2c2c2c]"
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  {tool.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Other Navigation Items */}
+          <div className="space-y-1">
+            {navItems.map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                    isActive(item.path)
+                      ? "text-yellow-400 bg-yellow-400/10"
+                      : "text-gray-300 hover:text-yellow-400 hover:bg-[#2c2c2c]"
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <IconComponent size={16} />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
         </div>
       )}
     </nav>
