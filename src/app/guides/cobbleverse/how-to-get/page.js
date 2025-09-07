@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "How to get *this* Pokmon Guide | CobbleToolkit",
+  title: "How to get *this* Pokemon Guide | CobbleToolkit",
   description: "Guide on how to catch specific pokemons in detail.",
 };
 
