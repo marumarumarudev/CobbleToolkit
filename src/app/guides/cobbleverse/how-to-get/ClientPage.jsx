@@ -241,6 +241,9 @@ export default function HowToGetPokemonPage() {
               Right-click a <b>Pikachu</b> with Ash’s Cap in your main hand to
               obtain <b>Ash’s Pikachu</b>.
             </li>
+            <li>
+              Requires <b>Friendship 200+</b>
+            </li>
           </ul>
 
           <h4 className="font-medium">Ash’s Pikachu Info</h4>
