@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import {
   MapPin,
   Users,
@@ -9,6 +9,7 @@ import {
   BarChart3,
   ArrowRight,
   BookOpen,
+  HelpCircle,
 } from "lucide-react";
 
 export const metadata = {
@@ -19,12 +20,19 @@ export const metadata = {
 export default function CobbleverseOverviewPage() {
   const guides = [
     {
+      title: "Frequently Asked Questions",
+      description:
+        "Quick answers to the most commonly asked questions about Cobbleverse",
+      href: "/guides/cobbleverse/faq",
+      icon: HelpCircle,
+      featured: true,
+    },
+    {
       title: "How to proceed to next region?",
       description:
         "Complete guide on advancing through different regions in COBBLEVERSE",
       href: "/guides/cobbleverse/progression",
       icon: MapPin,
-      featured: true,
     },
     {
       title: "Locating Gym Leaders",
@@ -88,7 +96,7 @@ export default function CobbleverseOverviewPage() {
           <div className="relative bg-gradient-to-br from-[#2a2a2a] to-[#1f1f1f] border border-yellow-400/20 rounded-2xl p-6 hover:border-yellow-400/40 transition-all duration-300">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center">
-                <MapPin className="w-6 h-6 text-black" />
+                <HelpCircle className="w-6 h-6 text-black" />
               </div>
               <div className="flex-1">
                 <h2 className="text-xl font-semibold text-white mb-2">
@@ -154,7 +162,7 @@ export default function CobbleverseOverviewPage() {
             <div className="text-sm text-gray-400">Total Guides</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-yellow-400">7</div>
+            <div className="text-2xl font-bold text-yellow-400">8</div>
             <div className="text-sm text-gray-400">Categories</div>
           </div>
           <div className="text-center">
@@ -162,7 +170,7 @@ export default function CobbleverseOverviewPage() {
             <div className="text-sm text-gray-400">Community Driven</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-yellow-400">∞</div>
+            <div className="text-2xl font-bold text-yellow-400"></div>
             <div className="text-sm text-gray-400">Always Updated</div>
           </div>
         </div>

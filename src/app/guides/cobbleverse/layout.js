@@ -12,6 +12,7 @@ import {
   Heart,
   BarChart3,
   ChevronRight,
+  HelpCircle,
 } from "lucide-react";
 
 export default function CobbleverseLayout({ children }) {
@@ -20,6 +21,11 @@ export default function CobbleverseLayout({ children }) {
 
   const items = [
     { name: "Overview", href: "/guides/cobbleverse", icon: Home },
+    {
+      name: "FAQ",
+      href: "/guides/cobbleverse/faq",
+      icon: HelpCircle,
+    },
     {
       name: "Progression",
       href: "/guides/cobbleverse/progression",
@@ -103,11 +109,11 @@ export default function CobbleverseLayout({ children }) {
             <div className="text-xs text-gray-400 space-y-1">
               <div className="flex justify-between">
                 <span>Total Guides:</span>
-                <span className="text-yellow-400">7</span>
+                <span className="text-yellow-400">8</span>
               </div>
               <div className="flex justify-between">
                 <span>Last Updated:</span>
-                <span className="text-yellow-400">Sept. 7, 2025</span>
+                <span className="text-yellow-400">9/8/25</span>
               </div>
             </div>
           </div>
