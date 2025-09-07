@@ -188,6 +188,20 @@ export default function BreedingGuidePage() {
 
       {/* Config & Pro Tips */}
       <section className="space-y-3">
+        <h2 className="font-semibold">🥚 Egg Hatching Pro Tip</h2>
+        <p className="text-gray-300">
+          You will receive the <span className="font-medium">Pokémon Egg</span>{" "}
+          as an item. It will hatch over time if kept in your inventory. You can
+          speed up this process by having a Pokémon with the ability
+          <b> Flame Body</b>, <b>Magma Armor</b>, or <b>Steam Engine</b> in your
+          party. This halves the hatching time by taking{" "}
+          <b>2 seconds off instead of 1</b>.
+          <span className="italic text-sm text-gray-400">
+            {" "}
+            (The effect does not stack.)
+          </span>
+        </p>
+
         <h2 className="font-semibold">⚙️ Config & Pro Tips</h2>
         <p className="text-gray-300">
           The config file is located at:{" "}
@@ -213,6 +227,18 @@ export default function BreedingGuidePage() {
             </span>
           </li>
         </ul>
+        <p className="text-gray-400 text-sm">
+          …or just download{" "}
+          <a
+            href="https://modrinth.com/mod/cobblemon-utility+"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-400 underline"
+          >
+            Cobblemon Utility+
+          </a>{" "}
+          because <span className="italic">fuck breeding</span>.
+        </p>
       </section>
 
       {/* Footer */}

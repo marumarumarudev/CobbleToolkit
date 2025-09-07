@@ -90,7 +90,7 @@ export default function ItemsGuidePage() {
         </ul>
       </section>
 
-      <section className="space-y-3">
+      <section className="space-y-6">
         <h2 className="font-semibold">Gimmick Items</h2>
         <p className="text-gray-300">
           Items like <strong>Mega Stones</strong>, <strong>Keystones</strong>,
@@ -107,6 +107,94 @@ export default function ItemsGuidePage() {
         >
           Mega Showdown Wiki
         </a>
+
+        {/* Keystone & Blank Megastone */}
+        <div className="space-y-2 mt-5">
+          <h3 className="font-medium">
+            Keystone & Blank Megastone (Mega Evolution)
+          </h3>
+          <FullscreenImage
+            src="/guides/megaroid.png"
+            alt="Keystone & Blank Megastone location"
+            credit="doctor"
+          />
+        </div>
+
+        {/* Sparkling Stone */}
+        <div className="space-y-2">
+          <h3 className="font-medium">Sparkling Stone → Z-Ring</h3>
+          <p className="text-gray-300">
+            Found in <strong>archaeological sites</strong> in deserts. Brush
+            suspicious sands.
+          </p>
+          <ImageCarousel
+            images={[
+              {
+                src: "/guides/sparkling-stone.png",
+                alt: "Suspicious sand site",
+                credit: "maru",
+              },
+              {
+                src: "/guides/archaeological-site.png",
+                alt: "Sparkling Stone in desert",
+                credit: "Mega Showdown",
+              },
+            ]}
+          />
+        </div>
+
+        {/* Blank Z-Crystal */}
+        <div className="space-y-2">
+          <h3 className="font-medium">Blank Z-Crystal</h3>
+          <p className="text-gray-300">
+            The <strong>Blank Z</strong> can be imbued with any type. It is the
+            key ingredient for crafting <strong>Type Z Crystals</strong>. Found
+            in <strong>Abandoned Observatories</strong>.
+          </p>
+          <FullscreenImage
+            src="/guides/observatory.png"
+            alt="Blank Z-Crystal in observatory"
+            credit="Mega Showdown"
+          />
+        </div>
+
+        {/* Wishing Star */}
+        <div className="space-y-2">
+          <h3 className="font-medium">Wishing Star</h3>
+          <p className="text-gray-300">
+            Obtain by mining a <strong>Wishing Star Crystal</strong> with a
+            diamond pickaxe in a<strong> Wishing Weald</strong>.
+          </p>
+          <FullscreenImage
+            src="/guides/wishing-weald.png"
+            alt="Wishing Star crystal node"
+            credit="Mega Showdown"
+          />
+        </div>
+
+        {/* Tera Orb & Omni Ring */}
+        <div className="space-y-2">
+          <h3 className="font-medium">Tera Orb & Omni Ring</h3>
+          <p className="text-gray-300">
+            The <strong>Tera Orb</strong> is craftable. The{" "}
+            <strong>Omni Ring</strong> is basically all gimmick recipes rolled
+            into one item/equipment.
+          </p>
+          <ImageCarousel
+            images={[
+              {
+                src: "/guides/tera-orb.png",
+                alt: "Tera Orb",
+                credit: "doctor",
+              },
+              {
+                src: "/guides/omniring.png",
+                alt: "Omni Ring",
+                credit: "doctor",
+              },
+            ]}
+          />
+        </div>
       </section>
 
       <div className="p-4 text-gray-300 border-t border-gray-700 space-y-2">
@@ -270,4 +358,53 @@ function DepartmentStoreSlider() {
     },
   ];
   return <ImageCarousel images={images} />;
+}
+
+function FullscreenImage({ src, alt, credit }) {
+  const [fullscreen, setFullscreen] = useState(false);
+
+  return (
+    <div className="space-y-1">
+      <button
+        className="relative w-full h-64 sm:h-80 md:h-96 overflow-hidden rounded-2xl shadow-lg"
+        onClick={() => setFullscreen(true)}
+        aria-label="Open image fullscreen"
+      >
+        <Image src={src} alt={alt} fill className="object-cover" />
+        <div className="absolute inset-x-0 bottom-0 bg-black/40 backdrop-blur px-3 py-2 text-sm text-gray-100">
+          <span className="font-medium">Credit:</span> {credit}
+        </div>
+      </button>
+
+      {fullscreen && (
+        <div
+          className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4"
+          onClick={() => setFullscreen(false)}
+        >
+          <div
+            className="relative w-full max-w-6xl h-[80vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setFullscreen(false)}
+              aria-label="Close fullscreen"
+              className="absolute top-2 right-2 z-10 rounded-md bg-black/60 hover:bg-black/70 text-white p-2"
+            >
+              ✕
+            </button>
+            <Image
+              src={src}
+              alt={alt}
+              fill
+              className="object-contain rounded-lg"
+            />
+            <p className="absolute inset-x-0 bottom-2 mx-auto w-fit bg-black/50 backdrop-blur px-3 py-1 rounded text-gray-100 text-sm">
+              <span className="font-medium">Credit:</span> {credit}
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }

@@ -54,12 +54,12 @@ export default function HowToGetPokemonPage() {
     mewtwo: {
       title: "Kanto Series: Mewtwo",
       series: "Kanto Series",
-      levelCap: "90+",
+      levelCap: "80+",
       content: (
         <div className="space-y-6">
           <ul className="list-disc list-inside space-y-1">
             <li>
-              Must be in <b>Kanto Series</b> with level cap 90+ (check trainer
+              Must be in <b>Kanto Series</b> with level cap 80+ (check trainer
               card).
             </li>
             <li>
@@ -91,11 +91,178 @@ export default function HowToGetPokemonPage() {
               Combine <b>Ancient DNA</b> + <b>Cloning Catalyst</b> in a Fossil
               Resurrection Machine to obtain Mewtwo.
             </li>
+            <li>
+              Hidden inside Radio Tower (Johto Series) is the{" "}
+              <b>Synthetic Matrix</b>, used to craft
+              <b> Armored Mewtwo</b>.
+            </li>
           </ul>
+
+          {/* Shadow Mewtwo Note */}
+          <p className="text-sm text-purple-300 italic">
+            ⚠️ As of writing this guide, <b>Shadow Mewtwo</b> cannot be obtained
+            through gameplay. You can only get it via command:{" "}
+            <code>/pokegive mewtwo shadow=true</code>
+          </p>
+
+          {/* Base Stats Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-gray-200 border border-gray-700 rounded-lg overflow-hidden">
+              <thead className="bg-gray-800 text-gray-100">
+                <tr>
+                  <th className="px-2 py-1 border border-gray-700">Form</th>
+                  <th className="px-2 py-1 border border-gray-700">HP</th>
+                  <th className="px-2 py-1 border border-gray-700">ATK</th>
+                  <th className="px-2 py-1 border border-gray-700">DEF</th>
+                  <th className="px-2 py-1 border border-gray-700">Sp. ATK</th>
+                  <th className="px-2 py-1 border border-gray-700">Sp. DEF</th>
+                  <th className="px-2 py-1 border border-gray-700">Speed</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="px-2 py-1 border border-gray-700">Mewtwo</td>
+                  <td>106</td>
+                  <td>110</td>
+                  <td>90</td>
+                  <td>154</td>
+                  <td>90</td>
+                  <td>130</td>
+                </tr>
+                <tr>
+                  <td className="px-2 py-1 border border-gray-700">Armored</td>
+                  <td>106</td>
+                  <td>130</td>
+                  <td>110</td>
+                  <td>90</td>
+                  <td>154</td>
+                  <td>90</td>
+                </tr>
+                <tr>
+                  <td className="px-2 py-1 border border-gray-700">Shadow</td>
+                  <td>106</td>
+                  <td>132</td>
+                  <td>72</td>
+                  <td>184</td>
+                  <td>72</td>
+                  <td>130</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <p className="text-xs opacity-50 italic">
             Use <code>/locate structure cobbleverse:team_rocket_tower</code>
           </p>
           <MewtwoImageSlider />
+        </div>
+      ),
+    },
+    ash_greninja: {
+      title: "Special: Ash's Greninja",
+      series: "Kanto Series",
+      levelCap: "40+",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Must be in <b>Kanto Series</b> with <b>level cap 40+</b>.
+            </li>
+            <li>
+              Find <b>Ash’s House</b> in <b>Plains biomes</b>.
+            </li>
+            <li>
+              Defeat Ash to obtain <b>Ash’s Cap</b>.
+            </li>
+            <li>
+              (CurseForge users: Ash’s Cap can be found free in a drawer inside
+              his room.)
+            </li>
+            <li>
+              To obtain <b>Ash’s Greninja</b>, right-click a Greninja while
+              holding Ash’s Cap in your main hand.
+            </li>
+          </ul>
+
+          <h4 className="font-medium">Battle Bond Ability</h4>
+          <p>
+            Ash’s Greninja has the unique ability <b>Battle Bond</b>:
+          </p>
+          <ul className="list-disc list-inside ml-6 space-y-1">
+            <li>
+              When Greninja directly causes another Pokémon to faint with a
+              damaging move, it transforms into <b>Ash-Greninja</b> (Gen 7
+              effect).
+            </li>
+            <li>After the battle, it reverts back to normal Greninja.</li>
+            <li>
+              In newer generations, Battle Bond instead gives stat boosts. Mega
+              Showdown makes this depend on friendship:
+              <ul className="list-disc list-inside ml-6">
+                <li>
+                  <b>Friendship 250+</b>: Gen 7 form-change effect.
+                </li>
+                <li>
+                  <b>Friendship below 250</b>: Newer generation stat-boost
+                  effect.
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <p className="text-sm text-red-400">
+            ⚠️ Giving Greninja Battle Bond via commands does not work properly.
+          </p>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:ash</code>
+          </p>
+
+          <AshGreninjaImageSlider />
+          <p className="text-xs opacity-50 italic">
+            Big thanks to <strong>Mega Showdown Wiki</strong>
+          </p>
+        </div>
+      ),
+    },
+    ash_pikachu: {
+      title: "Special: Ash's Pikachu",
+      series: "Kanto Series",
+      levelCap: "40+",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Must be in <b>Kanto Series</b> with <b>level cap 40+</b>.
+            </li>
+            <li>
+              Obtain <b>Ash’s Cap</b> from Ash (or his drawer if using
+              CurseForge).
+            </li>
+            <li>
+              Right-click a <b>Pikachu</b> with Ash’s Cap in your main hand to
+              obtain <b>Ash’s Pikachu</b>.
+            </li>
+          </ul>
+
+          <h4 className="font-medium">Ash’s Pikachu Info</h4>
+          <ul className="list-disc list-inside ml-6 space-y-1">
+            <li>No stat changes compared to a regular Pikachu.</li>
+            <li>
+              When holding <b>Pikashunium Z</b>, Ash’s Pikachu can use{" "}
+              <b>10,000,000 Volt Thunderbolt</b>.
+            </li>
+            <li>
+              Ash’s Pikachu <u>cannot</u> use <b>Catastropika</b> even with
+              Pikanium Z.
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:ash</code>
+          </p>
+
+          <AshPikachuImageSlider />
+          <p className="text-xs opacity-50 italic">
+            Big thanks to <strong>Mega Showdown Wiki</strong>
+          </p>
         </div>
       ),
     },
@@ -126,9 +293,6 @@ export default function HowToGetPokemonPage() {
                 <li>
                   Hidden <b>Corrupted Shards</b> to craft Shadow Soul Stone.
                 </li>
-                <li>
-                  <b>Synthetic Matrix</b> behind a lectern for Armored Mewtwo.
-                </li>
               </ul>
             </li>
             <li>
@@ -137,6 +301,46 @@ export default function HowToGetPokemonPage() {
               Lugia into Shadow Form)
             </li>
           </ul>
+
+          {/* Base Stats Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-gray-200 border border-gray-700 rounded-lg overflow-hidden">
+              <thead className="bg-gray-800 text-gray-100">
+                <tr>
+                  <th className="px-2 py-1 border border-gray-700">Form</th>
+                  <th className="px-2 py-1 border border-gray-700">HP</th>
+                  <th className="px-2 py-1 border border-gray-700">ATK</th>
+                  <th className="px-2 py-1 border border-gray-700">DEF</th>
+                  <th className="px-2 py-1 border border-gray-700">Sp. ATK</th>
+                  <th className="px-2 py-1 border border-gray-700">Sp. DEF</th>
+                  <th className="px-2 py-1 border border-gray-700">Speed</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="px-2 py-1 border border-gray-700">Lugia</td>
+                  <td>106</td>
+                  <td>90</td>
+                  <td>130</td>
+                  <td>90</td>
+                  <td>154</td>
+                  <td>110</td>
+                </tr>
+                <tr>
+                  <td className="px-2 py-1 border border-gray-700">
+                    Shadow Lugia
+                  </td>
+                  <td>106</td>
+                  <td>130</td>
+                  <td>90</td>
+                  <td>154</td>
+                  <td>90</td>
+                  <td>110</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
           <p className="text-xs opacity-50 italic">
             Use <code>/locate structure cobbleverse:rocket_radio_tower</code> or{" "}
             <code>/locate structure cobbleverse:whirl_island</code>
@@ -809,6 +1013,11 @@ function MewtwoImageSlider() {
       credit: "doctor",
     },
     {
+      src: "/guides/synthetic-matrix.png",
+      alt: "Synthetic Matrix",
+      credit: "doctor, Soggy&Wet",
+    },
+    {
       src: "/guides/ressurection-mewtwo.png",
       alt: "Fossil Resurrection Machine with Ancient DNA and Cloning Catalyst",
       credit: "maru",
@@ -853,11 +1062,6 @@ function LugiaImageSlider() {
       src: "/guides/corrupted-shard-7.jpg",
       alt: "Corrupted Shards hidden in Radio Tower",
       credit: "doctor",
-    },
-    {
-      src: "/guides/synthetic-matrix.png",
-      alt: "Synthetic Matrix",
-      credit: "doctor, Soggy&Wet",
     },
     {
       src: "/guides/whirl-island.png",
@@ -1112,6 +1316,83 @@ function DeoxysImageSlider() {
       src: "/guides/deoxys-form-meteorite.png",
       alt: "Form-changing meteorite block",
       credit: "skeleton, doctor",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function AshGreninjaImageSlider() {
+  const images = [
+    {
+      src: "/guides/ash-greninja.png",
+      alt: "Ash Greninja",
+      credit: "Mega Showdown",
+    },
+    {
+      src: "/guides/ash-house-1.png",
+      alt: "Ash House",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/ash.png",
+      alt: "Ash",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/ash-mom-1.png",
+      alt: "Ash Mom",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/ash-mom-2.png",
+      alt: "Ash Mom",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/ash-mom-3.png",
+      alt: "Ash Mom",
+      credit: "doctor",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function AshPikachuImageSlider() {
+  const images = [
+    {
+      src: "/guides/ash-pikachu.png",
+      alt: "Ash Pikachu",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/ash-pikachu-1.png",
+      alt: "Ash House",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/ash-house-1.png",
+      alt: "Ash House",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/ash.png",
+      alt: "Ash",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/ash-mom-1.png",
+      alt: "Ash Mom",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/ash-mom-2.png",
+      alt: "Ash Mom",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/ash-mom-3.png",
+      alt: "Ash Mom",
+      credit: "doctor",
     },
   ];
   return <ImageCarousel images={images} />;

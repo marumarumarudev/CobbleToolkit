@@ -1,5 +1,5 @@
 import React from "react";
-import ImageWithFullscreen from "./ImageWithFullscreen";
+import ImageWithFullscreen from "./ClientPage";
 
 export const metadata = {
   title: "Gym Leaders | CobbleToolkit",
@@ -144,6 +144,27 @@ export default function GymLeadersGuidePage() {
             credit="COBBLEVERSE"
           />
         </div>
+      </section>
+
+      {/* Alternative Method */}
+      <section>
+        <h2 className="cursor-pointer font-semibold">
+          Alternative — Using the Trainer Spawner
+        </h2>
+        <div className="p-4 text-gray-300">
+          <p>
+            Alternatively, if you don’t want to explore to look for gym leaders,
+            you can craft an item called{" "}
+            <span className="font-medium">Trainer Spawner</span>. Place the{" "}
+            <span className="font-medium">Item to Spawn</span> inside the
+            spawner, and it will summon the gym leader{" "}
+            <span className="font-medium">on top of the Trainer Spawner</span>.
+          </p>
+        </div>
+      </section>
+
+      {/* Commands */}
+      <section>
         <p className="text-xs opacity-50 italic">
           If you’d prefer to use commands to locate them, just type:
           <br />
