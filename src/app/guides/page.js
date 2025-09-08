@@ -23,8 +23,8 @@ export default function GuidesIndexPage() {
       href: "/guides/cobbleverse",
       icon: "/cobbleverse.png",
       stats: {
-        guides: 7,
-        categories: 7,
+        guides: 8,
+        categories: 8,
         lastUpdated: "Recently",
       },
       features: [

@@ -1034,37 +1034,47 @@ function LugiaImageSlider() {
     {
       src: "/guides/corrupted-shard-1.png",
       alt: "Corrupted Shards hidden in Radio Tower",
-      credit: "maru",
+      credit: "doctor, maru",
     },
     {
       src: "/guides/corrupted-shard-2.png",
       alt: "Corrupted Shards hidden in Radio Tower",
-      credit: "doctor",
+      credit: "doctor, maru",
     },
     {
       src: "/guides/corrupted-shard-3.png",
       alt: "Corrupted Shards hidden in Radio Tower",
-      credit: "doctor",
+      credit: "doctor, maru",
     },
     {
       src: "/guides/corrupted-shard-4.png",
       alt: "Corrupted Shards hidden in Radio Tower",
-      credit: "doctor",
+      credit: "doctor, maru",
+    },
+    {
+      src: "/guides/corrupted-shard-4a.png",
+      alt: "Corrupted Shards hidden in Radio Tower",
+      credit: "doctor, maru, Soggy&Wet",
     },
     {
       src: "/guides/corrupted-shard-5.png",
       alt: "Corrupted Shards hidden in Radio Tower",
-      credit: "doctor",
+      credit: "doctor, maru",
     },
     {
       src: "/guides/corrupted-shard-6.png",
       alt: "Corrupted Shards hidden in Radio Tower",
-      credit: "doctor",
+      credit: "doctor, maru",
     },
     {
-      src: "/guides/corrupted-shard-7.jpg",
+      src: "/guides/corrupted-shard-7.png",
       alt: "Corrupted Shards hidden in Radio Tower",
-      credit: "doctor",
+      credit: "doctor, maru",
+    },
+    {
+      src: "/guides/corrupted-shard-8.png",
+      alt: "Corrupted Shards hidden in Radio Tower",
+      credit: "doctor, maru",
     },
     {
       src: "/guides/whirl-island.png",

@@ -96,6 +96,12 @@ export default function CobbleverseFAQPage() {
       title: "Gameplay Mechanics",
       questions: [
         {
+          question: "How to enable Mobs and Hunger?",
+          answer:
+            "Delete/Disable `Mobs Be Gone` mod in mods folder to enable mobs. Delete `COBBLEVERSE - No Hunger.zip` in datapacks folder to enable hunger.",
+          type: "direct",
+        },
+        {
           question: "How to ride Pokémon and dismount?",
           answer:
             "Shift + Right-click your Pokémon to mount (not all are rideable). You’ll see an icon bottom-left. Default dismount key is 'V'.",
