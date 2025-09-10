@@ -6,7 +6,7 @@ import { useState } from "react";
 import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function HowToGetPokemonPage() {
+function HowToGetPokemonPageInner() {
   const [activeTab, setActiveTab] = useState("mew");
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
@@ -1293,6 +1293,14 @@ export default function HowToGetPokemonPage() {
 
       {/* Remove the entire "Available Pokémon Quick Access" section (lines 1129-1178) */}
     </div>
+  );
+}
+
+export default function HowToGetPokemonPage() {
+  return (
+    <React.Suspense fallback={null}>
+      <HowToGetPokemonPageInner />
+    </React.Suspense>
   );
 }
 
