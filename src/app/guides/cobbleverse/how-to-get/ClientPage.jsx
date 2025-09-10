@@ -4,13 +4,11 @@ import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import { useState } from "react";
 import React from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 
 function HowToGetPokemonPageInner() {
   const [activeTab, setActiveTab] = useState("mew");
   const [searchQuery, setSearchQuery] = useState("");
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const initializedFromUrlRef = React.useRef(false);
 
   const pokemonData = {
     mew: {
@@ -881,21 +879,28 @@ function HowToGetPokemonPageInner() {
   };
 
   React.useEffect(() => {
-    const paramTab = searchParams.get("p");
-    if (
-      paramTab &&
-      Object.prototype.hasOwnProperty.call(pokemonData, paramTab)
-    ) {
-      setActiveTab(paramTab);
-    }
-  }, [searchParams, pokemonData]);
+    if (initializedFromUrlRef.current) return;
+    initializedFromUrlRef.current = true;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const p = params.get("p");
+      if (p && Object.prototype.hasOwnProperty.call(pokemonData, p)) {
+        setActiveTab(p);
+      }
+    } catch {}
+  }, [pokemonData]);
 
   React.useEffect(() => {
-    if (!activeTab) return;
-    const current = new URLSearchParams(Array.from(searchParams.entries()));
-    current.set("p", activeTab);
-    router.replace(`?${current.toString()}`, { scroll: false });
-  }, [activeTab, router, searchParams]);
+    try {
+      const url = new URL(window.location.href);
+      if (activeTab) {
+        url.searchParams.set("p", activeTab);
+      } else {
+        url.searchParams.delete("p");
+      }
+      window.history.replaceState(null, "", url.toString());
+    } catch {}
+  }, [activeTab]);
 
   return (
     <div className="space-y-8 max-w-3xl mx-auto px-3 overflow-x-hidden">
