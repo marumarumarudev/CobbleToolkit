@@ -4,10 +4,13 @@ import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import { useState } from "react";
 import React from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function HowToGetPokemonPage() {
   const [activeTab, setActiveTab] = useState("mew");
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const pokemonData = {
     mew: {
@@ -847,11 +850,10 @@ export default function HowToGetPokemonPage() {
           <ul className="list-disc list-inside space-y-1">
             <li>
               <b>Dialga</b>: Stony Peaks, Jagged Peaks, Frozen Peaks, Snowy
-              Slopes — <b>nighttime</b> and <b>raining</b>.
+              Slopes — <b>nighttime</b> and <b>clear weather</b>.
             </li>
             <li>
-              <b>Palkia</b>: Same locations — <b>daytime</b> and <b>clear </b>
-              weather.
+              <b>Palkia</b>: Same locations — <b>daytime</b> and <b>raining</b>.
             </li>
             <li>
               <b>Giratina</b>: <b>Ancient Cities</b> only.
@@ -877,6 +879,23 @@ export default function HowToGetPokemonPage() {
       ),
     },
   };
+
+  React.useEffect(() => {
+    const paramTab = searchParams.get("p");
+    if (
+      paramTab &&
+      Object.prototype.hasOwnProperty.call(pokemonData, paramTab)
+    ) {
+      setActiveTab(paramTab);
+    }
+  }, [searchParams, pokemonData]);
+
+  React.useEffect(() => {
+    if (!activeTab) return;
+    const current = new URLSearchParams(Array.from(searchParams.entries()));
+    current.set("p", activeTab);
+    router.replace(`?${current.toString()}`, { scroll: false });
+  }, [activeTab, router, searchParams]);
 
   return (
     <div className="space-y-8 max-w-3xl mx-auto px-3 overflow-x-hidden">
