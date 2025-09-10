@@ -7,10 +7,11 @@ import React from "react";
 
 export default function HowToGetPokemonPage() {
   const [activeTab, setActiveTab] = useState("mew");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const pokemonData = {
     mew: {
-      title: "Mythical: Mew",
+      title: "Mew",
       series: "Mythical",
       levelCap: "Any",
       content: (
@@ -52,7 +53,7 @@ export default function HowToGetPokemonPage() {
       ),
     },
     mewtwo: {
-      title: "Kanto Series: Mewtwo",
+      title: "Mewtwo",
       series: "Kanto Series",
       levelCap: "80+",
       content: (
@@ -159,7 +160,7 @@ export default function HowToGetPokemonPage() {
       ),
     },
     ash_greninja: {
-      title: "Special: Ash's Greninja",
+      title: "Ash's Greninja",
       series: "Kanto Series",
       levelCap: "40+",
       content: (
@@ -224,7 +225,7 @@ export default function HowToGetPokemonPage() {
       ),
     },
     ash_pikachu: {
-      title: "Special: Ash's Pikachu",
+      title: "Ash's Pikachu",
       series: "Kanto Series",
       levelCap: "40+",
       content: (
@@ -270,7 +271,7 @@ export default function HowToGetPokemonPage() {
       ),
     },
     lugia: {
-      title: "Johto Series: Lugia",
+      title: "Lugia",
       series: "Johto Series",
       levelCap: "70+",
       content: (
@@ -353,7 +354,7 @@ export default function HowToGetPokemonPage() {
       ),
     },
     hooh: {
-      title: "Johto Series: Ho-oh",
+      title: "Ho-oh",
       series: "Johto Series",
       levelCap: "60+",
       content: (
@@ -388,7 +389,7 @@ export default function HowToGetPokemonPage() {
       ),
     },
     kyogre: {
-      title: "Hoenn Series: Kyogre",
+      title: "Kyogre",
       series: "Hoenn Series",
       levelCap: "Any",
       content: (
@@ -425,7 +426,7 @@ export default function HowToGetPokemonPage() {
       ),
     },
     groudon: {
-      title: "Hoenn Series: Groudon",
+      title: "Groudon",
       series: "Hoenn Series",
       levelCap: "Any",
       content: (
@@ -470,7 +471,7 @@ export default function HowToGetPokemonPage() {
       ),
     },
     rayquaza: {
-      title: "Hoenn Series: Rayquaza",
+      title: "Rayquaza",
       series: "Hoenn Series",
       levelCap: "Any",
       content: (
@@ -521,7 +522,7 @@ export default function HowToGetPokemonPage() {
       ),
     },
     deoxys: {
-      title: "Hoenn Series: Deoxys",
+      title: "Deoxys",
       series: "Hoenn Series",
       levelCap: "Any",
       content: (
@@ -554,7 +555,7 @@ export default function HowToGetPokemonPage() {
       ),
     },
     zygarde: {
-      title: "Legendary: Zygarde",
+      title: "Zygarde",
       series: "Legendary",
       levelCap: "Any",
       content: (
@@ -667,7 +668,7 @@ export default function HowToGetPokemonPage() {
       ),
     },
     calyrex: {
-      title: "Legendary: Calyrex",
+      title: "Calyrex",
       series: "Legendary",
       levelCap: "Any",
       content: (
@@ -724,7 +725,7 @@ export default function HowToGetPokemonPage() {
       ),
     },
     cosplay_pikachu: {
-      title: "Special: Cosplay Pikachu",
+      title: "Cosplay Pikachu",
       series: "Special Forms",
       levelCap: "Any",
       content: (
@@ -770,6 +771,111 @@ export default function HowToGetPokemonPage() {
         </div>
       ),
     },
+    tao_trio: {
+      title: "Tao Trio",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Kyurem</b>: Ice Spikes biome, <b>raining</b>.
+            </li>
+            <li>
+              <b>Reshiram</b>: Mountain-tagged biomes, <b>clear</b> weather.
+            </li>
+            <li>
+              <b>Zekrom</b>: Mountain-tagged biomes, <b>thundering</b>.
+            </li>
+            <li>
+              Craft <b>DNA Splicer</b> to fuse Reshiram/Zekrom with Kyurem.
+            </li>
+          </ul>
+          <TaoTrioImageSlider />
+        </div>
+      ),
+    },
+    legendary_birds_trio: {
+      title: "Legendary Birds Trio",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <p>
+            For Kanto versions, visit the wiki:{" "}
+            <a
+              href="https://www.lumyverse.com/cobbleverse/exclusive-structures-in-cobbleverse/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 underline hover:text-blue-300 transition-colors"
+            >
+              COBBLEVERSE Wiki
+            </a>
+          </p>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Dyna Tree</b> spawns when <b>Hoenn</b> is activated. No level
+              cap.
+            </li>
+            <li>
+              Spawns <b>Galarian</b> Articuno, Zapdos, Moltres. Not guaranteed;
+              this is the only place they can spawn.
+            </li>
+            <li>
+              <b>Galarian Articuno</b>: <b>Nighttime</b>.
+            </li>
+            <li>
+              <b>Galarian Zapdos</b>: <b>Thundering</b>.
+            </li>
+            <li>
+              <b>Galarian Moltres</b>: <b>Daytime</b>.
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:dyna_tree</code>
+          </p>
+          <LegendaryBirdsImageSlider />
+        </div>
+      ),
+    },
+    creation_trio: {
+      title: "Creation Trio",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Dialga</b>: Stony Peaks, Jagged Peaks, Frozen Peaks, Snowy
+              Slopes — <b>nighttime</b> and <b>raining</b>.
+            </li>
+            <li>
+              <b>Palkia</b>: Same locations — <b>daytime</b> and <b>clear </b>
+              weather.
+            </li>
+            <li>
+              <b>Giratina</b>: <b>Ancient Cities</b> only.
+            </li>
+          </ul>
+          <CreationTrioImageSlider />
+        </div>
+      ),
+    },
+    river_guardians: {
+      title: "River Guardians",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Azelf, Mesprit, Uxie</b>: Spawn at <b>Beaches</b>.
+            </li>
+          </ul>
+          <RiverGuardiansImageSlider />
+        </div>
+      ),
+    },
   };
 
   return (
@@ -791,24 +897,382 @@ export default function HowToGetPokemonPage() {
         </p>
       </div>
 
-      <div className="relative overflow-hidden mx-auto max-w-3xl w-full">
-        <TabsCarousel
-          items={pokemonData}
-          activeKey={activeTab}
-          onSelect={setActiveTab}
-        />
+      {/* 🔍 Search with Autocomplete */}
+      <div className="space-y-4">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search Pokémon... (e.g., Mew, Mewtwo, Lugia, Giratina)"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                const query = searchQuery.toLowerCase();
+                const pokemonMappings = {
+                  palkia: "creation_trio",
+                  dialga: "creation_trio",
+                  giratina: "creation_trio",
+                  kyurem: "tao_trio",
+                  reshiram: "tao_trio",
+                  zekrom: "tao_trio",
+                  azelf: "river_guardians",
+                  mesprit: "river_guardians",
+                  uxie: "river_guardians",
+                  articuno: "legendary_birds_trio",
+                  zapdos: "legendary_birds_trio",
+                  moltres: "legendary_birds_trio",
+                  greninja: "ash_greninja",
+                  pikachu: "ash_pikachu",
+                };
 
-        {/* Scroll Indicators */}
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-gray-900 to-transparent pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-900 to-transparent pointer-events-none" />
-      </div>
+                // Find matching entry
+                for (const [pokemonName, entryKey] of Object.entries(
+                  pokemonMappings
+                )) {
+                  if (pokemonName.includes(query)) {
+                    setActiveTab(entryKey);
+                    setSearchQuery("");
+                    return;
+                  }
+                }
 
-      {/* Tab Content with Modern Card Design */}
-      <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl mx-auto max-w-3xl w-full">
-        <div className="p-4 sm:p-5 md:p-6">
-          {pokemonData[activeTab].content}
+                // Fallback to title/series search
+                const matchingEntry = Object.entries(pokemonData).find(
+                  ([key, data]) =>
+                    data.title.toLowerCase().includes(query) ||
+                    data.series.toLowerCase().includes(query)
+                );
+
+                if (matchingEntry) {
+                  setActiveTab(matchingEntry[0]);
+                  setSearchQuery("");
+                }
+              }
+            }}
+            className="w-full px-4 py-3 rounded-lg bg-gray-800/50 border border-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-400 focus:outline-none text-lg"
+          />
+
+          {/* Autocomplete Dropdown */}
+          {searchQuery && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-10 max-h-60 overflow-y-auto">
+              {Object.entries(pokemonData)
+                .filter(([key, data]) => {
+                  const query = searchQuery.toLowerCase();
+
+                  // Enhanced fuzzy search function
+                  const fuzzyMatch = (text, search) => {
+                    const textLower = text.toLowerCase();
+                    const searchLower = search.toLowerCase();
+
+                    // Exact match gets highest priority
+                    if (textLower.includes(searchLower)) return 3;
+
+                    // Fuzzy matching - check if all characters exist in order
+                    let searchIndex = 0;
+                    for (
+                      let i = 0;
+                      i < textLower.length && searchIndex < searchLower.length;
+                      i++
+                    ) {
+                      if (textLower[i] === searchLower[searchIndex]) {
+                        searchIndex++;
+                      }
+                    }
+
+                    // If all search characters found in order
+                    if (searchIndex === searchLower.length) return 2;
+
+                    // Check for common abbreviations (e.g., "mew2" -> "mewtwo")
+                    const abbreviations = {
+                      mew2: "mewtwo",
+                      ash: "ash",
+                      hooh: "ho-oh",
+                      "ho-oh": "hooh",
+                    };
+
+                    if (
+                      abbreviations[searchLower] &&
+                      textLower.includes(abbreviations[searchLower])
+                    ) {
+                      return 2;
+                    }
+
+                    return 0;
+                  };
+
+                  // Search in title and series
+                  const titleScore = fuzzyMatch(data.title, query);
+                  const seriesScore = fuzzyMatch(data.series, query);
+
+                  if (titleScore > 0 || seriesScore > 0) return true;
+
+                  // Map specific Pokémon names to their entries with fuzzy matching
+                  const pokemonMappings = {
+                    palkia: "creation_trio",
+                    dialga: "creation_trio",
+                    giratina: "creation_trio",
+                    kyurem: "tao_trio",
+                    reshiram: "tao_trio",
+                    zekrom: "tao_trio",
+                    azelf: "river_guardians",
+                    mesprit: "river_guardians",
+                    uxie: "river_guardians",
+                    articuno: "legendary_birds_trio",
+                    zapdos: "legendary_birds_trio",
+                    moltres: "legendary_birds_trio",
+                    greninja: "ash_greninja",
+                    pikachu: "ash_pikachu",
+                  };
+
+                  // Check if the search query matches a mapped Pokémon with fuzzy matching
+                  for (const [pokemonName, entryKey] of Object.entries(
+                    pokemonMappings
+                  )) {
+                    if (
+                      fuzzyMatch(pokemonName, query) > 0 &&
+                      key === entryKey
+                    ) {
+                      return true;
+                    }
+                  }
+
+                  return false;
+                })
+                .sort(([keyA, dataA], [keyB, dataB]) => {
+                  // Sort by relevance (exact matches first, then fuzzy matches)
+                  const query = searchQuery.toLowerCase();
+
+                  const getScore = (data) => {
+                    const titleScore = data.title.toLowerCase().includes(query)
+                      ? 3
+                      : data.title.toLowerCase().indexOf(query) > -1
+                      ? 2
+                      : 0;
+                    const seriesScore = data.series
+                      .toLowerCase()
+                      .includes(query)
+                      ? 1
+                      : 0;
+                    return titleScore + seriesScore;
+                  };
+
+                  return getScore(dataB) - getScore(dataA);
+                })
+                .slice(0, 8)
+                .map(([key, data]) => (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      setActiveTab(key);
+                      setSearchQuery(""); // Clear search bar
+                    }}
+                    className="w-full px-4 py-3 text-left hover:bg-gray-700 transition-colors border-b border-gray-700 last:border-b-0"
+                  >
+                    <div className="font-medium text-white">{data.title}</div>
+                    <div className="text-sm text-gray-400">{data.series}</div>
+                  </button>
+                ))}
+
+              {/* No results message */}
+              {(() => {
+                const query = searchQuery.toLowerCase();
+
+                // Enhanced fuzzy search function (same as above)
+                const fuzzyMatch = (text, search) => {
+                  const textLower = text.toLowerCase();
+                  const searchLower = search.toLowerCase();
+
+                  // Exact match gets highest priority
+                  if (textLower.includes(searchLower)) return 3;
+
+                  // Fuzzy matching - check if all characters exist in order
+                  let searchIndex = 0;
+                  for (
+                    let i = 0;
+                    i < textLower.length && searchIndex < searchLower.length;
+                    i++
+                  ) {
+                    if (textLower[i] === searchLower[searchIndex]) {
+                      searchIndex++;
+                    }
+                  }
+
+                  // If all search characters found in order
+                  if (searchIndex === searchLower.length) return 2;
+
+                  // Check for common abbreviations
+                  const abbreviations = {
+                    mew2: "mewtwo",
+                    ash: "ash",
+                    hooh: "ho-oh",
+                    "ho-oh": "hooh",
+                  };
+
+                  if (
+                    abbreviations[searchLower] &&
+                    textLower.includes(abbreviations[searchLower])
+                  ) {
+                    return 2;
+                  }
+
+                  return 0;
+                };
+
+                // Check if there are any results using the same logic as the filter
+                const hasResults = Object.entries(pokemonData).some(
+                  ([key, data]) => {
+                    // Search in title and series
+                    const titleScore = fuzzyMatch(data.title, query);
+                    const seriesScore = fuzzyMatch(data.series, query);
+
+                    if (titleScore > 0 || seriesScore > 0) return true;
+
+                    // Map specific Pokémon names to their entries with fuzzy matching
+                    const pokemonMappings = {
+                      palkia: "creation_trio",
+                      dialga: "creation_trio",
+                      giratina: "creation_trio",
+                      kyurem: "tao_trio",
+                      reshiram: "tao_trio",
+                      zekrom: "tao_trio",
+                      azelf: "river_guardians",
+                      mesprit: "river_guardians",
+                      uxie: "river_guardians",
+                      articuno: "legendary_birds_trio",
+                      zapdos: "legendary_birds_trio",
+                      moltres: "legendary_birds_trio",
+                      greninja: "ash_greninja",
+                      pikachu: "ash_pikachu",
+                    };
+
+                    // Check if the search query matches a mapped Pokémon with fuzzy matching
+                    for (const [pokemonName, entryKey] of Object.entries(
+                      pokemonMappings
+                    )) {
+                      if (
+                        fuzzyMatch(pokemonName, query) > 0 &&
+                        key === entryKey
+                      ) {
+                        return true;
+                      }
+                    }
+
+                    return false;
+                  }
+                );
+
+                return (
+                  !hasResults && (
+                    <div className="px-4 py-3 text-gray-400 text-center">
+                      No Pokémon found matching "{searchQuery}"
+                    </div>
+                  )
+                );
+              })()}
+            </div>
+          )}
         </div>
       </div>
+
+      {/* 📖 Content Card */}
+      {activeTab && (
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 shadow-xl mx-auto max-w-3xl w-full">
+          <div className="p-4 sm:p-5 md:p-6">
+            {pokemonData[activeTab].content}
+          </div>
+        </div>
+      )}
+
+      {/* Navigation Buttons */}
+      {activeTab && (
+        <div className="flex justify-between items-center max-w-3xl mx-auto">
+          <button
+            onClick={() => {
+              const pokemonKeys = Object.keys(pokemonData);
+              const currentIndex = pokemonKeys.indexOf(activeTab);
+              const prevIndex =
+                currentIndex > 0 ? currentIndex - 1 : pokemonKeys.length - 1;
+              setActiveTab(pokemonKeys[prevIndex]);
+            }}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-700/50 text-gray-300 hover:bg-gray-600/70 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            <div className="text-left">
+              <div className="text-sm text-gray-400">Previous</div>
+              <div className="font-medium">
+                {(() => {
+                  const pokemonKeys = Object.keys(pokemonData);
+                  const currentIndex = pokemonKeys.indexOf(activeTab);
+                  const prevIndex =
+                    currentIndex > 0
+                      ? currentIndex - 1
+                      : pokemonKeys.length - 1;
+                  return pokemonData[pokemonKeys[prevIndex]].title;
+                })()}
+              </div>
+            </div>
+          </button>
+
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <span>{Object.keys(pokemonData).indexOf(activeTab) + 1}</span>
+            <span>/</span>
+            <span>{Object.keys(pokemonData).length}</span>
+          </div>
+
+          <button
+            onClick={() => {
+              const pokemonKeys = Object.keys(pokemonData);
+              const currentIndex = pokemonKeys.indexOf(activeTab);
+              const nextIndex =
+                currentIndex < pokemonKeys.length - 1 ? currentIndex + 1 : 0;
+              setActiveTab(pokemonKeys[nextIndex]);
+            }}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-700/50 text-gray-300 hover:bg-gray-600/70 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="text-right">
+              <div className="text-sm text-gray-400">Next</div>
+              <div className="font-medium">
+                {(() => {
+                  const pokemonKeys = Object.keys(pokemonData);
+                  const currentIndex = pokemonKeys.indexOf(activeTab);
+                  const nextIndex =
+                    currentIndex < pokemonKeys.length - 1
+                      ? currentIndex + 1
+                      : 0;
+                  return pokemonData[pokemonKeys[nextIndex]].title;
+                })()}
+              </div>
+            </div>
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {/* Remove the entire "Available Pokémon Quick Access" section (lines 1129-1178) */}
     </div>
   );
 }
@@ -918,91 +1382,6 @@ function ImageCarousel({ images }) {
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-/* === TABS CAROUSEL (5 per view) === */
-function TabsCarousel({ items, activeKey, onSelect }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: false,
-    dragFree: true,
-  });
-
-  const scrollPrev = React.useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
-
-  const scrollNext = React.useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
-
-  const canPrev = emblaApi ? emblaApi.canScrollPrev() : false;
-  const canNext = emblaApi ? emblaApi.canScrollNext() : false;
-
-  // Re-render on select to update button disabled states
-  React.useEffect(() => {
-    if (!emblaApi) return;
-    const rerender = () => {
-      // no-op, just trigger React state update via setState pattern
-      // by using a dummy state if needed in the future
-    };
-    emblaApi.on("select", rerender);
-    emblaApi.on("reInit", rerender);
-    return () => {
-      emblaApi.off("select", rerender);
-      emblaApi.off("reInit", rerender);
-    };
-  }, [emblaApi]);
-
-  return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={scrollPrev}
-        disabled={!canPrev}
-        className="absolute left-1 top-1/2 -translate-y-1/2 z-10 rounded-full bg-black/40 text-white px-2 py-1 backdrop-blur disabled:opacity-40"
-        aria-label="Previous tabs"
-      >
-        ‹
-      </button>
-      <div className="overflow-hidden w-full" ref={emblaRef}>
-        <div className="flex">
-          {Object.entries(items).map(([key, data]) => (
-            <div
-              className="flex-[0_0_60%] sm:flex-[0_0_40%] md:flex-[0_0_33.3333%] lg:flex-[0_0_33.3333%] pr-2"
-              key={key}
-            >
-              <button
-                onClick={() => onSelect(key)}
-                className={`w-full h-14 sm:h-16 px-3 sm:px-4 md:px-5 py-2 rounded-xl font-semibold transition-all duration-200 ${
-                  activeKey === key
-                    ? "bg-gradient-to-r from-blue-400 to-purple-400 text-white shadow-lg shadow-purple-500/25"
-                    : "bg-gray-700/50 text-gray-300 hover:bg-gray-600/70 hover:text-white backdrop-blur-sm"
-                }`}
-              >
-                <div className="flex flex-col items-center justify-center space-y-1 leading-none">
-                  <span className="text-xs sm:text-sm font-medium truncate max-w-[8.5rem] sm:max-w-[9.5rem]">
-                    {data.title.split(": ")[1]}
-                  </span>
-                  <span className="text-[10px] sm:text-xs opacity-70 truncate max-w-[8.5rem] sm:max-w-[9.5rem]">
-                    {data.series}
-                  </span>
-                </div>
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-      <button
-        type="button"
-        onClick={scrollNext}
-        disabled={!canNext}
-        className="absolute right-1 top-1/2 -translate-y-1/2 z-10 rounded-full bg-black/40 text-white px-2 py-1 backdrop-blur disabled:opacity-40"
-        aria-label="Next tabs"
-      >
-        ›
-      </button>
     </div>
   );
 }
@@ -1406,6 +1785,78 @@ function AshPikachuImageSlider() {
       src: "/guides/ash-mom-3.png",
       alt: "Ash Mom",
       credit: "doctor",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function TaoTrioImageSlider() {
+  const images = [
+    {
+      src: "/guides/tao-1.png",
+      alt: "Kyurem in Ice Spikes (raining)",
+      credit: "maru",
+    },
+    {
+      src: "/guides/tao-2.png",
+      alt: "Reshiram in mountains (clear)",
+      credit: "maru",
+    },
+    {
+      src: "/guides/tao-3.png",
+      alt: "Zekrom in mountains (thundering)",
+      credit: "maru",
+    },
+    { src: "/guides/tao-4.png", alt: "DNA Splicer item", credit: "maru" },
+    {
+      src: "/guides/tao-5.png",
+      alt: "Kyurem fusion showcase",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function LegendaryBirdsImageSlider() {
+  const images = [
+    {
+      src: "/guides/galar-articuno.png",
+      alt: "Galarian Articuno (night)",
+      credit: "maru",
+    },
+    {
+      src: "/guides/galar-zapdos.png",
+      alt: "Galarian Zapdos (thundering)",
+      credit: "maru",
+    },
+    {
+      src: "/guides/galar-moltres.png",
+      alt: "Galarian Moltres (day)",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function CreationTrioImageSlider() {
+  const images = [
+    { src: "/guides/dialga.png", alt: "Dialga spawn", credit: "maru" },
+    { src: "/guides/palkia.png", alt: "Palkia spawn", credit: "maru" },
+    {
+      src: "/guides/giratina.png",
+      alt: "Giratina in Ancient City",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function RiverGuardiansImageSlider() {
+  const images = [
+    {
+      src: "/guides/river-guardians.png",
+      alt: "Azelf, Mesprit, Uxie at Beaches",
+      credit: "maru",
     },
   ];
   return <ImageCarousel images={images} />;
