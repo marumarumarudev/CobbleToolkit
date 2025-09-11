@@ -181,6 +181,11 @@ export async function parseCobblemonZip(file) {
                 const condition = entry.condition || {};
                 const anticondition = entry.anticondition || {};
                 const weightMultiplier = entry.weightMultiplier || null;
+                const weightMultipliers = Array.isArray(entry.weightMultipliers)
+                  ? entry.weightMultipliers
+                  : weightMultiplier
+                  ? [weightMultiplier]
+                  : [];
 
                 // Helper function to format array values
                 const formatArrayValue = (value) => {
@@ -233,6 +238,8 @@ export async function parseCobblemonZip(file) {
                     weight: String(entry.weight ?? ""),
                     context: String(entry.context || "none"),
                     presets: formatArrayValue(entry.presets),
+                    // Preserve plural weight multipliers for UI rendering/search
+                    weightMultipliers: weightMultipliers,
 
                     // Condition fields
                     biomes: formatArrayValue(condition.biomes),

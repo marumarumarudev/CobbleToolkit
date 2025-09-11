@@ -223,6 +223,9 @@ export default function UploadArea() {
     { key: "antiBait", label: "Anti-Bait", sortable: true },
     { key: "antiLabelMode", label: "Anti-Label Mode", sortable: true },
 
+    // Weight multiplier (plural) summary
+    { key: "weightMultipliers", label: "Weight Multipliers", sortable: false },
+
     // Weight multiplier fields
     {
       key: "weightMultiplierMultiplier",
@@ -490,6 +493,27 @@ export default function UploadArea() {
         r.weightMultiplierBait,
         r.weightMultiplierLabelMode,
         r.sourceFile,
+        // Serialize plural weight multipliers for search
+        Array.isArray(r.weightMultipliers)
+          ? r.weightMultipliers
+              .map((wm) => {
+                try {
+                  return [
+                    wm.multiplier,
+                    ...(wm.condition
+                      ? Object.entries(wm.condition).map(
+                          ([k, v]) => `${k}:${String(v)}`
+                        )
+                      : []),
+                  ]
+                    .filter(Boolean)
+                    .join(" ");
+                } catch {
+                  return "";
+                }
+              })
+              .join(" | ")
+          : "",
       ]
         .filter(Boolean)
         .some(
@@ -500,9 +524,31 @@ export default function UploadArea() {
     } else {
       const value = r[searchField];
       return (
-        value &&
-        value.toString().toLowerCase().includes(debouncedSearch.toLowerCase())
-      );
+        searchField === "weightMultipliers"
+          ? Array.isArray(value)
+            ? value
+                .map((wm) => {
+                  try {
+                    return [
+                      wm.multiplier,
+                      ...(wm.condition
+                        ? Object.entries(wm.condition).map(
+                            ([k, v]) => `${k}:${String(v)}`
+                          )
+                        : []),
+                    ]
+                      .filter(Boolean)
+                      .join(" ");
+                  } catch {
+                    return "";
+                  }
+                })
+                .join(" | ")
+            : ""
+          : (value ?? "").toString()
+      )
+        .toLowerCase()
+        .includes(debouncedSearch.toLowerCase());
     }
   });
 
@@ -900,6 +946,7 @@ export default function UploadArea() {
     { value: "weightMultiplierBobber", label: "WM-Bobber" },
     { value: "weightMultiplierBait", label: "WM-Bait" },
     { value: "weightMultiplierLabelMode", label: "WM-Label Mode" },
+    { value: "weightMultipliers", label: "Weight Multipliers" },
   ];
 
   // Memory cleanup for Chrome
@@ -1344,6 +1391,36 @@ export default function UploadArea() {
                               >
                                 {value}
                               </span>
+                            ) : key === "weightMultipliers" &&
+                              Array.isArray(value) ? (
+                              <div className="flex flex-wrap gap-1">
+                                {value.map((wm, i) => {
+                                  const summary = (() => {
+                                    try {
+                                      const parts = [];
+                                      if (wm?.multiplier)
+                                        parts.push(`x${wm.multiplier}`);
+                                      const cond = wm?.condition || {};
+                                      const condParts = Object.entries(
+                                        cond
+                                      ).map(([k, v]) => `${k}=${String(v)}`);
+                                      if (condParts.length)
+                                        parts.push(condParts.join(", "));
+                                      return parts.join(" • ");
+                                    } catch {
+                                      return "";
+                                    }
+                                  })();
+                                  return (
+                                    <span
+                                      key={i}
+                                      className="px-2 py-1 bg-gray-700/50 rounded text-xs"
+                                    >
+                                      {summary || "(invalid)"}
+                                    </span>
+                                  );
+                                })}
+                              </div>
                             ) : isArray ? (
                               <div className="flex flex-wrap gap-1">
                                 {value.map((item, i) => (
