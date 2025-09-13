@@ -6,17 +6,18 @@ import { useState } from "react";
 import React from "react";
 
 function HowToGetPokemonPageInner() {
-  const [activeTab, setActiveTab] = useState("mew");
+  const [activeTab, setActiveTab] = useState("mew_duo");
   const [searchQuery, setSearchQuery] = useState("");
   const initializedFromUrlRef = React.useRef(false);
 
   const pokemonData = {
-    mew: {
-      title: "Mew",
-      series: "Mythical",
-      levelCap: "Any",
+    mew_duo: {
+      title: "Mew Duo",
+      series: "Kanto Series",
+      levelCap: "80+",
       content: (
         <div className="space-y-6">
+          <h4 className="font-medium text-lg">Mew</h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Kanto Series</b>.
@@ -49,16 +50,8 @@ function HowToGetPokemonPageInner() {
           <p className="text-xs opacity-50 italic">
             Use <code>/locate structure cobbleverse:mythical/mew</code>
           </p>
-          <MewImageSlider />
-        </div>
-      ),
-    },
-    mewtwo: {
-      title: "Mewtwo",
-      series: "Kanto Series",
-      levelCap: "80+",
-      content: (
-        <div className="space-y-6">
+
+          <h4 className="font-medium text-lg">Mewtwo</h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Kanto Series</b> with level cap 80+ (check trainer
@@ -156,16 +149,133 @@ function HowToGetPokemonPageInner() {
           <p className="text-xs opacity-50 italic">
             Use <code>/locate structure cobbleverse:team_rocket_tower</code>
           </p>
-          <MewtwoImageSlider />
+          <MewDuoImageSlider />
         </div>
       ),
     },
-    ash_greninja: {
-      title: "Ash's Greninja",
+    weather_trio: {
+      title: "Weather Trio",
+      series: "Hoenn Series",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <h4 className="font-medium text-lg">Kyogre</h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Must be in <b>Hoenn Series</b>.
+            </li>
+            <li>
+              Locate Kyogre's structure in <b>Deep Cold Ocean</b> biomes.
+            </li>
+            <li>
+              Craft <b>Ocean Core</b> to summon Kyogre.
+            </li>
+            <li>
+              Secrets inside the structure:
+              <ul className="list-disc list-inside ml-6">
+                <li>
+                  <b>Blue Orb</b> found in a barrel inside the entrance dome.
+                </li>
+                <li>
+                  <b>Water Spout TM</b> hidden in a barrel at the base of one of
+                  the pillars.
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:legendary/kyogre</code>
+          </p>
+
+          <h4 className="font-medium text-lg">Groudon</h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Must be in <b>Hoenn Series</b>.
+            </li>
+            <li>
+              Locate Groudon's structure in <b>Deep Warm Ocean</b> (Terralith
+              biome).
+            </li>
+            <li>
+              Craft <b>Earth Core</b> to summon Groudon.
+            </li>
+            <li>
+              Secrets inside the structure:
+              <ul className="list-disc list-inside ml-6">
+                <li>
+                  Hidden cave inside the mountain with a <b>lore book</b>, free
+                  ores, and the <b>Heatstone</b> (enough for 1 spawn item).
+                </li>
+                <li>
+                  <b>Red Orb</b> located at the bottom of the crater (requires
+                  fire resistance or draining lava).
+                </li>
+                <li>
+                  Small lava pool with dripstone—inside a Netherite barrel
+                  you'll find a <b>Precipice Blades TM</b> and a{" "}
+                  <b>Nether Star</b>.
+                </li>
+                <li>Groudon's also has a raw megastone. (thanks azera)</li>
+              </ul>
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:legendary/groudon</code>
+          </p>
+
+          <h4 className="font-medium text-lg">Rayquaza</h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Must be in <b>Hoenn Series</b>.
+            </li>
+            <li>
+              Head to the <b>Sky Pillar</b>. (Deep Ocean Biome)
+            </li>
+            <li>
+              The <b>Emerald Emblem</b> to craft Rayquaza's spawn item is
+              located in the room with the crafters, hidden behind the chest.
+            </li>
+          </ul>
+
+          <h4 className="font-medium">Secrets Inside Sky Pillar</h4>
+          <ul className="list-disc list-inside ml-6 space-y-1">
+            <li>
+              <b>Kyogre Chamber</b>: A hidden room with a{" "}
+              <b>Shiny Kyogre plushie</b> and coins in the pond. Access it
+              through a trapdoor. <u>Warning:</u> the chest is trapped!
+            </li>
+            <li>
+              <b>Groudon Chamber</b>: A chest with <b>Fire Resistance Potion</b>{" "}
+              under one of the blackstones.
+            </li>
+            <li>
+              <b>Dragon Chamber</b>: A chest with a <b>TM</b> in the 1-block
+              space under the floor.
+            </li>
+            <li>
+              <b>Dragon Chamber Statue</b>: A chest with <b>Dragon's Breath</b>{" "}
+              hidden in the dragon statue's mouth.
+            </li>
+            <li>
+              <b>Sky Pillar Lantern</b> (left side as you walk in): Hidden chest
+              containing <b>Dragonium-Z</b>. (thanks @₮ØⱤ₦₳ĐØ)
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:sky_pillar</code>
+          </p>
+
+          <WeatherTrioImageSlider />
+        </div>
+      ),
+    },
+    ash_pokemons: {
+      title: "Ash's Pokemons",
       series: "Kanto Series",
       levelCap: "40+",
       content: (
         <div className="space-y-6">
+          <h4 className="font-medium text-lg">Ash's Greninja</h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Kanto Series</b> with <b>level cap 40+</b>.
@@ -214,23 +324,8 @@ function HowToGetPokemonPageInner() {
           <p className="text-sm text-red-400">
             ⚠️ Giving Greninja Battle Bond via commands does not work properly.
           </p>
-          <p className="text-xs opacity-50 italic">
-            Use <code>/locate structure cobbleverse:ash</code>
-          </p>
 
-          <AshGreninjaImageSlider />
-          <p className="text-xs opacity-50 italic">
-            Big thanks to <strong>Mega Showdown Wiki</strong>
-          </p>
-        </div>
-      ),
-    },
-    ash_pikachu: {
-      title: "Ash's Pikachu",
-      series: "Kanto Series",
-      levelCap: "40+",
-      content: (
-        <div className="space-y-6">
+          <h4 className="font-medium text-lg">Ash's Pikachu</h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Kanto Series</b> with <b>level cap 40+</b>.
@@ -264,7 +359,7 @@ function HowToGetPokemonPageInner() {
             Use <code>/locate structure cobbleverse:ash</code>
           </p>
 
-          <AshPikachuImageSlider />
+          <AshPokemonsImageSlider />
           <p className="text-xs opacity-50 italic">
             Big thanks to <strong>Mega Showdown Wiki</strong>
           </p>
@@ -389,139 +484,6 @@ function HowToGetPokemonPageInner() {
         </div>
       ),
     },
-    kyogre: {
-      title: "Kyogre",
-      series: "Hoenn Series",
-      levelCap: "Any",
-      content: (
-        <div className="space-y-6">
-          <ul className="list-disc list-inside space-y-1">
-            <li>
-              Must be in <b>Hoenn Series</b>.
-            </li>
-            <li>
-              Locate Kyogre's structure in <b>Deep Cold Ocean</b> biomes.
-            </li>
-            <li>
-              Craft <b>Ocean Core</b> to summon Kyogre.
-            </li>
-            <li>
-              Secrets inside the structure:
-              <ul className="list-disc list-inside ml-6">
-                <li>
-                  <b>Blue Orb</b> found in a barrel inside the entrance dome.
-                </li>
-                <li>
-                  <b>Water Spout TM</b> hidden in a barrel at the base of one of
-                  the pillars.
-                </li>
-              </ul>
-            </li>
-          </ul>
-          <p className="text-xs opacity-50 italic">
-            Use <code>/locate structure cobbleverse:legendary/kyogre</code>
-          </p>
-
-          <KyogreImageSlider />
-        </div>
-      ),
-    },
-    groudon: {
-      title: "Groudon",
-      series: "Hoenn Series",
-      levelCap: "Any",
-      content: (
-        <div className="space-y-6">
-          <ul className="list-disc list-inside space-y-1">
-            <li>
-              Must be in <b>Hoenn Series</b>.
-            </li>
-            <li>
-              Locate Groudon's structure in <b>Deep Warm Ocean</b> (Terralith
-              biome).
-            </li>
-            <li>
-              Craft <b>Earth Core</b> to summon Groudon.
-            </li>
-            <li>
-              Secrets inside the structure:
-              <ul className="list-disc list-inside ml-6">
-                <li>
-                  Hidden cave inside the mountain with a <b>lore book</b>, free
-                  ores, and the <b>Heatstone</b> (enough for 1 spawn item).
-                </li>
-                <li>
-                  <b>Red Orb</b> located at the bottom of the crater (requires
-                  fire resistance or draining lava).
-                </li>
-                <li>
-                  Small lava pool with dripstone—inside a Netherite barrel
-                  you'll find a <b>Precipice Blades TM</b> and a{" "}
-                  <b>Nether Star</b>.
-                </li>
-                <li>Groudon's also has a raw megastone. (thanks azera)</li>
-              </ul>
-            </li>
-          </ul>
-          <p className="text-xs opacity-50 italic">
-            Use <code>/locate structure cobbleverse:legendary/groudon</code>
-          </p>
-
-          <GroudonImageSlider />
-        </div>
-      ),
-    },
-    rayquaza: {
-      title: "Rayquaza",
-      series: "Hoenn Series",
-      levelCap: "Any",
-      content: (
-        <div className="space-y-6">
-          <ul className="list-disc list-inside space-y-1">
-            <li>
-              Must be in <b>Hoenn Series</b>.
-            </li>
-            <li>
-              Head to the <b>Sky Pillar</b>. (Deep Ocean Biome)
-            </li>
-            <li>
-              The <b>Emerald Emblem</b> to craft Rayquaza's spawn item is
-              located in the room with the crafters, hidden behind the chest.
-            </li>
-          </ul>
-
-          <h4 className="font-medium">Secrets Inside Sky Pillar</h4>
-          <ul className="list-disc list-inside ml-6 space-y-1">
-            <li>
-              <b>Kyogre Chamber</b>: A hidden room with a{" "}
-              <b>Shiny Kyogre plushie</b> and coins in the pond. Access it
-              through a trapdoor. <u>Warning:</u> the chest is trapped!
-            </li>
-            <li>
-              <b>Groudon Chamber</b>: A chest with <b>Fire Resistance Potion</b>{" "}
-              under one of the blackstones.
-            </li>
-            <li>
-              <b>Dragon Chamber</b>: A chest with a <b>TM</b> in the 1-block
-              space under the floor.
-            </li>
-            <li>
-              <b>Dragon Chamber Statue</b>: A chest with <b>Dragon's Breath</b>{" "}
-              hidden in the dragon statue's mouth.
-            </li>
-            <li>
-              <b>Sky Pillar Lantern</b> (left side as you walk in): Hidden chest
-              containing <b>Dragonium-Z</b>. (thanks @₮ØⱤ₦₳ĐØ)
-            </li>
-          </ul>
-          <p className="text-xs opacity-50 italic">
-            Use <code>/locate structure cobbleverse:sky_pillar</code>
-          </p>
-
-          <RayquazaImageSlider />
-        </div>
-      ),
-    },
     deoxys: {
       title: "Deoxys",
       series: "Hoenn Series",
@@ -552,119 +514,6 @@ function HowToGetPokemonPageInner() {
           </p>
 
           <DeoxysImageSlider />
-        </div>
-      ),
-    },
-    zygarde: {
-      title: "Zygarde",
-      series: "Legendary",
-      levelCap: "Any",
-      content: (
-        <div className="space-y-6">
-          <ul className="list-disc list-inside space-y-1">
-            <li>
-              You can get <b>Zygarde Cells</b> by brushing suspicious sand in{" "}
-              <b>Archaeological Sites</b>, looting <b>Chests</b>,{" "}
-              <b>Wishing Weald Chests</b>, and barrels in <b>Observatories</b>.
-            </li>
-            <li>
-              <b>Zygarde Cores</b> can be found in <b>Mossy Oubliette Ruins</b>{" "}
-              and <b>Crumbling Arch Ruins</b>.
-            </li>
-            <li>
-              To assemble Zygarde parts, you need a <b>Zygarde Cube</b> and a{" "}
-              <b>Reassembly Unit</b>.
-            </li>
-          </ul>
-
-          {/* Static banner image */}
-          <div className="relative h-48 sm:h-64 md:h-80 w-full overflow-hidden rounded-2xl shadow-lg">
-            <Image
-              src="/guides/zygarde.png"
-              alt="Where to get Zygarde"
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
-              className="object-cover max-w-full"
-            />
-          </div>
-          <ZygardeImageSlider />
-
-          {/* Description block */}
-          <div className="space-y-3 border-t border-gray-700 pt-4">
-            <h3 className="font-semibold text-lg">Reassembly Unit</h3>
-            <p>
-              The Reassembly Unit is a block used with the Zygarde Cube to
-              create Zygarde. It functions somewhat similarly to a{" "}
-              <b>Resurrection Machine</b>.
-            </p>
-            <h4 className="font-medium">How to Use</h4>
-            <p>
-              Right-click the Reassembly Unit with a <b>Zygarde Cube</b>{" "}
-              containing a set number of Zygarde Cells and Cores. The result
-              depends on how many are stored in the cube.
-            </p>
-            <p>
-              When the cube has the correct number of Cells and Cores,
-              right-click the Reassembly Unit again to begin the process. The
-              fusion takes time to complete based on the form:
-            </p>
-            <table className="w-full text-sm text-gray-200 border border-gray-700 rounded-lg overflow-hidden">
-              <thead className="bg-gray-800 text-gray-100">
-                <tr>
-                  <th className="px-2 py-1 border border-gray-700">
-                    Cell Count
-                  </th>
-                  <th className="px-2 py-1 border border-gray-700">
-                    Core Count
-                  </th>
-                  <th className="px-2 py-1 border border-gray-700">Form %</th>
-                  <th className="px-2 py-1 border border-gray-700">Ability</th>
-                  <th className="px-2 py-1 border border-gray-700">
-                    Wait Time
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="px-2 py-1 border border-gray-700">9</td>
-                  <td className="px-2 py-1 border border-gray-700">1</td>
-                  <td className="px-2 py-1 border border-gray-700">10%</td>
-                  <td className="px-2 py-1 border border-gray-700">
-                    Aura Break
-                  </td>
-                  <td className="px-2 py-1 border border-gray-700">2 min</td>
-                </tr>
-                <tr>
-                  <td className="px-2 py-1 border border-gray-700">49</td>
-                  <td className="px-2 py-1 border border-gray-700">1</td>
-                  <td className="px-2 py-1 border border-gray-700">50%</td>
-                  <td className="px-2 py-1 border border-gray-700">
-                    Aura Break
-                  </td>
-                  <td className="px-2 py-1 border border-gray-700">5 min</td>
-                </tr>
-                <tr>
-                  <td className="px-2 py-1 border border-gray-700">95</td>
-                  <td className="px-2 py-1 border border-gray-700">5</td>
-                  <td className="px-2 py-1 border border-gray-700">50%</td>
-                  <td className="px-2 py-1 border border-gray-700">
-                    Power Construct
-                  </td>
-                  <td className="px-2 py-1 border border-gray-700">10 min</td>
-                </tr>
-              </tbody>
-            </table>
-            <p>
-              Once the process finishes, right-click the Reassembly Unit with
-              any <b>Pokéball</b> to receive your Zygarde.
-            </p>
-            <p className="text-xs opacity-70 italic">
-              Assembled Zygarde has a small chance of being shiny (1 in 4096).
-            </p>
-            <p className="text-xs opacity-50 italic">
-              Credit: Mega Showdown Wiki
-            </p>
-          </div>
         </div>
       ),
     },
@@ -857,6 +706,41 @@ function HowToGetPokemonPageInner() {
               <b>Giratina</b>: <b>Ancient Cities</b> only.
             </li>
           </ul>
+
+          <h4 className="font-medium text-lg">Origin Forms</h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Dialga Origin Form</b>: Give Dialga the <b>Adamant Crystal</b>{" "}
+              as a held item.
+              <ul className="list-disc list-inside ml-6">
+                <li>
+                  <b>Adamant Crystal</b> can be found by brushing suspicious
+                  sands in <b>Cold Ocean Ruins</b>.
+                </li>
+              </ul>
+            </li>
+            <li>
+              <b>Palkia Origin Form</b>: Give Palkia the <b>Lustrous Globe</b>{" "}
+              as a held item.
+              <ul className="list-disc list-inside ml-6">
+                <li>
+                  <b>Lustrous Globe</b> can be found by brushing suspicious
+                  sands in <b>Warm Ocean Ruins</b>.
+                </li>
+              </ul>
+            </li>
+            <li>
+              <b>Giratina Origin Form</b>: Give Giratina the{" "}
+              <b>Griseous Core</b> as a held item.
+              <ul className="list-disc list-inside ml-6">
+                <li>
+                  <b>Griseous Core</b> can be found by brushing suspicious sands
+                  in <b>Desert Pyramids</b>.
+                </li>
+              </ul>
+            </li>
+          </ul>
+
           <CreationTrioImageSlider />
         </div>
       ),
@@ -882,30 +766,127 @@ function HowToGetPokemonPageInner() {
       levelCap: "Any",
       content: (
         <div className="space-y-6">
+          <h4 className="font-medium text-lg">Xerneas</h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
               <b>Xerneas</b>: Spawns in <b>Floral Biomes</b> during{" "}
               <b>daytime</b>.
             </li>
+          </ul>
+
+          <h4 className="font-medium text-lg">Yveltal</h4>
+          <ul className="list-disc list-inside space-y-1">
             <li>
               <b>Yveltal</b>: Spawns in <b>Dark Forests</b> during{" "}
               <b>nighttime</b>.
             </li>
+          </ul>
+
+          <h4 className="font-medium text-lg">Zygarde</h4>
+          <ul className="list-disc list-inside space-y-1">
             <li>
-              <b>Zygarde</b>: Visit the{" "}
-              <a
-                href="#zygarde"
-                className="text-blue-400 underline hover:text-blue-300 transition-colors"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActiveTab("zygarde");
-                }}
-              >
-                Zygarde guide
-              </a>{" "}
-              for detailed information.
+              You can get <b>Zygarde Cells</b> by brushing suspicious sand in{" "}
+              <b>Archaeological Sites</b>, looting <b>Chests</b>,{" "}
+              <b>Wishing Weald Chests</b>, and barrels in <b>Observatories</b>.
+            </li>
+            <li>
+              <b>Zygarde Cores</b> can be found in <b>Mossy Oubliette Ruins</b>{" "}
+              and <b>Crumbling Arch Ruins</b>.
+            </li>
+            <li>
+              To assemble Zygarde parts, you need a <b>Zygarde Cube</b> and a{" "}
+              <b>Reassembly Unit</b>.
             </li>
           </ul>
+
+          {/* Static banner image */}
+          <div className="relative h-48 sm:h-64 md:h-80 w-full overflow-hidden rounded-2xl shadow-lg">
+            <Image
+              src="/guides/zygarde.png"
+              alt="Where to get Zygarde"
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
+              className="object-cover max-w-full"
+            />
+          </div>
+
+          {/* Description block */}
+          <div className="space-y-3 border-t border-gray-700 pt-4">
+            <h3 className="font-semibold text-lg">Reassembly Unit</h3>
+            <p>
+              The Reassembly Unit is a block used with the Zygarde Cube to
+              create Zygarde. It functions somewhat similarly to a{" "}
+              <b>Resurrection Machine</b>.
+            </p>
+            <h4 className="font-medium">How to Use</h4>
+            <p>
+              Right-click the Reassembly Unit with a <b>Zygarde Cube</b>{" "}
+              containing a set number of Zygarde Cells and Cores. The result
+              depends on how many are stored in the cube.
+            </p>
+            <p>
+              When the cube has the correct number of Cells and Cores,
+              right-click the Reassembly Unit again to begin the process. The
+              fusion takes time to complete based on the form:
+            </p>
+            <table className="w-full text-sm text-gray-200 border border-gray-700 rounded-lg overflow-hidden">
+              <thead className="bg-gray-800 text-gray-100">
+                <tr>
+                  <th className="px-2 py-1 border border-gray-700">
+                    Cell Count
+                  </th>
+                  <th className="px-2 py-1 border border-gray-700">
+                    Core Count
+                  </th>
+                  <th className="px-2 py-1 border border-gray-700">Form %</th>
+                  <th className="px-2 py-1 border border-gray-700">Ability</th>
+                  <th className="px-2 py-1 border border-gray-700">
+                    Wait Time
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="px-2 py-1 border border-gray-700">9</td>
+                  <td className="px-2 py-1 border border-gray-700">1</td>
+                  <td className="px-2 py-1 border border-gray-700">10%</td>
+                  <td className="px-2 py-1 border border-gray-700">
+                    Aura Break
+                  </td>
+                  <td className="px-2 py-1 border border-gray-700">2 min</td>
+                </tr>
+                <tr>
+                  <td className="px-2 py-1 border border-gray-700">49</td>
+                  <td className="px-2 py-1 border border-gray-700">1</td>
+                  <td className="px-2 py-1 border border-gray-700">50%</td>
+                  <td className="px-2 py-1 border border-gray-700">
+                    Aura Break
+                  </td>
+                  <td className="px-2 py-1 border border-gray-700">5 min</td>
+                </tr>
+                <tr>
+                  <td className="px-2 py-1 border border-gray-700">95</td>
+                  <td className="px-2 py-1 border border-gray-700">5</td>
+                  <td className="px-2 py-1 border border-gray-700">50%</td>
+                  <td className="px-2 py-1 border border-gray-700">
+                    Power Construct
+                  </td>
+                  <td className="px-2 py-1 border border-gray-700">10 min</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>
+              Once the process finishes, right-click the Reassembly Unit with
+              any <b>Pokéball</b> to receive your Zygarde.
+            </p>
+            <p className="text-xs opacity-70 italic">
+              Assembled Zygarde has a small chance of being shiny (1 in 4096).
+            </p>
+            <p className="text-xs opacity-50 italic">
+              Credit: Mega Showdown Wiki
+            </p>
+          </div>
+
           <AuraTrioImageSlider />
         </div>
       ),
@@ -1068,8 +1049,8 @@ function HowToGetPokemonPageInner() {
                   articuno: "legendary_birds_trio",
                   zapdos: "legendary_birds_trio",
                   moltres: "legendary_birds_trio",
-                  greninja: "ash_greninja",
-                  pikachu: "ash_pikachu",
+                  greninja: "ash_pokemons",
+                  pikachu: "ash_pokemons",
                   xerneas: "aura_trio",
                   yveltal: "aura_trio",
                   zygarde: "aura_trio",
@@ -1078,6 +1059,11 @@ function HowToGetPokemonPageInner() {
                   zacian: "combat_trio",
                   zamazenta: "combat_trio",
                   eternatus: "combat_trio",
+                  mew: "mew_duo",
+                  mewtwo: "mew_duo",
+                  kyogre: "weather_trio",
+                  groudon: "weather_trio",
+                  rayquaza: "weather_trio",
                 };
 
                 // Find matching entry
@@ -1175,8 +1161,8 @@ function HowToGetPokemonPageInner() {
                     articuno: "legendary_birds_trio",
                     zapdos: "legendary_birds_trio",
                     moltres: "legendary_birds_trio",
-                    greninja: "ash_greninja",
-                    pikachu: "ash_pikachu",
+                    greninja: "ash_pokemons",
+                    pikachu: "ash_pokemons",
                     xerneas: "aura_trio",
                     yveltal: "aura_trio",
                     zygarde: "aura_trio",
@@ -1185,6 +1171,11 @@ function HowToGetPokemonPageInner() {
                     zacian: "combat_trio",
                     zamazenta: "combat_trio",
                     eternatus: "combat_trio",
+                    mew: "mew_duo",
+                    mewtwo: "mew_duo",
+                    kyogre: "weather_trio",
+                    groudon: "weather_trio",
+                    rayquaza: "weather_trio",
                   };
 
                   // Check if the search query matches a mapped Pokémon with fuzzy matching
@@ -1304,8 +1295,8 @@ function HowToGetPokemonPageInner() {
                       articuno: "legendary_birds_trio",
                       zapdos: "legendary_birds_trio",
                       moltres: "legendary_birds_trio",
-                      greninja: "ash_greninja",
-                      pikachu: "ash_pikachu",
+                      greninja: "ash_pokemons",
+                      pikachu: "ash_pokemons",
                       xerneas: "aura_trio",
                       yveltal: "aura_trio",
                       zygarde: "aura_trio",
@@ -1314,6 +1305,11 @@ function HowToGetPokemonPageInner() {
                       zacian: "combat_trio",
                       zamazenta: "combat_trio",
                       eternatus: "combat_trio",
+                      mew: "mew_duo",
+                      mewtwo: "mew_duo",
+                      kyogre: "weather_trio",
+                      groudon: "weather_trio",
+                      rayquaza: "weather_trio",
                     };
 
                     // Check if the search query matches a mapped Pokémon with fuzzy matching
@@ -1585,8 +1581,18 @@ function ImageCarousel({ images }) {
 }
 
 /* === INDIVIDUAL SLIDERS === */
-function MewtwoImageSlider() {
+function MewDuoImageSlider() {
   const images = [
+    {
+      src: "/guides/origin-fossil.jpg",
+      alt: "Origin Fossil crafting recipe",
+      credit: "COBBLEVERSE",
+    },
+    {
+      src: "/guides/mew-temple.webp",
+      alt: "Mew's Temple in Jungle biome",
+      credit: "COBBLEVERSE",
+    },
     {
       src: "/guides/atena.png",
       alt: "Team Rocket Admin Atena",
@@ -1601,6 +1607,62 @@ function MewtwoImageSlider() {
       src: "/guides/ressurection-mewtwo.png",
       alt: "Fossil Resurrection Machine with Ancient DNA and Cloning Catalyst",
       credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function WeatherTrioImageSlider() {
+  const images = [
+    {
+      src: "/guides/blue-orb.png",
+      alt: "Blue Orb",
+      credit: "maru",
+    },
+    {
+      src: "/guides/water-spout-tm.png",
+      alt: "Water Spout Barrel",
+      credit: "skeleton",
+    },
+    {
+      src: "/guides/red-orb.png",
+      alt: "Red Orb",
+      credit: "maru",
+    },
+    {
+      src: "/guides/groudon-secret-1.png",
+      alt: "Groudon Secret",
+      credit: "skeleton",
+    },
+    {
+      src: "/guides/groudon-secret-2.png",
+      alt: "Groudon Secret",
+      credit: "skeleton",
+    },
+    {
+      src: "/guides/emerald-emblem.png",
+      alt: "Emerald Emblem",
+      credit: "skeleton",
+    },
+    {
+      src: "/guides/kyogre-plush.png",
+      alt: "Kyogre Chamber secret room",
+      credit: "skeleton",
+    },
+    {
+      src: "/guides/skypillar-1.png",
+      alt: "Secret chest",
+      credit: "skeleton",
+    },
+    {
+      src: "/guides/skypillar-2.png",
+      alt: "Secret chest",
+      credit: "skeleton",
+    },
+    {
+      src: "/guides/skypillar-3.png",
+      alt: "Secret chest",
+      credit: "skeleton",
     },
   ];
   return <ImageCarousel images={images} />;
@@ -1678,79 +1740,6 @@ function HoohImageSlider() {
   return <ImageCarousel images={images} />;
 }
 
-function KyogreImageSlider() {
-  const images = [
-    {
-      src: "/guides/blue-orb.png",
-      alt: "Blue Orb",
-      credit: "maru",
-    },
-    {
-      src: "/guides/water-spout-tm.png",
-      alt: "Water Spout Barrel",
-      credit: "skeleton",
-    },
-  ];
-  return <ImageCarousel images={images} />;
-}
-
-function GroudonImageSlider() {
-  const images = [
-    {
-      src: "/guides/red-orb.png",
-      alt: "Red Orb",
-      credit: "maru",
-    },
-    {
-      src: "/guides/groudon-secret-1.png",
-      alt: "Groudon Secret",
-      credit: "skeleton",
-    },
-    {
-      src: "/guides/groudon-secret-2.png",
-      alt: "Groudon Secret",
-      credit: "skeleton",
-    },
-  ];
-  return <ImageCarousel images={images} />;
-}
-
-function ZygardeImageSlider() {
-  const images = [
-    {
-      src: "/guides/mossy-oubliette-ruins.png",
-      alt: "Ruins",
-      credit: "Cobblemon",
-    },
-    {
-      src: "/guides/crumbling-arch-ruins.png",
-      alt: "Ruins",
-      credit: "Cobblemon",
-    },
-    {
-      src: "/guides/archaeological-site.png",
-      alt: "Dig Site",
-      credit: "Mega Showdown",
-    },
-    {
-      src: "/guides/observatory.png",
-      alt: "Observatory",
-      credit: "Mega Showdown",
-    },
-    {
-      src: "/guides/wishing-weald.png",
-      alt: "Wishing Weald",
-      credit: "Mega Showdown",
-    },
-    {
-      src: "/guides/reassembly-unit.png",
-      alt: "Reassembly Unit",
-      credit: "Mega Showdown",
-    },
-  ];
-  return <ImageCarousel images={images} />;
-}
-
 function CosplayPikachuImageSlider() {
   const images = [
     {
@@ -1777,22 +1766,6 @@ function CosplayPikachuImageSlider() {
       src: "/guides/cosplay-popstar.png",
       alt: "Popstar Cosplay Pikachu",
       credit: "maru",
-    },
-  ];
-  return <ImageCarousel images={images} />;
-}
-
-function MewImageSlider() {
-  const images = [
-    {
-      src: "/guides/origin-fossil.jpg",
-      alt: "Origin Fossil crafting recipe",
-      credit: "COBBLEVERSE",
-    },
-    {
-      src: "/guides/mew-temple.webp",
-      alt: "Mew's Temple in Jungle biome",
-      credit: "COBBLEVERSE",
     },
   ];
   return <ImageCarousel images={images} />;
@@ -1854,37 +1827,6 @@ function CalyrexImageSlider() {
   return <ImageCarousel images={images} />;
 }
 
-function RayquazaImageSlider() {
-  const images = [
-    {
-      src: "/guides/emerald-emblem.png",
-      alt: "Emerald Emblem",
-      credit: "skeleton",
-    },
-    {
-      src: "/guides/kyogre-plush.png",
-      alt: "Kyogre Chamber secret room",
-      credit: "skeleton",
-    },
-    {
-      src: "/guides/skypillar-1.png",
-      alt: "Secret chest",
-      credit: "skeleton",
-    },
-    {
-      src: "/guides/skypillar-2.png",
-      alt: "Secret chest",
-      credit: "skeleton",
-    },
-    {
-      src: "/guides/skypillar-3.png",
-      alt: "Secret chest",
-      credit: "skeleton",
-    },
-  ];
-  return <ImageCarousel images={images} />;
-}
-
 function DeoxysImageSlider() {
   const images = [
     {
@@ -1911,7 +1853,7 @@ function DeoxysImageSlider() {
   return <ImageCarousel images={images} />;
 }
 
-function AshGreninjaImageSlider() {
+function AshPokemonsImageSlider() {
   const images = [
     {
       src: "/guides/ash-greninja.png",
@@ -1943,12 +1885,6 @@ function AshGreninjaImageSlider() {
       alt: "Ash Mom",
       credit: "doctor",
     },
-  ];
-  return <ImageCarousel images={images} />;
-}
-
-function AshPikachuImageSlider() {
-  const images = [
     {
       src: "/guides/ash-pikachu.png",
       alt: "Ash Pikachu",
@@ -1957,31 +1893,6 @@ function AshPikachuImageSlider() {
     {
       src: "/guides/ash-pikachu-1.png",
       alt: "Ash House",
-      credit: "doctor",
-    },
-    {
-      src: "/guides/ash-house-1.png",
-      alt: "Ash House",
-      credit: "doctor",
-    },
-    {
-      src: "/guides/ash.png",
-      alt: "Ash",
-      credit: "doctor",
-    },
-    {
-      src: "/guides/ash-mom-1.png",
-      alt: "Ash Mom",
-      credit: "doctor",
-    },
-    {
-      src: "/guides/ash-mom-2.png",
-      alt: "Ash Mom",
-      credit: "doctor",
-    },
-    {
-      src: "/guides/ash-mom-3.png",
-      alt: "Ash Mom",
       credit: "doctor",
     },
   ];
@@ -2071,6 +1982,36 @@ function AuraTrioImageSlider() {
       src: "/guides/yveltal.png",
       alt: "Yveltal in Dark Forests",
       credit: "maru",
+    },
+    {
+      src: "/guides/mossy-oubliette-ruins.png",
+      alt: "Ruins",
+      credit: "Cobblemon",
+    },
+    {
+      src: "/guides/crumbling-arch-ruins.png",
+      alt: "Ruins",
+      credit: "Cobblemon",
+    },
+    {
+      src: "/guides/archaeological-site.png",
+      alt: "Dig Site",
+      credit: "Mega Showdown",
+    },
+    {
+      src: "/guides/observatory.png",
+      alt: "Observatory",
+      credit: "Mega Showdown",
+    },
+    {
+      src: "/guides/wishing-weald.png",
+      alt: "Wishing Weald",
+      credit: "Mega Showdown",
+    },
+    {
+      src: "/guides/reassembly-unit.png",
+      alt: "Reassembly Unit",
+      credit: "Mega Showdown",
     },
   ];
   return <ImageCarousel images={images} />;
