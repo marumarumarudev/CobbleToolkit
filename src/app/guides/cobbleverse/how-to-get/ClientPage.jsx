@@ -18,7 +18,12 @@ function HowToGetPokemonPageInner() {
       levelCap: "80+",
       content: (
         <div className="space-y-6">
-          <h4 className="font-medium text-lg">Mew</h4>
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(244,114,182,0.7)" }}
+          >
+            Mew
+          </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Kanto Series</b>.
@@ -52,7 +57,14 @@ function HowToGetPokemonPageInner() {
             Use <code>/locate structure cobbleverse:mythical/mew</code>
           </p>
 
-          <h4 className="font-medium text-lg">Mewtwo</h4>
+          <MewImageSlider />
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-purple-600 to-indigo-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(139,92,246,0.7)" }}
+          >
+            Mewtwo
+          </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Kanto Series</b> with level cap 80+ (check trainer
@@ -150,7 +162,7 @@ function HowToGetPokemonPageInner() {
           <p className="text-xs opacity-50 italic">
             Use <code>/locate structure cobbleverse:team_rocket_tower</code>
           </p>
-          <MewDuoImageSlider />
+          <MewTwoImageSlider />
         </div>
       ),
     },
@@ -160,7 +172,12 @@ function HowToGetPokemonPageInner() {
       levelCap: "Any",
       content: (
         <div className="space-y-6">
-          <h4 className="font-medium text-lg">Kyogre</h4>
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(59,130,246,0.7)" }}
+          >
+            Kyogre
+          </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Hoenn Series</b>.
@@ -188,7 +205,14 @@ function HowToGetPokemonPageInner() {
             Use <code>/locate structure cobbleverse:legendary/kyogre</code>
           </p>
 
-          <h4 className="font-medium text-lg">Groudon</h4>
+          <KyogreImageSlider />
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-red-600 to-orange-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(220,38,38,0.7)" }}
+          >
+            Groudon
+          </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Hoenn Series</b>.
@@ -224,7 +248,14 @@ function HowToGetPokemonPageInner() {
             Use <code>/locate structure cobbleverse:legendary/groudon</code>
           </p>
 
-          <h4 className="font-medium text-lg">Rayquaza</h4>
+          <GroudonImageSlider />
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-green-500 to-yellow-400 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(34,197,94,0.7)" }}
+          >
+            Rayquaza
+          </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Hoenn Series</b>.
@@ -266,7 +297,7 @@ function HowToGetPokemonPageInner() {
             Use <code>/locate structure cobbleverse:sky_pillar</code>
           </p>
 
-          <WeatherTrioImageSlider />
+          <RayquazaImageSlider />
         </div>
       ),
     },
@@ -276,7 +307,13 @@ function HowToGetPokemonPageInner() {
       levelCap: "40+",
       content: (
         <div className="space-y-6">
-          <h4 className="font-medium text-lg">Ash's Greninja</h4>
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-blue-300 to-red-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(59,130,246,0.7)" }}
+          >
+            Ash's Greninja
+          </h4>
+
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Kanto Series</b> with <b>level cap 40+</b>.
@@ -326,7 +363,15 @@ function HowToGetPokemonPageInner() {
             ⚠️ Giving Greninja Battle Bond via commands does not work properly.
           </p>
 
-          <h4 className="font-medium text-lg">Ash's Pikachu</h4>
+          <AshGreninjaImageSlider />
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(250,204,21,0.8)" }}
+          >
+            Ash's Pikachu
+          </h4>
+
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Kanto Series</b> with <b>level cap 40+</b>.
@@ -360,7 +405,7 @@ function HowToGetPokemonPageInner() {
             Use <code>/locate structure cobbleverse:ash</code>
           </p>
 
-          <AshPokemonsImageSlider />
+          <AshPikachuImageSlider />
           <p className="text-xs opacity-50 italic">
             Big thanks to <strong>Mega Showdown Wiki</strong>
           </p>
@@ -767,7 +812,12 @@ function HowToGetPokemonPageInner() {
       levelCap: "Any",
       content: (
         <div className="space-y-6">
-          <h4 className="font-medium text-lg">Xerneas</h4>
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-blue-200 to-emerald-800 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(37,99,235,0.7)" }}
+          >
+            Xerneas
+          </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
               <b>Xerneas</b>: Spawns in <b>Floral Biomes</b> during{" "}
@@ -775,7 +825,14 @@ function HowToGetPokemonPageInner() {
             </li>
           </ul>
 
-          <h4 className="font-medium text-lg">Yveltal</h4>
+          <XerneasImage />
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-red-600 to-purple-600 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(220,38,38,0.7)" }}
+          >
+            Yveltal
+          </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
               <b>Yveltal</b>: Spawns in <b>Dark Forests</b> during{" "}
@@ -783,7 +840,14 @@ function HowToGetPokemonPageInner() {
             </li>
           </ul>
 
-          <h4 className="font-medium text-lg">Zygarde</h4>
+          <YveltalImage />
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-green-500 to-yellow-400 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(34,197,94,0.7)" }}
+          >
+            Zygarde
+          </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
               You can get <b>Zygarde Cells</b> by brushing suspicious sand in{" "}
@@ -888,7 +952,7 @@ function HowToGetPokemonPageInner() {
             </p>
           </div>
 
-          <AuraTrioImageSlider />
+          <ZygardeImageSlider />
         </div>
       ),
     },
@@ -1602,7 +1666,7 @@ function ImageCarousel({ images }) {
 }
 
 /* === INDIVIDUAL SLIDERS === */
-function MewDuoImageSlider() {
+function MewImageSlider() {
   const images = [
     {
       src: "/guides/origin-fossil.jpg",
@@ -1614,6 +1678,12 @@ function MewDuoImageSlider() {
       alt: "Mew's Temple in Jungle biome",
       credit: "COBBLEVERSE",
     },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function MewTwoImageSlider() {
+  const images = [
     {
       src: "/guides/atena.png",
       alt: "Team Rocket Admin Atena",
@@ -1633,7 +1703,7 @@ function MewDuoImageSlider() {
   return <ImageCarousel images={images} />;
 }
 
-function WeatherTrioImageSlider() {
+function KyogreImageSlider() {
   const images = [
     {
       src: "/guides/blue-orb.png",
@@ -1645,6 +1715,12 @@ function WeatherTrioImageSlider() {
       alt: "Water Spout Barrel",
       credit: "skeleton",
     },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function GroudonImageSlider() {
+  const images = [
     {
       src: "/guides/red-orb.png",
       alt: "Red Orb",
@@ -1660,6 +1736,12 @@ function WeatherTrioImageSlider() {
       alt: "Groudon Secret",
       credit: "skeleton",
     },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function RayquazaImageSlider() {
+  const images = [
     {
       src: "/guides/emerald-emblem.png",
       alt: "Emerald Emblem",
@@ -1874,7 +1956,7 @@ function DeoxysImageSlider() {
   return <ImageCarousel images={images} />;
 }
 
-function AshPokemonsImageSlider() {
+function AshGreninjaImageSlider() {
   const images = [
     {
       src: "/guides/ash-greninja.png",
@@ -1906,6 +1988,12 @@ function AshPokemonsImageSlider() {
       alt: "Ash Mom",
       credit: "doctor",
     },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function AshPikachuImageSlider() {
+  const images = [
     {
       src: "/guides/ash-pikachu.png",
       alt: "Ash Pikachu",
@@ -1914,6 +2002,21 @@ function AshPokemonsImageSlider() {
     {
       src: "/guides/ash-pikachu-1.png",
       alt: "Ash House",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/ash-mom-1.png",
+      alt: "Ash Mom",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/ash-mom-2.png",
+      alt: "Ash Mom",
+      credit: "doctor",
+    },
+    {
+      src: "/guides/ash-mom-3.png",
+      alt: "Ash Mom",
       credit: "doctor",
     },
   ];
@@ -2136,4 +2239,169 @@ function TabsCarousel({ pokemonData, activeTab, setActiveTab }) {
       </div>
     </div>
   );
+}
+
+/* === INDIVIDUAL IMAGE COMPONENTS === */
+function SingleImage({ src, alt, credit }) {
+  const [fullscreen, setFullscreen] = useState(null);
+
+  // Scoped Escape handler: active only when fullscreen is open
+  React.useEffect(() => {
+    if (!fullscreen) return;
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setFullscreen(null);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [fullscreen]);
+
+  // Prevent background scroll while fullscreen
+  React.useEffect(() => {
+    if (!fullscreen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [fullscreen]);
+
+  // Fullscreen modal component
+  const FullscreenModal = () => {
+    if (!fullscreen) return null;
+
+    return (
+      <div
+        className="fixed inset-0 bg-black/95 flex items-center justify-center z-[9999] p-4"
+        onClick={() => setFullscreen(null)}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Image preview"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 9999,
+        }}
+      >
+        <div
+          className="relative w-full h-full max-w-7xl max-h-full flex items-center justify-center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            onClick={() => setFullscreen(null)}
+            aria-label="Close fullscreen"
+            className="absolute top-4 right-4 z-10 inline-flex items-center justify-center rounded-md bg-black/70 hover:bg-black/80 text-white p-3 shadow-lg"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+          <div className="relative w-full h-full flex items-center justify-center">
+            <Image
+              src={fullscreen.src}
+              alt={fullscreen.alt}
+              fill
+              sizes="100vw"
+              className="object-contain"
+              style={{ maxHeight: "100vh", maxWidth: "100vw" }}
+            />
+          </div>
+          <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur px-4 py-2 rounded-lg text-gray-100 text-sm shadow-lg">
+            <span className="font-medium">Credit:</span> {fullscreen.credit}
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="relative h-48 sm:h-64 md:h-80 w-full overflow-hidden rounded-2xl shadow-lg">
+        <button
+          className="relative w-full h-full overflow-hidden rounded-2xl"
+          onClick={() => setFullscreen({ src, alt, credit })}
+        >
+          <Image src={src} alt={alt} fill className="object-cover" />
+          <div className="absolute inset-x-0 bottom-0 bg-black/40 backdrop-blur px-3 py-2 text-sm text-gray-100">
+            <span className="font-medium">Credit:</span> {credit}
+          </div>
+        </button>
+      </div>
+
+      {/* Render fullscreen modal using portal */}
+      {typeof window !== "undefined" &&
+        fullscreen &&
+        createPortal(<FullscreenModal />, document.body)}
+    </div>
+  );
+}
+
+function XerneasImage() {
+  return (
+    <SingleImage
+      src="/guides/xerneas.png"
+      alt="Xerneas in Floral Biomes"
+      credit="maru"
+    />
+  );
+}
+
+function YveltalImage() {
+  return (
+    <SingleImage
+      src="/guides/yveltal.png"
+      alt="Yveltal in Dark Forests"
+      credit="maru"
+    />
+  );
+}
+
+function ZygardeImageSlider() {
+  const images = [
+    {
+      src: "/guides/mossy-oubliette-ruins.png",
+      alt: "Ruins",
+      credit: "Cobblemon",
+    },
+    {
+      src: "/guides/crumbling-arch-ruins.png",
+      alt: "Ruins",
+      credit: "Cobblemon",
+    },
+    {
+      src: "/guides/archaeological-site.png",
+      alt: "Dig Site",
+      credit: "Mega Showdown",
+    },
+    {
+      src: "/guides/observatory.png",
+      alt: "Observatory",
+      credit: "Mega Showdown",
+    },
+    {
+      src: "/guides/wishing-weald.png",
+      alt: "Wishing Weald",
+      credit: "Mega Showdown",
+    },
+    {
+      src: "/guides/reassembly-unit.png",
+      alt: "Reassembly Unit",
+      credit: "Mega Showdown",
+    },
+  ];
+  return <ImageCarousel images={images} />;
 }

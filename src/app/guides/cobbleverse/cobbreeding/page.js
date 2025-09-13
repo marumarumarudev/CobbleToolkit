@@ -21,6 +21,10 @@ export default function BreedingGuidePage() {
         </a>
         . Community notes provided by{" "}
         <span className="font-medium">requiem</span>.
+        <br />
+        <span className="text-xs opacity-50 italic">
+          requiem misses azera so much. ❤️
+        </span>
       </p>
 
       {/* Pasture Blocks */}
