@@ -4,6 +4,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import { useState } from "react";
 import React from "react";
+import { createPortal } from "react-dom";
 
 function HowToGetPokemonPageInner() {
   const [activeTab, setActiveTab] = useState("mew_duo");
@@ -1498,6 +1499,67 @@ function ImageCarousel({ images }) {
     };
   }, [fullscreen]);
 
+  // Fullscreen modal component
+  const FullscreenModal = () => {
+    if (!fullscreen) return null;
+
+    return (
+      <div
+        className="fixed inset-0 bg-black/95 flex items-center justify-center z-[9999] p-4"
+        onClick={() => setFullscreen(null)}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Image preview"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 9999,
+        }}
+      >
+        <div
+          className="relative w-full h-full max-w-7xl max-h-full flex items-center justify-center"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            onClick={() => setFullscreen(null)}
+            aria-label="Close fullscreen"
+            className="absolute top-4 right-4 z-10 inline-flex items-center justify-center rounded-md bg-black/70 hover:bg-black/80 text-white p-3 shadow-lg"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+          <div className="relative w-full h-full flex items-center justify-center">
+            <Image
+              src={fullscreen.src}
+              alt={fullscreen.alt}
+              fill
+              sizes="100vw"
+              className="object-contain"
+              style={{ maxHeight: "100vh", maxWidth: "100vw" }}
+            />
+          </div>
+          <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur px-4 py-2 rounded-lg text-gray-100 text-sm shadow-lg">
+            <span className="font-medium">Credit:</span> {fullscreen.credit}
+          </p>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-2">
       <div
@@ -1531,51 +1593,10 @@ function ImageCarousel({ images }) {
         </div>
       </div>
 
-      {/* Fullscreen modal */}
-      {fullscreen && (
-        <div
-          className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4"
-          onClick={() => setFullscreen(null)}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Image preview"
-        >
-          <div
-            className="relative w-full max-w-6xl h-[80vh]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              onClick={() => setFullscreen(null)}
-              aria-label="Close fullscreen"
-              className="absolute top-2 right-2 z-10 inline-flex items-center justify-center rounded-md bg-black/60 hover:bg-black/70 text-white p-2"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-5 h-5"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-            <Image
-              src={fullscreen.src}
-              alt={fullscreen.alt}
-              fill
-              sizes="(min-width: 1024px) 80vw, 100vw"
-              className="object-contain rounded-lg"
-            />
-            <p className="absolute inset-x-0 bottom-2 mx-auto w-fit bg-black/50 backdrop-blur px-3 py-1 rounded text-gray-100 text-sm">
-              <span className="font-medium">Credit:</span> {fullscreen.credit}
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Render fullscreen modal using portal */}
+      {typeof window !== "undefined" &&
+        fullscreen &&
+        createPortal(<FullscreenModal />, document.body)}
     </div>
   );
 }
