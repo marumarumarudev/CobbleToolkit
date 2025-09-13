@@ -34,7 +34,7 @@ function HowToGetPokemonPageInner() {
                 <li>
                   <b>Ancient DNA</b> — dropped once by{" "}
                   <b>Gym Leader Giovanni</b> OR found in a chest inside{" "}
-                  <b>Mew’s Temple</b> (Jungle biome).
+                  <b>Mew's Temple</b> (Jungle biome).
                 </li>
                 <li>
                   <b>5 Fossils</b> — any kind of fossil works.
@@ -43,7 +43,7 @@ function HowToGetPokemonPageInner() {
             </li>
             <li>
               Combine these items to craft the <b>Origin Fossil</b> and place it{" "}
-              in <b>Mew’s Altar</b> to summon Mew.
+              in <b>Mew's Altar</b> to summon Mew.
             </li>
           </ul>
           <p className="text-xs opacity-50 italic">
@@ -68,7 +68,7 @@ function HowToGetPokemonPageInner() {
               Obtain <b>Ancient DNA</b>:
               <ul className="list-disc list-inside ml-6">
                 <li>Defeat Gym Leader Giovanni (drops once), OR</li>
-                <li>Find Mew’s Temple in Jungle biome.</li>
+                <li>Find Mew's Temple in Jungle biome.</li>
               </ul>
             </li>
             <li>
@@ -171,24 +171,24 @@ function HowToGetPokemonPageInner() {
               Must be in <b>Kanto Series</b> with <b>level cap 40+</b>.
             </li>
             <li>
-              Find <b>Ash’s House</b> in <b>Plains biomes</b>.
+              Find <b>Ash's House</b> in <b>Plains biomes</b>.
             </li>
             <li>
-              Defeat Ash to obtain <b>Ash’s Cap</b>.
+              Defeat Ash to obtain <b>Ash's Cap</b>.
             </li>
             <li>
-              (CurseForge users: Ash’s Cap can be found free in a drawer inside
+              (CurseForge users: Ash's Cap can be found free in a drawer inside
               his room.)
             </li>
             <li>
-              To obtain <b>Ash’s Greninja</b>, right-click a Greninja while
-              holding Ash’s Cap in your main hand.
+              To obtain <b>Ash's Greninja</b>, right-click a Greninja while
+              holding Ash's Cap in your main hand.
             </li>
           </ul>
 
           <h4 className="font-medium">Battle Bond Ability</h4>
           <p>
-            Ash’s Greninja has the unique ability <b>Battle Bond</b>:
+            Ash's Greninja has the unique ability <b>Battle Bond</b>:
           </p>
           <ul className="list-disc list-inside ml-6 space-y-1">
             <li>
@@ -236,27 +236,27 @@ function HowToGetPokemonPageInner() {
               Must be in <b>Kanto Series</b> with <b>level cap 40+</b>.
             </li>
             <li>
-              Obtain <b>Ash’s Cap</b> from Ash (or his drawer if using
+              Obtain <b>Ash's Cap</b> from Ash (or his drawer if using
               CurseForge).
             </li>
             <li>
-              Right-click a <b>Pikachu</b> with Ash’s Cap in your main hand to
-              obtain <b>Ash’s Pikachu</b>.
+              Right-click a <b>Pikachu</b> with Ash's Cap in your main hand to
+              obtain <b>Ash's Pikachu</b>.
             </li>
             <li>
               Requires <b>Friendship 200+</b>
             </li>
           </ul>
 
-          <h4 className="font-medium">Ash’s Pikachu Info</h4>
+          <h4 className="font-medium">Ash's Pikachu Info</h4>
           <ul className="list-disc list-inside ml-6 space-y-1">
             <li>No stat changes compared to a regular Pikachu.</li>
             <li>
-              When holding <b>Pikashunium Z</b>, Ash’s Pikachu can use{" "}
+              When holding <b>Pikashunium Z</b>, Ash's Pikachu can use{" "}
               <b>10,000,000 Volt Thunderbolt</b>.
             </li>
             <li>
-              Ash’s Pikachu <u>cannot</u> use <b>Catastropika</b> even with
+              Ash's Pikachu <u>cannot</u> use <b>Catastropika</b> even with
               Pikanium Z.
             </li>
           </ul>
@@ -400,7 +400,7 @@ function HowToGetPokemonPageInner() {
               Must be in <b>Hoenn Series</b>.
             </li>
             <li>
-              Locate Kyogre’s structure in <b>Deep Cold Ocean</b> biomes.
+              Locate Kyogre's structure in <b>Deep Cold Ocean</b> biomes.
             </li>
             <li>
               Craft <b>Ocean Core</b> to summon Kyogre.
@@ -437,7 +437,7 @@ function HowToGetPokemonPageInner() {
               Must be in <b>Hoenn Series</b>.
             </li>
             <li>
-              Locate Groudon’s structure in <b>Deep Warm Ocean</b> (Terralith
+              Locate Groudon's structure in <b>Deep Warm Ocean</b> (Terralith
               biome).
             </li>
             <li>
@@ -456,10 +456,10 @@ function HowToGetPokemonPageInner() {
                 </li>
                 <li>
                   Small lava pool with dripstone—inside a Netherite barrel
-                  you’ll find a <b>Precipice Blades TM</b> and a{" "}
+                  you'll find a <b>Precipice Blades TM</b> and a{" "}
                   <b>Nether Star</b>.
                 </li>
-                <li>Groudon’s also has a raw megastone. (thanks azera)</li>
+                <li>Groudon's also has a raw megastone. (thanks azera)</li>
               </ul>
             </li>
           </ul>
@@ -485,7 +485,7 @@ function HowToGetPokemonPageInner() {
               Head to the <b>Sky Pillar</b>. (Deep Ocean Biome)
             </li>
             <li>
-              The <b>Emerald Emblem</b> to craft Rayquaza’s spawn item is
+              The <b>Emerald Emblem</b> to craft Rayquaza's spawn item is
               located in the room with the crafters, hidden behind the chest.
             </li>
           </ul>
@@ -506,8 +506,8 @@ function HowToGetPokemonPageInner() {
               space under the floor.
             </li>
             <li>
-              <b>Dragon Chamber Statue</b>: A chest with <b>Dragon’s Breath</b>{" "}
-              hidden in the dragon statue’s mouth.
+              <b>Dragon Chamber Statue</b>: A chest with <b>Dragon's Breath</b>{" "}
+              hidden in the dragon statue's mouth.
             </li>
             <li>
               <b>Sky Pillar Lantern</b> (left side as you walk in): Hidden chest
@@ -537,7 +537,7 @@ function HowToGetPokemonPageInner() {
               <b>Meteorite structures</b>.
             </li>
             <li>
-              Dig within the <b>Mega Meteorite blocks</b> to uncover Deoxys’
+              Dig within the <b>Mega Meteorite blocks</b> to uncover Deoxys'
               summon item and the hidden altar.
             </li>
             <li>
@@ -691,11 +691,11 @@ function HowToGetPokemonPageInner() {
               </ul>
             </li>
             <li>
-              You’ll receive <b>Calyrex</b> for each structure, allowing you to
+              You'll receive <b>Calyrex</b> for each structure, allowing you to
               create both Rider forms.
             </li>
             <li>
-              Locate <b>Calyrex’s Crown</b> in a barrel:
+              Locate <b>Calyrex's Crown</b> in a barrel:
               <ul className="list-disc list-inside ml-6">
                 <li>
                   Found within one of the surrounding <b>ice spires</b>{" "}
@@ -708,7 +708,7 @@ function HowToGetPokemonPageInner() {
               </ul>
             </li>
             <li>
-              Place the <b>Calyrex’s Crown</b> atop the <b>Calyrex statue</b> to
+              Place the <b>Calyrex's Crown</b> atop the <b>Calyrex statue</b> to
               complete the ritual.
             </li>
             <li>
@@ -876,6 +876,129 @@ function HowToGetPokemonPageInner() {
         </div>
       ),
     },
+    aura_trio: {
+      title: "Aura Trio",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Xerneas</b>: Spawns in <b>Floral Biomes</b> during{" "}
+              <b>daytime</b>.
+            </li>
+            <li>
+              <b>Yveltal</b>: Spawns in <b>Dark Forests</b> during{" "}
+              <b>nighttime</b>.
+            </li>
+            <li>
+              <b>Zygarde</b>: Visit the{" "}
+              <a
+                href="#zygarde"
+                className="text-blue-400 underline hover:text-blue-300 transition-colors"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveTab("zygarde");
+                }}
+              >
+                Zygarde guide
+              </a>{" "}
+              for detailed information.
+            </li>
+          </ul>
+          <AuraTrioImageSlider />
+        </div>
+      ),
+    },
+    kubfu: {
+      title: "Kubfu",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Kubfu</b> spawns in <b>Cherry Groves</b>.
+            </li>
+            <li>
+              To evolve Kubfu, you need one of these items:
+              <ul className="list-disc list-inside ml-6">
+                <li>
+                  <b>Scroll of Darkness</b> — found by brushing suspicious sands
+                  in <b>Desert Pyramids</b>. Evolves Kubfu to{" "}
+                  <b>Urshifu Single Strike Form</b>.
+                </li>
+                <li>
+                  <b>Scroll of Water</b> — found in <b>Warm Ocean Ruins</b> by
+                  brushing suspicious sands. Evolves Kubfu to{" "}
+                  <b>Urshifu Rapid Strike Form</b>.
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <KubfuImageSlider />
+        </div>
+      ),
+    },
+    combat_trio: {
+      title: "Combat Trio",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Zacian</b> and <b>Zamazenta</b> spawn in <b>Forest Biomes</b>.
+            </li>
+            <li>
+              <b>Eternatus</b> spawns in the <b>End dimension</b>.
+            </li>
+            <li>
+              To Crown <b>Zamazenta</b>:
+              <ul className="list-disc list-inside ml-6">
+                <li>
+                  Brush up <b>Suspicious gravels</b> in <b>Sol Henge Ruins</b>{" "}
+                  OR
+                </li>
+                <li>
+                  Brush up <b>Suspicious sands</b> in{" "}
+                  <b>Archaeological Sites</b>
+                </li>
+                <li>
+                  Find the <b>Rusted Shield</b> to crown Zamazenta.
+                </li>
+              </ul>
+            </li>
+            <li>
+              To Crown <b>Zacian</b>:
+              <ul className="list-disc list-inside ml-6">
+                <li>
+                  Brush up <b>Suspicious graves</b> in <b>Luna Henge Ruins</b>{" "}
+                  OR
+                </li>
+                <li>
+                  Brush up <b>Suspicious sands</b> in{" "}
+                  <b>Archaeological Sites</b>
+                </li>
+                <li>
+                  Find the <b>Rusted Sword</b> to crown Zacian.
+                </li>
+              </ul>
+            </li>
+            <li>
+              For <b>Eternamax Eternatus</b>:
+              <ul className="list-disc list-inside ml-6">
+                <li>
+                  Craft a <b>Star Core</b> and give it to Eternatus as a held
+                  item.
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <CombatTrioImageSlider />
+        </div>
+      ),
+    },
   };
 
   React.useEffect(() => {
@@ -947,6 +1070,14 @@ function HowToGetPokemonPageInner() {
                   moltres: "legendary_birds_trio",
                   greninja: "ash_greninja",
                   pikachu: "ash_pikachu",
+                  xerneas: "aura_trio",
+                  yveltal: "aura_trio",
+                  zygarde: "aura_trio",
+                  kubfu: "kubfu",
+                  urshifu: "kubfu",
+                  zacian: "combat_trio",
+                  zamazenta: "combat_trio",
+                  eternatus: "combat_trio",
                 };
 
                 // Find matching entry
@@ -1046,6 +1177,14 @@ function HowToGetPokemonPageInner() {
                     moltres: "legendary_birds_trio",
                     greninja: "ash_greninja",
                     pikachu: "ash_pikachu",
+                    xerneas: "aura_trio",
+                    yveltal: "aura_trio",
+                    zygarde: "aura_trio",
+                    kubfu: "kubfu",
+                    urshifu: "kubfu",
+                    zacian: "combat_trio",
+                    zamazenta: "combat_trio",
+                    eternatus: "combat_trio",
                   };
 
                   // Check if the search query matches a mapped Pokémon with fuzzy matching
@@ -1167,6 +1306,14 @@ function HowToGetPokemonPageInner() {
                       moltres: "legendary_birds_trio",
                       greninja: "ash_greninja",
                       pikachu: "ash_pikachu",
+                      xerneas: "aura_trio",
+                      yveltal: "aura_trio",
+                      zygarde: "aura_trio",
+                      kubfu: "kubfu",
+                      urshifu: "kubfu",
+                      zacian: "combat_trio",
+                      zamazenta: "combat_trio",
+                      eternatus: "combat_trio",
                     };
 
                     // Check if the search query matches a mapped Pokémon with fuzzy matching
@@ -1196,6 +1343,25 @@ function HowToGetPokemonPageInner() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* 🎯 Tabs Carousel */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-gray-200">
+            Available Pokémon
+          </h2>
+          <div className="text-sm text-gray-400">
+            {Object.keys(pokemonData).indexOf(activeTab) + 1} of{" "}
+            {Object.keys(pokemonData).length}
+          </div>
+        </div>
+
+        <TabsCarousel
+          pokemonData={pokemonData}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
       </div>
 
       {/* 📖 Content Card */}
@@ -1625,7 +1791,7 @@ function MewImageSlider() {
     },
     {
       src: "/guides/mew-temple.webp",
-      alt: "Mew’s Temple in Jungle biome",
+      alt: "Mew's Temple in Jungle biome",
       credit: "COBBLEVERSE",
     },
   ];
@@ -1892,4 +2058,120 @@ function RiverGuardiansImageSlider() {
     },
   ];
   return <ImageCarousel images={images} />;
+}
+
+function AuraTrioImageSlider() {
+  const images = [
+    {
+      src: "/guides/xerneas.png",
+      alt: "Xerneas in Floral Biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/yveltal.png",
+      alt: "Yveltal in Dark Forests",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function KubfuImageSlider() {
+  const images = [
+    {
+      src: "/guides/kubfu.png",
+      alt: "Kubfu in Cherry Groves",
+      credit: "maru",
+    },
+    {
+      src: "/guides/urshifu-single-strike.png",
+      alt: "Urshifu Single Strike Form",
+      credit: "maru",
+    },
+    {
+      src: "/guides/urshifu-rapid-strike.png",
+      alt: "Urshifu Rapid Strike Form",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function CombatTrioImageSlider() {
+  const images = [
+    {
+      src: "/guides/rusted-shield.png",
+      alt: "Rusted Shield from Sol Henge Ruins or Archaeological Sites",
+      credit: "maru",
+    },
+    {
+      src: "/guides/rusted-sword.png",
+      alt: "Rusted Sword from Luna Henge Ruins or Archaeological Sites",
+      credit: "maru",
+    },
+    {
+      src: "/guides/star-core.png",
+      alt: "Star Core for Eternamax Eternatus",
+      credit: "maru",
+    },
+    {
+      src: "/guides/crowned-dogs.png",
+      alt: "Crowned Dogs",
+      credit: "maru",
+    },
+    {
+      src: "/guides/eternamax-eternatus.png",
+      alt: "Eternamax Eternatus",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+/* === TABS CAROUSEL COMPONENT === */
+function TabsCarousel({ pokemonData, activeTab, setActiveTab }) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: "start",
+    slidesToScroll: 1,
+    containScroll: "trimSnaps",
+  });
+
+  const pokemonEntries = Object.entries(pokemonData);
+
+  // Auto-scroll to active tab when it changes
+  React.useEffect(() => {
+    if (emblaApi) {
+      const activeIndex = pokemonEntries.findIndex(
+        ([key]) => key === activeTab
+      );
+      if (activeIndex !== -1) {
+        emblaApi.scrollTo(activeIndex);
+      }
+    }
+  }, [activeTab, emblaApi, pokemonEntries]);
+
+  return (
+    <div className="overflow-hidden" ref={emblaRef}>
+      <div className="flex">
+        {pokemonEntries.map(([key, data]) => (
+          <div key={key} className="flex-[0_0_33.333%] min-w-0 px-1">
+            <button
+              onClick={() => setActiveTab(key)}
+              className={`w-full px-4 py-3 rounded-lg font-medium text-sm transition-all duration-200 ${
+                activeTab === key
+                  ? "bg-gradient-to-r from-blue-400 to-purple-400 text-white shadow-lg shadow-purple-500/25"
+                  : "bg-gray-700/50 text-gray-300 hover:bg-gray-600/70 hover:text-white"
+              }`}
+            >
+              <div className="text-center">
+                <div className="font-semibold truncate">{data.title}</div>
+                <div className="text-xs opacity-75 truncate">{data.series}</div>
+              </div>
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }

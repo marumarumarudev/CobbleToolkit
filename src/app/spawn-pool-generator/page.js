@@ -106,6 +106,30 @@ function emptySpawn(defaultName) {
   };
 }
 
+// Helper function to parse weight multipliers from imported JSON
+function parseWeightMultiplier(spawn) {
+  // Handle both weightMultiplier (singular) and weightMultipliers (plural array)
+  if (spawn.weightMultiplier) {
+    // Already in the correct format
+    return spawn.weightMultiplier;
+  }
+
+  if (
+    spawn.weightMultipliers &&
+    Array.isArray(spawn.weightMultipliers) &&
+    spawn.weightMultipliers.length > 0
+  ) {
+    // Convert array format to single object (take the first one)
+    const firstMultiplier = spawn.weightMultipliers[0];
+    return {
+      multiplier: firstMultiplier.multiplier || 1,
+      condition: firstMultiplier.condition || {},
+    };
+  }
+
+  return null;
+}
+
 export default function SpawnPoolGenerator() {
   const [fileList, setFileList] = useState([]);
   const [activeFileIndex, setActiveFileIndex] = useState(null);
@@ -548,7 +572,7 @@ export default function SpawnPoolGenerator() {
                   weight: spawn.weight || 1,
                   condition: spawn.condition || {},
                   anticondition: spawn.anticondition || {},
-                  weightMultiplier: spawn.weightMultiplier || null,
+                  weightMultiplier: parseWeightMultiplier(spawn),
                   lastEdited: Date.now(),
                   uiCollapsed: false,
                 };
@@ -649,7 +673,7 @@ export default function SpawnPoolGenerator() {
           weight: spawn.weight || 1,
           condition: spawn.condition || {},
           anticondition: spawn.anticondition || {},
-          weightMultiplier: spawn.weightMultiplier || null,
+          weightMultiplier: parseWeightMultiplier(spawn),
           lastEdited: Date.now(),
           uiCollapsed: false,
         };
@@ -1158,7 +1182,7 @@ export default function SpawnPoolGenerator() {
       } else {
         // Enable with defaults
         spawn.weightMultiplier = {
-          multiplier: 2.0,
+          multiplier: 2,
           condition: {},
         };
       }
@@ -1177,7 +1201,7 @@ export default function SpawnPoolGenerator() {
       const copy = JSON.parse(JSON.stringify(prev));
       const spawn = copy[fileIndex].spawns[spawnIndex];
       if (!spawn.weightMultiplier) {
-        spawn.weightMultiplier = { multiplier: 1.0, condition: {} };
+        spawn.weightMultiplier = { multiplier: 1, condition: {} };
       }
       spawn.weightMultiplier[key] = value;
       touchFile(copy, fileIndex);
@@ -1195,7 +1219,7 @@ export default function SpawnPoolGenerator() {
       const copy = JSON.parse(JSON.stringify(prev));
       const spawn = copy[fileIndex].spawns[spawnIndex];
       if (!spawn.weightMultiplier) {
-        spawn.weightMultiplier = { multiplier: 1.0, condition: {} };
+        spawn.weightMultiplier = { multiplier: 1, condition: {} };
       }
       const cond = spawn.weightMultiplier.condition || {};
       if (cond.hasOwnProperty(key)) {
@@ -1282,7 +1306,7 @@ export default function SpawnPoolGenerator() {
         const copy = JSON.parse(JSON.stringify(prev));
         const spawn = copy[fileIndex].spawns[spawnIndex];
         if (!spawn.weightMultiplier) {
-          spawn.weightMultiplier = { multiplier: 1.0, condition: {} };
+          spawn.weightMultiplier = { multiplier: 1, condition: {} };
         }
         const cond = spawn.weightMultiplier.condition || {};
         cond[key] = cond[key] || [];
@@ -1365,7 +1389,7 @@ export default function SpawnPoolGenerator() {
       const copy = JSON.parse(JSON.stringify(prev));
       const spawn = copy[fileIndex].spawns[spawnIndex];
       if (!spawn.weightMultiplier) {
-        spawn.weightMultiplier = { multiplier: 1.0, condition: {} };
+        spawn.weightMultiplier = { multiplier: 1, condition: {} };
       }
       const cond = spawn.weightMultiplier.condition || {};
       cond[key] = value;
@@ -1490,7 +1514,7 @@ export default function SpawnPoolGenerator() {
         s.weightMultiplier.condition
       ) {
         spawnObj.weightMultiplier = {
-          multiplier: Number(s.weightMultiplier.multiplier) || 1.0,
+          multiplier: Number(s.weightMultiplier.multiplier) || 1,
           condition: s.weightMultiplier.condition,
         };
       }
@@ -1648,7 +1672,7 @@ export default function SpawnPoolGenerator() {
           weight: spawn.weight || 1,
           condition: spawn.condition || {},
           anticondition: spawn.anticondition || {},
-          weightMultiplier: spawn.weightMultiplier || null,
+          weightMultiplier: parseWeightMultiplier(spawn),
           lastEdited: Date.now(),
           uiCollapsed: false,
         };
@@ -1848,7 +1872,7 @@ export default function SpawnPoolGenerator() {
                           className="mt-1 p-1 rounded bg-[#121217] border w-32"
                           autoComplete="off"
                           min="0"
-                          step="0.1"
+                          step="1"
                         />
                       </div>
                       <button
@@ -2126,7 +2150,7 @@ export default function SpawnPoolGenerator() {
                           className="mt-1 p-1 rounded bg-[#121217] border w-32"
                           autoComplete="off"
                           min="0"
-                          step="0.1"
+                          step="1"
                         />
                       </div>
                       <button
@@ -2250,19 +2274,38 @@ export default function SpawnPoolGenerator() {
           <div className="space-y-2">
             <input
               type="number"
-              value={weightMultiplier.multiplier || 1.0}
-              onChange={(e) =>
-                setWeightMultiplierValue(
-                  fileIndex,
-                  spawnIndex,
-                  "multiplier",
-                  e.target.value === "" ? 1.0 : Number(e.target.value)
-                )
+              value={
+                Number.isInteger(weightMultiplier.multiplier)
+                  ? weightMultiplier.multiplier
+                  : weightMultiplier.multiplier || 1
               }
+              onChange={(e) => {
+                const rawValue = e.target.value;
+                if (rawValue === "") {
+                  setWeightMultiplierValue(
+                    fileIndex,
+                    spawnIndex,
+                    "multiplier",
+                    1
+                  );
+                } else {
+                  const numValue = Number(rawValue);
+                  // Ensure whole numbers are stored as integers to avoid floating point issues
+                  const normalizedValue = Number.isInteger(numValue)
+                    ? numValue
+                    : numValue;
+                  setWeightMultiplierValue(
+                    fileIndex,
+                    spawnIndex,
+                    "multiplier",
+                    normalizedValue
+                  );
+                }
+              }}
               className="w-full p-2 rounded bg-[#2a2a2a] border"
               autoComplete="off"
-              min="0.1"
-              step="0.1"
+              min="0"
+              step="1"
               placeholder="Multiplier value"
             />
             <div className="text-xs text-gray-400">
@@ -2978,7 +3021,7 @@ export default function SpawnPoolGenerator() {
                               className="w-full p-2 mt-1 rounded bg-[#2a2a2a] border"
                               autoComplete="off"
                               min="0"
-                              step="0.1"
+                              step="1"
                             />
                           </div>
 
@@ -3523,7 +3566,7 @@ export default function SpawnPoolGenerator() {
                                       className="mt-1 p-1 rounded bg-[#121217] border w-32"
                                       autoComplete="off"
                                       min="0"
-                                      step="0.1"
+                                      step="1"
                                     />
                                   </div>
                                   <button
