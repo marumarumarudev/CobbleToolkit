@@ -6,6 +6,8 @@ import { parseTrainersFromZip } from "@/utils/trainerParser";
 import Spinner from "./Spinner";
 import { X, ChevronDown, ChevronUp, Mars, Venus } from "lucide-react";
 import Image from "next/image";
+import { useStorage, usePreferences } from "@/hooks/useStorage";
+import StorageInfo from "./StorageInfo";
 
 export default function TrainerScanner() {
   const [fileReports, setFileReports] = useState([]);
@@ -19,43 +21,43 @@ export default function TrainerScanner() {
   const PAGE_SIZE = 20;
   const [persistenceDisabled, setPersistenceDisabled] = useState(false);
 
-  useEffect(() => {
-    const saved = localStorage.getItem("trainer_reports");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) setFileReports(parsed);
-      } catch (err) {
-        console.error("Failed to load saved trainer reports:", err);
-      }
+  const {
+    data: trainerReports,
+    setData: setTrainerReports,
+    saveData: saveTrainerReports,
+    clearData: clearTrainerReports,
+  } = useStorage("trainerReports", []);
+
+  const { preferences: sort, savePreferences: saveSort } = usePreferences(
+    "trainerScanner",
+    {
+      sortBy: "name",
+      direction: "asc",
     }
-  }, []);
+  );
+
+  useEffect(() => {
+    setFileReports(trainerReports);
+  }, [trainerReports]);
 
   useEffect(() => {
     document.title = "Trainer Scanner | CobbleToolkit";
   }, []);
 
-  const safePersistReports = (updatedReports) => {
+  // Handle storage errors
+  useEffect(() => {
+    if (persistenceDisabled) {
+      toast.error("Local persistence disabled due to storage limits.");
+    }
+  }, [persistenceDisabled]);
+
+  const safePersistReports = async (updatedReports) => {
     if (persistenceDisabled) return;
     try {
-      const payload = JSON.stringify(updatedReports);
-      // Guard against very large payloads (~5MB localStorage limits in many browsers)
-      // Skip persisting if over ~4.5MB to avoid QuotaExceededError
-      if (payload.length > 4_500_000) {
-        setPersistenceDisabled(true);
-        toast.error(
-          "Too much data to save locally. Persistence disabled for this session."
-        );
-        return;
-      }
-      localStorage.setItem("trainer_reports", payload);
+      await saveTrainerReports(updatedReports);
     } catch (err) {
-      // Most likely QuotaExceededError in production or restricted environments
       console.error("Failed to persist trainer reports:", err);
-      setPersistenceDisabled(true);
-      toast.error(
-        "Storage quota exceeded. Data won't be saved between refreshes."
-      );
+      toast.error("Failed to save data. Please try again.");
     }
   };
 
@@ -1375,8 +1377,13 @@ export default function TrainerScanner() {
         </div>
       )}
 
-      {allTrainers.length > 0 && (
+      {fileReports.length > 0 && (
         <>
+          {/* Add StorageInfo component here */}
+          <div className="w-full max-w-4xl mb-6 px-4">
+            <StorageInfo />
+          </div>
+
           {/* Search & Filters */}
           <div className="flex flex-col md:flex-row gap-2 items-center mb-6 w-full max-w-4xl">
             <input
@@ -1427,9 +1434,7 @@ export default function TrainerScanner() {
               className="flex items-center gap-2 px-4 py-2 bg-red-600 rounded hover:bg-red-700 transition"
               onClick={() => {
                 setFileReports([]);
-                try {
-                  localStorage.removeItem("trainer_reports");
-                } catch {}
+                clearTrainerReports();
                 setPersistenceDisabled(false);
               }}
             >

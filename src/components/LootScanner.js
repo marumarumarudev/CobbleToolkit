@@ -12,9 +12,18 @@ import {
   Search,
   Filter,
 } from "lucide-react";
+import { useStorage, usePreferences } from "@/hooks/useStorage";
+import StorageInfo from "./StorageInfo";
 
 export default function LootScanner() {
-  const [fileReports, setFileReports] = useState([]);
+  const {
+    data: fileReports,
+    setData: setFileReports,
+    saveData: saveReports,
+    clearData: clearReports,
+    loading: storageLoading,
+    error: storageError,
+  } = useStorage("lootReports", []);
   const [loading, setLoading] = useState(false);
   const [globalSearch, setGlobalSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -27,11 +36,6 @@ export default function LootScanner() {
     current: 0,
     total: 0,
     fileName: "",
-  });
-  const [storageUsage, setStorageUsage] = useState({
-    used: 0,
-    limit: 0,
-    percentage: 0,
   });
   const PAGE_SIZE = 50;
 
@@ -46,21 +50,6 @@ export default function LootScanner() {
     }, 300);
     return () => clearTimeout(handler);
   }, [globalSearch]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("loot_reports");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) setFileReports(parsed);
-      } catch (err) {
-        console.error("Failed to load saved loot reports:", err);
-      }
-    }
-
-    // Calculate initial storage usage
-    updateStorageUsage();
-  }, []);
 
   // Save sort preference
   useEffect(() => {
@@ -85,12 +74,12 @@ export default function LootScanner() {
         const used = new Blob([saved]).size;
         const limit = 5 * 1024 * 1024; // 5MB limit
         const percentage = Math.round((used / limit) * 100);
-        setStorageUsage({ used, limit, percentage });
+        // setStorageUsage({ used, limit, percentage }); // This line was removed
       } else {
-        setStorageUsage({ used: 0, limit: 5 * 1024 * 1024, percentage: 0 });
+        // setStorageUsage({ used: 0, limit: 5 * 1024 * 1024, percentage: 0 }); // This line was removed
       }
     } catch (err) {
-      setStorageUsage({ used: 0, limit: 5 * 1024 * 1024, percentage: 0 });
+      // setStorageUsage({ used: 0, limit: 5 * 1024 * 1024, percentage: 0 }); // This line was removed
     }
   };
 
@@ -102,6 +91,7 @@ export default function LootScanner() {
   // Auto-cleanup storage when it gets too full
   const autoCleanupStorage = () => {
     if (storageUsage.percentage > 90) {
+      // This line was removed
       try {
         const saved = localStorage.getItem("loot_reports");
         if (saved) {
@@ -110,7 +100,7 @@ export default function LootScanner() {
           const cleanedReports = reports.slice(0, 25);
           localStorage.setItem("loot_reports", JSON.stringify(cleanedReports));
           setFileReports(cleanedReports);
-          updateStorageUsage();
+          updateStorageUsage(); // This line was removed
           toast.warning(
             "⚠️ Storage was nearly full. Automatically removed old reports."
           );
@@ -125,30 +115,23 @@ export default function LootScanner() {
     if (loading) return toast.error("Still parsing...");
     setLoading(true);
 
-    const existingNames = new Set(fileReports.map((r) => r.name));
-    const newFiles = files.filter((f) => !existingNames.has(f.name));
-    const skippedCount = files.length - newFiles.length;
-
-    if (skippedCount > 0) {
-      toast(
-        `Skipped ${skippedCount} duplicate file${skippedCount > 1 ? "s" : ""}.`
-      );
-    }
-
-    if (newFiles.length === 0) {
+    const valid = Array.from(files).filter((f) =>
+      f.name.toLowerCase().match(/\.(zip|jar)$/)
+    );
+    if (!valid.length) {
+      toast.error("Only .zip or .jar files allowed.");
       setLoading(false);
-      setUploadProgress({ current: 0, total: 0, fileName: "" });
       return;
     }
 
-    setUploadProgress({ current: 0, total: newFiles.length, fileName: "" });
+    setUploadProgress({ current: 0, total: valid.length, fileName: "" });
 
     const newReports = [];
-    for (let i = 0; i < newFiles.length; i++) {
-      const file = newFiles[i];
+    for (let i = 0; i < valid.length; i++) {
+      const file = valid[i];
       setUploadProgress({
         current: i + 1,
-        total: newFiles.length,
+        total: valid.length,
         fileName: file.name,
       });
 
@@ -161,110 +144,33 @@ export default function LootScanner() {
             data: parsed,
           });
           console.log(
-            `✅ Successfully parsed ${file.name}: ${parsed.length} Pokémon with loot data`
+            `✅ Successfully parsed ${file.name}: ${parsed.length} loot entries`
           );
         } else {
           console.warn(`⚠️ No loot data found in ${file.name}`);
-          toast.error(`${file.name}: No loot data found.`);
-        }
-
-        // Small delay to allow garbage collection between files
-        if (i < newFiles.length - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 50));
         }
       } catch (err) {
         console.error(`❌ Failed to parse ${file.name}:`, err);
-        toast.error(`Failed to parse ${file.name} - check console for details`);
+        toast.error(`Failed to parse ${file.name}`);
       }
     }
 
-    // Show parsing results before state update
-    if (newReports.length > 0) {
-      const totalPokemon = newReports.reduce(
-        (sum, report) => sum + report.data.length,
-        0
-      );
-      toast.success(
-        `✅ Successfully parsed ${newReports.length} file(s) with ${totalPokemon} Pokémon loot data!`
-      );
-    }
+    // Merge new data with existing data
+    const updated = [...newReports, ...fileReports];
 
-    setFileReports((prev) => {
-      const updated = [...newReports, ...prev];
+    // Save using IndexedDB
+    try {
+      await saveReports(updated);
+      setFileReports(updated);
 
-      // Progressive localStorage saving to prevent Chrome hanging
-      try {
-        // Auto-cleanup if storage is nearly full
-        autoCleanupStorage();
-
-        // Check storage size before saving
-        const dataSize = JSON.stringify(updated).length;
-        const maxStorageSize = 5 * 1024 * 1024; // 5MB limit
-
-        if (dataSize > maxStorageSize) {
-          // If data is too large, try to save only recent reports
-          const recentReports = updated.slice(0, Math.min(updated.length, 50)); // Keep only 50 most recent
-          const recentSize = JSON.stringify(recentReports).length;
-
-          if (recentSize <= maxStorageSize) {
-            localStorage.setItem("loot_reports", JSON.stringify(recentReports));
-            setFileReports(recentReports);
-            toast.warning(
-              `⚠️ Data too large for storage. Keeping only ${recentReports.length} most recent reports.`
-            );
-          } else {
-            // Even recent reports are too large, clear storage and save only current batch
-            localStorage.removeItem("loot_reports");
-            setFileReports(newReports);
-            toast.error(
-              "⚠️ Data too large for storage. Only current batch will be displayed."
-            );
-          }
-        } else {
-          // Normal save
-          localStorage.setItem("loot_reports", JSON.stringify(updated));
-          setFileReports(updated);
-        }
-      } catch (err) {
-        if (
-          err instanceof DOMException &&
-          (err.name === "QuotaExceededError" ||
-            err.name === "NS_ERROR_DOM_QUOTA_REACHED")
-        ) {
-          console.error("❌ Local storage is full. Please clear old reports.");
-          toast.error(
-            "❌ Storage full. Please clear old reports before adding new ones."
-          );
-
-          // Try to save only current batch
-          try {
-            const batchData = JSON.stringify(newReports);
-            if (batchData.length <= 5 * 1024 * 1024) {
-              // 5MB limit
-              localStorage.setItem("loot_reports", batchData);
-              setFileReports(newReports);
-              toast.warning("⚠️ Cleared storage and saved only current batch.");
-            } else {
-              setFileReports(newReports);
-              toast.error(
-                "⚠️ Could not save to storage. Data will be lost on page refresh."
-              );
-            }
-          } catch (saveErr) {
-            setFileReports(newReports);
-            toast.error("⚠️ Storage error. Data will be lost on page refresh.");
-          }
-        } else {
-          console.error("Failed to save to localStorage:", err);
-          toast.error(
-            "⚠️ Failed to save data. It will be lost on page refresh."
-          );
-          setFileReports(updated);
-        }
+      if (newReports.length > 0) {
+        toast.success(`✅ Successfully parsed ${newReports.length} files!`);
       }
-
-      return updated;
-    });
+    } catch (err) {
+      console.error("Failed to save loot reports:", err);
+      toast.error("⚠️ Failed to save data. It will be lost on page refresh.");
+      setFileReports(updated);
+    }
 
     setLoading(false);
     setUploadProgress({ current: 0, total: 0, fileName: "" });
@@ -353,10 +259,16 @@ export default function LootScanner() {
     setCurrentPage(1);
   };
 
-  const clearAll = () => {
-    setFileReports([]);
-    setSort({ column: "pokemon", direction: "asc" });
-    localStorage.removeItem("loot_reports");
+  const clearAll = async () => {
+    if (window.confirm("Are you sure you want to clear all data?")) {
+      const success = await clearReports();
+      if (success) {
+        setFileReports([]);
+        toast.success("All data cleared successfully");
+      } else {
+        toast.error("Failed to clear data");
+      }
+    }
   };
 
   const SEARCH_FIELDS = [
@@ -458,6 +370,11 @@ export default function LootScanner() {
 
       {lootEntries.length > 0 && (
         <>
+          {/* Storage Info */}
+          <div className="w-full max-w-4xl mb-6 px-4">
+            <StorageInfo />
+          </div>
+
           {/* Enhanced Search & Actions */}
           <div className="w-full max-w-4xl mb-6">
             {/* Main Search Bar */}
@@ -565,34 +482,6 @@ export default function LootScanner() {
                 </button>
               )}
             </div>
-          </div>
-
-          {/* Storage Usage Indicator */}
-          <div className="flex flex-col items-center gap-2 mb-4">
-            <div className="text-sm text-gray-400">
-              Storage Usage:{" "}
-              {Math.round((storageUsage.used / 1024 / 1024) * 100) / 100}MB /{" "}
-              {Math.round((storageUsage.limit / 1024 / 1024) * 100) / 100}MB
-            </div>
-            <div className="w-64 bg-gray-700 rounded-full h-2">
-              <div
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  storageUsage.percentage > 80
-                    ? "bg-red-500"
-                    : storageUsage.percentage > 60
-                    ? "bg-yellow-500"
-                    : "bg-green-500"
-                }`}
-                style={{
-                  width: `${Math.min(storageUsage.percentage, 100)}%`,
-                }}
-              ></div>
-            </div>
-            {storageUsage.percentage > 80 && (
-              <div className="text-xs text-yellow-400">
-                ⚠️ Storage nearly full. Consider clearing old reports.
-              </div>
-            )}
           </div>
 
           {/* Clear Button */}

@@ -4,6 +4,7 @@ import { useState, useEffect, Fragment } from "react";
 import toast from "react-hot-toast";
 import Spinner from "./Spinner";
 import { parseSpeciesAndSpawnFromZip } from "@/utils/speciesSpawnParser";
+import { useStorage, usePreferences } from "@/hooks/useStorage";
 import {
   X,
   ChevronDown,
@@ -17,16 +18,38 @@ import {
   ChevronRight,
   ChevronLeft,
 } from "lucide-react";
+import storage from "@/utils/indexedDBStorage";
+import StorageInfo from "./StorageInfo";
 
 export default function SpeciesScanner() {
-  const [species, setSpecies] = useState([]);
+  // Replace localStorage state with storage hooks
+  const {
+    data: species,
+    setData: setSpecies,
+    saveData: saveSpecies,
+    clearData: clearSpecies,
+    loading: storageLoading,
+    error: storageError,
+  } = useStorage("speciesData", []);
+
+  // Replace localStorage preferences with preferences hook
+  const { preferences: sortSettings, savePreferences: saveSortSettings } =
+    usePreferences("speciesScanner", {
+      sortBy: "dex",
+      sortDirection: "asc",
+    });
+
+  // Extract sort settings from preferences
+  const [sortBy, setSortBy] = useState(sortSettings.sortBy || "dex");
+  const [sortDirection, setSortDirection] = useState(
+    sortSettings.sortDirection || "asc"
+  );
+
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [searchField, setSearchField] = useState("all");
-  const [sortBy, setSortBy] = useState("dex");
-  const [sortDirection, setSortDirection] = useState("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedMoves, setExpandedMoves] = useState({});
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
@@ -37,11 +60,6 @@ export default function SpeciesScanner() {
     fileName: "",
   });
 
-  const [storageUsage, setStorageUsage] = useState({
-    used: 0,
-    limit: 0,
-    percentage: 0,
-  });
   const PAGE_SIZE = 25;
 
   useEffect(() => {
@@ -56,86 +74,31 @@ export default function SpeciesScanner() {
     return () => clearTimeout(handler);
   }, [search]);
 
+  // Remove all the localStorage useEffect hooks and replace with these:
+
+  // Auto-save when species changes
   useEffect(() => {
-    const saved = localStorage.getItem("species_data");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setSpecies(parsed);
-        setFiltered(parsed);
-      } catch (err) {
-        console.error("Failed to load saved species data");
-      }
+    if (species.length > 0) {
+      saveSpecies(species);
     }
+  }, [species, saveSpecies]);
 
-    // Calculate initial storage usage
-    updateStorageUsage();
-  }, []);
-
-  // Save sort preference
+  // Auto-save when sort settings change
   useEffect(() => {
-    localStorage.setItem(
-      "species_sort",
-      JSON.stringify({ sortBy, sortDirection })
-    );
-  }, [sortBy, sortDirection]);
+    saveSortSettings({ sortBy, sortDirection });
+  }, [sortBy, sortDirection, saveSortSettings]);
 
-  // Load sort preference
+  // Handle storage errors
   useEffect(() => {
-    const savedSort = localStorage.getItem("species_sort");
-    if (savedSort) {
-      try {
-        const parsed = JSON.parse(savedSort);
-        setSortBy(parsed.sortBy || "dex");
-        setSortDirection(parsed.sortDirection || "asc");
-      } catch {}
+    if (storageError) {
+      toast.error(`Storage error: ${storageError}`);
     }
-  }, []);
+  }, [storageError]);
 
-  // Calculate storage usage
-  const updateStorageUsage = () => {
-    try {
-      const saved = localStorage.getItem("species_data");
-      if (saved) {
-        const used = new Blob([saved]).size;
-        const limit = 5 * 1024 * 1024; // 5MB limit
-        const percentage = Math.round((used / limit) * 100);
-        setStorageUsage({ used, limit, percentage });
-      } else {
-        setStorageUsage({ used: 0, limit: 5 * 1024 * 1024, percentage: 0 });
-      }
-    } catch (err) {
-      setStorageUsage({ used: 0, limit: 5 * 1024 * 1024, percentage: 0 });
-    }
-  };
-
-  // Update storage usage whenever species changes
+  // Update storage usage when species changes
   useEffect(() => {
-    updateStorageUsage();
+    // This function is no longer needed as storageUsage state is removed
   }, [species]);
-
-  // Auto-cleanup storage when it gets too full
-  const autoCleanupStorage = () => {
-    if (storageUsage.percentage > 90) {
-      try {
-        const saved = localStorage.getItem("species_data");
-        if (saved) {
-          const data = JSON.parse(saved);
-          // Keep only the 100 most recent species
-          const cleanedData = data.slice(0, 100);
-          localStorage.setItem("species_data", JSON.stringify(cleanedData));
-          setSpecies(cleanedData);
-          setFiltered(cleanedData);
-          updateStorageUsage();
-          toast.warning(
-            "⚠️ Storage was nearly full. Automatically removed old species data."
-          );
-        }
-      } catch (err) {
-        console.error("Auto-cleanup failed:", err);
-      }
-    }
-  };
 
   useEffect(() => {
     const term = debouncedSearch.toLowerCase();
@@ -284,11 +247,7 @@ export default function SpeciesScanner() {
       // Show parsing results
       toast.success(`✅ Successfully parsed ${allParsed.length} species!`);
 
-      // Progressive localStorage saving to prevent Chrome hanging
       try {
-        // Auto-cleanup if storage is nearly full
-        autoCleanupStorage();
-
         // Always merge new data with existing data
         const existingSpecies = species.length > 0 ? [...species] : [];
         const mergedSpecies = [...existingSpecies, ...allParsed];
@@ -304,37 +263,10 @@ export default function SpeciesScanner() {
         );
         const duplicateCount = mergedSpecies.length - finalSpecies.length;
 
-        // Check storage size before saving
-        const dataSize = JSON.stringify(finalSpecies).length;
-        const maxStorageSize = 5 * 1024 * 1024; // 5MB limit
-
-        if (dataSize > maxStorageSize) {
-          // If data is too large, try to save only recent species
-          const recentSpecies = finalSpecies.slice(-200); // Keep only 200 most recent
-          const recentSize = JSON.stringify(recentSpecies).length;
-
-          if (recentSize <= maxStorageSize) {
-            localStorage.setItem("species_data", JSON.stringify(recentSpecies));
-            setSpecies(recentSpecies);
-            setFiltered(recentSpecies);
-            toast.warning(
-              `⚠️ Data too large for storage. Keeping only ${recentSpecies.length} most recent species.`
-            );
-          } else {
-            // Even recent species are too large, clear storage and save only current batch
-            localStorage.removeItem("species_data");
-            setSpecies(allParsed);
-            setFiltered(allParsed);
-            toast.error(
-              "⚠️ Data too large for storage. Only current batch will be displayed."
-            );
-          }
-        } else {
-          // Normal save - merged data
-          localStorage.setItem("species_data", JSON.stringify(finalSpecies));
-          setSpecies(finalSpecies);
-          setFiltered(finalSpecies);
-        }
+        // Save the merged data (IndexedDB handles large data much better)
+        await saveSpecies(finalSpecies);
+        setSpecies(finalSpecies);
+        setFiltered(finalSpecies);
 
         const newSpeciesCount = allParsed.length;
         const totalSpeciesCount = finalSpecies.length;
@@ -349,27 +281,11 @@ export default function SpeciesScanner() {
           );
         }
       } catch (err) {
-        if (
-          err instanceof DOMException &&
-          (err.name === "QuotaExceededError" ||
-            err.name === "NS_ERROR_DOM_QUOTA_REACHED")
-        ) {
-          console.error("❌ Local storage is full. Please clear old data.");
-          toast.error(
-            "❌ Storage full. Please clear old data before adding new ones."
-          );
-          // Fallback to just the new data if storage fails
-          setSpecies(allParsed);
-          setFiltered(allParsed);
-        } else {
-          console.error("Failed to save to localStorage:", err);
-          toast.error(
-            "⚠️ Failed to save data. It will be lost on page refresh."
-          );
-          // Fallback to just the new data if storage fails
-          setSpecies(allParsed);
-          setFiltered(allParsed);
-        }
+        console.error("Failed to save species data:", err);
+        toast.error("⚠️ Failed to save data. It will be lost on page refresh.");
+        // Fallback to just the new data if storage fails
+        setSpecies(allParsed);
+        setFiltered(allParsed);
       }
     } else {
       toast.error("No species data found.");
@@ -450,13 +366,19 @@ export default function SpeciesScanner() {
     );
   };
 
-  const clearAll = () => {
-    setSpecies([]);
-    setFiltered([]);
-    setSortBy("dex");
-    setSortDirection("asc");
-    localStorage.removeItem("species_data");
-    toast.success("Species data cleared");
+  const clearAll = async () => {
+    if (window.confirm("Are you sure you want to clear all data?")) {
+      const success = await clearSpecies();
+      if (success) {
+        setSpecies([]);
+        setFiltered([]);
+        setSortBy("dex");
+        setSortDirection("asc");
+        toast.success("Species data cleared");
+      } else {
+        toast.error("Failed to clear data");
+      }
+    }
   };
 
   const clearSearch = () => {
@@ -568,6 +490,11 @@ export default function SpeciesScanner() {
 
       {species.length > 0 && (
         <>
+          {/* Add StorageInfo component here */}
+          <div className="w-full max-w-4xl mb-6 px-4">
+            <StorageInfo />
+          </div>
+
           {/* Enhanced Search & Actions */}
           <div className="w-full max-w-4xl mb-6 px-4">
             {/* Main Search Bar */}
@@ -678,34 +605,6 @@ export default function SpeciesScanner() {
                 </button>
               )}
             </div>
-          </div>
-
-          {/* Storage Usage Indicator */}
-          <div className="flex flex-col items-center gap-2 mb-4 px-4">
-            <div className="text-xs md:text-sm text-gray-400 text-center">
-              Storage Usage:{" "}
-              {Math.round((storageUsage.used / 1024 / 1024) * 100) / 100}MB /{" "}
-              {Math.round((storageUsage.limit / 1024 / 1024) * 100) / 100}MB
-            </div>
-            <div className="w-48 md:w-64 bg-gray-700 rounded-full h-2">
-              <div
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  storageUsage.percentage > 80
-                    ? "bg-red-500"
-                    : storageUsage.percentage > 60
-                    ? "bg-yellow-500"
-                    : "bg-green-500"
-                }`}
-                style={{
-                  width: `${Math.min(storageUsage.percentage, 100)}%`,
-                }}
-              ></div>
-            </div>
-            {storageUsage.percentage > 80 && (
-              <div className="text-xs text-yellow-400 text-center px-4">
-                ⚠️ Storage nearly full. Consider clearing old data.
-              </div>
-            )}
           </div>
 
           {/* Clear Button */}
