@@ -2616,34 +2616,19 @@ function SingleImage({ src, alt, credit }) {
 function OriginalTitansImageSlider() {
   const images = [
     {
-      src: "/guides/regice-structure.png",
+      src: "/guides/regice.png",
       alt: "Regice Structure in Snowy Badlands",
-      credit: "COBBLEVERSE",
+      credit: "maru",
     },
     {
-      src: "/guides/regirock-structure.png",
-      alt: "Regirock Structure in Lush Desert",
-      credit: "COBBLEVERSE",
+      src: "/guides/regirock.png",
+      alt: "Regirock Structure in Lush Dsert",
+      credit: "maru",
     },
     {
-      src: "/guides/registeel-structure.png",
+      src: "/guides/registeel.png",
       alt: "Registeel Structure in Alpine Highlands",
-      credit: "COBBLEVERSE",
-    },
-    {
-      src: "/guides/cryo-relic.png",
-      alt: "Cryo Relic crafting",
-      credit: "COBBLEVERSE",
-    },
-    {
-      src: "/guides/pebble-relic.png",
-      alt: "Pebble Relic crafting",
-      credit: "COBBLEVERSE",
-    },
-    {
-      src: "/guides/metal-relic.png",
-      alt: "Metal Relic crafting",
-      credit: "COBBLEVERSE",
+      credit: "maru",
     },
   ];
   return <ImageCarousel images={images} />;
@@ -2652,19 +2637,19 @@ function OriginalTitansImageSlider() {
 function NewTitansImageSlider() {
   const images = [
     {
-      src: "/guides/regidrago-cave.png",
+      src: "/guides/regidrago.png",
       alt: "Regidrago Cave Structure",
-      credit: "COBBLEVERSE",
+      credit: "maru",
     },
     {
-      src: "/guides/regieleki-cave.png",
+      src: "/guides/regieleki.png",
       alt: "Regieleki Cave Structure",
-      credit: "COBBLEVERSE",
+      credit: "maru",
     },
     {
-      src: "/guides/snowpoint-temple.png",
+      src: "/guides/regigigas.png",
       alt: "Snowpoint Temple Structure",
-      credit: "COBBLEVERSE",
+      credit: "maru",
     },
   ];
   return <ImageCarousel images={images} />;
