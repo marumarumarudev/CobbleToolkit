@@ -1045,6 +1045,232 @@ function HowToGetPokemonPageInner() {
         </div>
       ),
     },
+    legendary_titans: {
+      title: "Legendary Titans",
+      series: "Mixed",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(34,211,238,0.7)" }}
+          >
+            Regice
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Must be in <b>Hoenn Series</b>.
+            </li>
+            <li>
+              Structure generates in <b>Snowy Badlands</b>.
+            </li>
+            <li>
+              Player needs <b>Ice Ore</b> (found in Frozen Peaks, Frozen Ocean,
+              Ice Spikes) to turn into <b>Cryo Relic</b> to summon Regice.
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:legendary/regice</code>
+          </p>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-amber-600 to-orange-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(217,119,6,0.7)" }}
+          >
+            Regirock
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Must be in <b>Hoenn Series</b>.
+            </li>
+            <li>
+              Structure generates in <b>Lush Desert</b>.
+            </li>
+            <li>
+              Player needs <b>Rock Ore</b> (found in Badlands, Wooded Badlands,
+              Eroded Badlands) to turn into <b>Pebble Relic</b> to summon
+              Regirock.
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:legendary/regirock</code>
+          </p>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-gray-400 to-gray-600 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(107,114,128,0.7)" }}
+          >
+            Registeel
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Must be in <b>Hoenn Series</b>.
+            </li>
+            <li>
+              Structure generates in <b>Alpine Highlands</b>.
+            </li>
+            <li>
+              Player needs <b>Steel Ore</b> (found in Deep Dark) to turn into{" "}
+              <b>Metal Relic</b> to summon Registeel.
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:legendary/registeel</code>
+          </p>
+
+          <OriginalTitansImageSlider />
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(239,68,68,0.7)" }}
+          >
+            Regidrago
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>No series required.</li>
+            <li>
+              Structure generates in underground <b>Caves</b>.
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use{" "}
+            <code>/locate structure cobbleverse:legendary/regidrago_cave</code>
+          </p>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(234,179,8,0.7)" }}
+          >
+            Regieleki
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>No series required.</li>
+            <li>
+              Structure generates in <b>Desert Biomes</b>.
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use{" "}
+            <code>/locate structure cobbleverse:legendary/regieleki_cave</code>
+          </p>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-purple-500 to-indigo-600 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(147,51,234,0.7)" }}
+          >
+            Regigigas
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>No series required.</li>
+            <li>
+              Structure generates in <b>Snowy Taiga Biomes</b>.
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use{" "}
+            <code>
+              /locate structure cobbleverse:legendary/snowpoint_temple
+            </code>
+          </p>
+
+          <NewTitansImageSlider />
+        </div>
+      ),
+    },
+    eon_duo: {
+      title: "Eon Duo",
+      series: "Hoenn Series",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-blue-600 to-cyan-400 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(37,99,235,0.7)" }}
+          >
+            Latios
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Must be in <b>Hoenn Series</b>.
+            </li>
+            <li>
+              Structure generates in <b>Deep Lukewarm Ocean</b> biome (around y
+              200).
+            </li>
+            <li>
+              Player needs <b>Sapphire Dew</b> to summon Latios.
+            </li>
+            <li>
+              <b>Sapphire Dew</b> is dropped by beating the{" "}
+              <b>Hoenn Champion Rocco</b>.
+            </li>
+          </ul>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-pink-500 to-red-400 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(236,72,153,0.7)" }}
+          >
+            Latias
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Must be in <b>Hoenn Series</b>.
+            </li>
+            <li>
+              Structure generates in <b>Deep Lukewarm Ocean</b> biome (around y
+              200).
+            </li>
+            <li>
+              Player needs <b>Ruby Dew</b> to summon Latias.
+            </li>
+            <li>
+              <b>Ruby Dew</b> is dropped by beating the{" "}
+              <b>Hoenn Champion Rocco</b>.
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:secret_garden</code>
+          </p>
+
+          <EonDuoImageSlider />
+        </div>
+      ),
+    },
+    jirachi: {
+      title: "Jirachi",
+      series: "Hoenn Series",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-yellow-400 to-pink-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(251,191,36,0.7)" }}
+          >
+            Jirachi
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Must be in <b>Hoenn Series</b>.
+            </li>
+            <li>
+              Structure generates in <b>Blooming Plateau</b>.
+            </li>
+            <li>
+              To summon Jirachi, you need to find the <b>Melodic Tape</b>.
+            </li>
+            <li>
+              The <b>Melodic Tape</b> is found inside a barrel at the top of the
+              structure.
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:mythical/jirachi</code>
+          </p>
+
+          <JirachiImageSlider />
+        </div>
+      ),
+    },
   };
 
   React.useEffect(() => {
@@ -1129,6 +1355,15 @@ function HowToGetPokemonPageInner() {
                   kyogre: "weather_trio",
                   groudon: "weather_trio",
                   rayquaza: "weather_trio",
+                  regice: "legendary_titans",
+                  regirock: "legendary_titans",
+                  registeel: "legendary_titans",
+                  regidrago: "legendary_titans",
+                  regieleki: "legendary_titans",
+                  regigigas: "legendary_titans",
+                  latios: "eon_duo",
+                  latias: "eon_duo",
+                  jirachi: "jirachi",
                 };
 
                 // Find matching entry
@@ -1241,6 +1476,15 @@ function HowToGetPokemonPageInner() {
                     kyogre: "weather_trio",
                     groudon: "weather_trio",
                     rayquaza: "weather_trio",
+                    regice: "legendary_titans",
+                    regirock: "legendary_titans",
+                    registeel: "legendary_titans",
+                    regidrago: "legendary_titans",
+                    regieleki: "legendary_titans",
+                    regigigas: "legendary_titans",
+                    latios: "eon_duo",
+                    latias: "eon_duo",
+                    jirachi: "jirachi",
                   };
 
                   // Check if the search query matches a mapped Pokémon with fuzzy matching
@@ -1375,6 +1619,15 @@ function HowToGetPokemonPageInner() {
                       kyogre: "weather_trio",
                       groudon: "weather_trio",
                       rayquaza: "weather_trio",
+                      regice: "legendary_titans",
+                      regirock: "legendary_titans",
+                      registeel: "legendary_titans",
+                      regidrago: "legendary_titans",
+                      regieleki: "legendary_titans",
+                      regigigas: "legendary_titans",
+                      latios: "eon_duo",
+                      latias: "eon_duo",
+                      jirachi: "jirachi",
                     };
 
                     // Check if the search query matches a mapped Pokémon with fuzzy matching
@@ -2095,18 +2348,28 @@ function RiverGuardiansImageSlider() {
   return <ImageCarousel images={images} />;
 }
 
-function AuraTrioImageSlider() {
+function XerneasImage() {
+  return (
+    <SingleImage
+      src="/guides/xerneas.png"
+      alt="Xerneas in Floral Biomes"
+      credit="maru"
+    />
+  );
+}
+
+function YveltalImage() {
+  return (
+    <SingleImage
+      src="/guides/yveltal.png"
+      alt="Yveltal in Dark Forests"
+      credit="maru"
+    />
+  );
+}
+
+function ZygardeImageSlider() {
   const images = [
-    {
-      src: "/guides/xerneas.png",
-      alt: "Xerneas in Floral Biomes",
-      credit: "maru",
-    },
-    {
-      src: "/guides/yveltal.png",
-      alt: "Yveltal in Dark Forests",
-      credit: "maru",
-    },
     {
       src: "/guides/mossy-oubliette-ruins.png",
       alt: "Ruins",
@@ -2350,57 +2613,95 @@ function SingleImage({ src, alt, credit }) {
   );
 }
 
-function XerneasImage() {
-  return (
-    <SingleImage
-      src="/guides/xerneas.png"
-      alt="Xerneas in Floral Biomes"
-      credit="maru"
-    />
-  );
-}
-
-function YveltalImage() {
-  return (
-    <SingleImage
-      src="/guides/yveltal.png"
-      alt="Yveltal in Dark Forests"
-      credit="maru"
-    />
-  );
-}
-
-function ZygardeImageSlider() {
+function OriginalTitansImageSlider() {
   const images = [
     {
-      src: "/guides/mossy-oubliette-ruins.png",
-      alt: "Ruins",
-      credit: "Cobblemon",
+      src: "/guides/regice-structure.png",
+      alt: "Regice Structure in Snowy Badlands",
+      credit: "COBBLEVERSE",
     },
     {
-      src: "/guides/crumbling-arch-ruins.png",
-      alt: "Ruins",
-      credit: "Cobblemon",
+      src: "/guides/regirock-structure.png",
+      alt: "Regirock Structure in Lush Desert",
+      credit: "COBBLEVERSE",
     },
     {
-      src: "/guides/archaeological-site.png",
-      alt: "Dig Site",
-      credit: "Mega Showdown",
+      src: "/guides/registeel-structure.png",
+      alt: "Registeel Structure in Alpine Highlands",
+      credit: "COBBLEVERSE",
     },
     {
-      src: "/guides/observatory.png",
-      alt: "Observatory",
-      credit: "Mega Showdown",
+      src: "/guides/cryo-relic.png",
+      alt: "Cryo Relic crafting",
+      credit: "COBBLEVERSE",
     },
     {
-      src: "/guides/wishing-weald.png",
-      alt: "Wishing Weald",
-      credit: "Mega Showdown",
+      src: "/guides/pebble-relic.png",
+      alt: "Pebble Relic crafting",
+      credit: "COBBLEVERSE",
     },
     {
-      src: "/guides/reassembly-unit.png",
-      alt: "Reassembly Unit",
-      credit: "Mega Showdown",
+      src: "/guides/metal-relic.png",
+      alt: "Metal Relic crafting",
+      credit: "COBBLEVERSE",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function NewTitansImageSlider() {
+  const images = [
+    {
+      src: "/guides/regidrago-cave.png",
+      alt: "Regidrago Cave Structure",
+      credit: "COBBLEVERSE",
+    },
+    {
+      src: "/guides/regieleki-cave.png",
+      alt: "Regieleki Cave Structure",
+      credit: "COBBLEVERSE",
+    },
+    {
+      src: "/guides/snowpoint-temple.png",
+      alt: "Snowpoint Temple Structure",
+      credit: "COBBLEVERSE",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function EonDuoImageSlider() {
+  const images = [
+    {
+      src: "/guides/secret-garden.png",
+      alt: "Secret Garden Structure in Deep Lukewarm Ocean",
+      credit: "maru",
+    },
+    {
+      src: "/guides/latias-shrine.png",
+      alt: "Latias summoning with Ruby Dew",
+      credit: "maru",
+    },
+    {
+      src: "/guides/latios-shrine.png",
+      alt: "Latios summoning with Sapphire Dew",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function JirachiImageSlider() {
+  const images = [
+    {
+      src: "/guides/jirachi.png",
+      alt: "Jirachi Structure in Blooming Plateau",
+      credit: "maru",
+    },
+    {
+      src: "/guides/melodic-tape.png",
+      alt: "Melodic Tape in barrel at top of structure",
+      credit: "maru",
     },
   ];
   return <ImageCarousel images={images} />;
