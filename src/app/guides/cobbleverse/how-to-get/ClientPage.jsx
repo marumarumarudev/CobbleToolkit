@@ -1305,7 +1305,13 @@ function HowToGetPokemonPageInner() {
       levelCap: "Any",
       content: (
         <div className="space-y-6">
-          <h4 className="font-bold text-lg">Cresselia</h4>
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-pink-400 to-indigo-400 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(167,139,250,0.7)" }}
+          >
+            Cresselia
+          </h4>
+
           <ul className="list-disc list-inside space-y-1">
             <li>
               <b>Cresselia</b> spawns in <b>Cherry Groves</b> during{" "}
@@ -1313,7 +1319,13 @@ function HowToGetPokemonPageInner() {
             </li>
           </ul>
 
-          <h4 className="font-bold text-lg">Darkrai</h4>
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-gray-200 to-purple-700 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(126,34,206,0.7)" }}
+          >
+            Darkrai
+          </h4>
+
           <ul className="list-disc list-inside space-y-1">
             <li>
               <b>Darkrai</b> spawns in <b>Dark Forests</b> during{" "}
@@ -1446,6 +1458,254 @@ function HowToGetPokemonPageInner() {
         </div>
       ),
     },
+    swords_of_justice: {
+      title: "Swords of Justice",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-blue-400 to-gray-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(59,130,246,0.7)" }}
+          >
+            Cobalion
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Cobalion</b> spawns in <b>Windswept Forest</b> biome.
+            </li>
+          </ul>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(249,115,22,0.7)" }}
+          >
+            Terrakion
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Terrakion</b> spawns in <b>Savanna</b> biomes.
+            </li>
+          </ul>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(34,197,94,0.7)" }}
+          >
+            Virizion
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Virizion</b> spawns in <b>all Forest</b> biomes.
+            </li>
+          </ul>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(244,114,182,0.7)" }}
+          >
+            Keldeo
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Keldeo</b> spawns in <b>Sakura Grove</b> and{" "}
+              <b>Sakura Valley</b>.
+            </li>
+          </ul>
+
+          <SwordsOfJusticeImageSlider />
+        </div>
+      ),
+    },
+    forces_of_nature: {
+      title: "Forces of Nature",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(34,211,238,0.7)" }}
+          >
+            Tornadus
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Tornadus</b> spawns in <b>All Ocean Biomes</b>. <b>3x</b> when{" "}
+              <b>Raining</b>.
+            </li>
+          </ul>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(250,204,21,0.7)" }}
+          >
+            Thundurus
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Thundurus</b> spawns in <b>Mountain</b> biomes. <b>3x</b> when{" "}
+              <b>Thundering</b>.
+            </li>
+          </ul>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-green-600 to-yellow-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(34,197,94,0.7)" }}
+          >
+            Landorus
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Landorus</b> spawns in <b>Badlands</b> biomes.{" "}
+              <b>Clear weather</b>.
+            </li>
+          </ul>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(236,72,153,0.7)" }}
+          >
+            Enamorus
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Enamorus</b> spawns in <b>Mountain</b> biomes. <b>4x</b> when{" "}
+              <b>Thundering</b>.
+            </li>
+          </ul>
+
+          <h4 className="font-medium text-lg">Therian Formes</h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              You can reveal their <b>Therian Formes</b> by using a{" "}
+              <b>Reveal Glass</b>.
+            </li>
+            <li>
+              <b>Reveal Glass</b> is obtainable by brushing suspicious sands in{" "}
+              <b>Desert Pyramids</b> with a <b>7.69%</b> drop rate.
+            </li>
+          </ul>
+
+          <ForcesOfNatureImageSlider />
+        </div>
+      ),
+    },
+    meloetta: {
+      title: "Meloetta",
+      series: "Mythical",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Meloetta</b> spawns in <b>Sunflower Plains</b>.
+            </li>
+          </ul>
+
+          <h4 className="font-medium">Form Change</h4>
+          <p>
+            To change Meloetta's form, use the move <b>Relic Song</b> during a
+            battle. After using this move, Meloetta switches from{" "}
+            <b>Aria Forme</b> to <b>Pirouette Forme</b>. It reverts back to{" "}
+            <b>Aria Forme</b> when the battle ends or if it is switched out.
+          </p>
+
+          <MeloettaImage />
+        </div>
+      ),
+    },
+    genesect: {
+      title: "Genesect",
+      series: "Mythical",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Genesect</b> spawns in <b>Dripstone Caves</b>.
+            </li>
+          </ul>
+
+          <h4 className="font-medium">Genesect Drives</h4>
+          <p>
+            Genesect Drives change the type of <b>Techno Blast</b> used by
+            Genesect. There are four Drives: <b>Burn</b> (Fire), <b>Chill</b>
+            (Ice), <b>Douse</b> (Water), and <b>Shock</b> (Electric).
+          </p>
+          <p>
+            To change Genesect's Techno Blast type, craft its Drives or obtain
+            them from <b>Ominous Trial Vaults</b> with a <b>5.26%</b> drop
+            chance.
+          </p>
+
+          <GenesectImage />
+        </div>
+      ),
+    },
+    diancie: {
+      title: "Diancie",
+      series: "Mythical",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Diancie</b> spawns near <b>Diamond Ores</b> (not Deepslate
+              Diamond Ore) and <b>Amethyst Blocks</b> in <b>Lush Caves</b>.
+            </li>
+          </ul>
+
+          <DiancieImage />
+        </div>
+      ),
+    },
+    hoopa: {
+      title: "Hoopa",
+      series: "Mythical",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Hoopa</b> spawns in the <b>End dimension</b>.
+            </li>
+          </ul>
+
+          <h4 className="font-medium">Unbound Form</h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              To reveal Hoopa's <b>Unbound</b> Form, <b>interact</b> (not hold)
+              with the <b>Prison Bottle</b>.
+            </li>
+            <li>
+              <b>Prison Bottle</b> can be found by brushing suspicious sands in
+              <b> Desert Wells</b> with an <b>11.11%</b> drop chance.
+            </li>
+          </ul>
+
+          <HoopaImageSlider />
+        </div>
+      ),
+    },
+    volcanion: {
+      title: "Volcanion",
+      series: "Mythical",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Volcanion</b> spawns in <b>Meadow</b>, <b>Grove</b>,
+              <b> Snowy Slopes</b>, <b> Jagged Peaks</b>, <b> Frozen Peaks</b>,
+              and <b> Stony Peaks</b>.
+            </li>
+          </ul>
+
+          <VolcanionImage />
+        </div>
+      ),
+    },
   };
 
   React.useEffect(() => {
@@ -1510,6 +1770,19 @@ function HowToGetPokemonPageInner() {
                   heatran: "heatran",
                   shaymin: "shaymin",
                   arceus: "arceus",
+                  cobalion: "swords_of_justice",
+                  terrakion: "swords_of_justice",
+                  virizion: "swords_of_justice",
+                  keldeo: "swords_of_justice",
+                  tornadus: "forces_of_nature",
+                  thundurus: "forces_of_nature",
+                  landorus: "forces_of_nature",
+                  enamorus: "forces_of_nature",
+                  meloetta: "meloetta",
+                  genesect: "genesect",
+                  diancie: "diancie",
+                  hoopa: "hoopa",
+                  volcanion: "volcanion",
                   palkia: "creation_trio",
                   dialga: "creation_trio",
                   giratina: "creation_trio",
@@ -1643,6 +1916,19 @@ function HowToGetPokemonPageInner() {
                     heatran: "heatran",
                     shaymin: "shaymin",
                     arceus: "arceus",
+                    cobalion: "swords_of_justice",
+                    terrakion: "swords_of_justice",
+                    virizion: "swords_of_justice",
+                    keldeo: "swords_of_justice",
+                    tornadus: "forces_of_nature",
+                    thundurus: "forces_of_nature",
+                    landorus: "forces_of_nature",
+                    enamorus: "forces_of_nature",
+                    meloetta: "meloetta",
+                    genesect: "genesect",
+                    diancie: "diancie",
+                    hoopa: "hoopa",
+                    volcanion: "volcanion",
                     palkia: "creation_trio",
                     dialga: "creation_trio",
                     giratina: "creation_trio",
@@ -1798,6 +2084,19 @@ function HowToGetPokemonPageInner() {
                       heatran: "heatran",
                       shaymin: "shaymin",
                       arceus: "arceus",
+                      cobalion: "swords_of_justice",
+                      terrakion: "swords_of_justice",
+                      virizion: "swords_of_justice",
+                      keldeo: "swords_of_justice",
+                      tornadus: "forces_of_nature",
+                      thundurus: "forces_of_nature",
+                      landorus: "forces_of_nature",
+                      enamorus: "forces_of_nature",
+                      meloetta: "meloetta",
+                      genesect: "genesect",
+                      diancie: "diancie",
+                      hoopa: "hoopa",
+                      volcanion: "volcanion",
                       palkia: "creation_trio",
                       dialga: "creation_trio",
                       giratina: "creation_trio",
@@ -2991,6 +3290,119 @@ function VictiniImage() {
     <SingleImage
       src="/guides/victini.png"
       alt="Victini in Mushroom Island"
+      credit="maru"
+    />
+  );
+}
+
+function SwordsOfJusticeImageSlider() {
+  const images = [
+    {
+      src: "/guides/cobalion.png",
+      alt: "Cobalion in Windswept Forest",
+      credit: "maru",
+    },
+    {
+      src: "/guides/terrakion.png",
+      alt: "Terrakion in Savanna biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/virizion.png",
+      alt: "Virizion in Forest biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/keldeo.png",
+      alt: "Keldeo in Sakura Grove/Valley",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function ForcesOfNatureImageSlider() {
+  const images = [
+    {
+      src: "/guides/tornadus.png",
+      alt: "Tornadus in Ocean biomes (3x when raining)",
+      credit: "maru",
+    },
+    {
+      src: "/guides/thundurus-enamorus.png",
+      alt: "Thundurus in Mountain biomes (3x when thundering)",
+      credit: "maru",
+    },
+    {
+      src: "/guides/landorus.png",
+      alt: "Landorus in Badlands biomes (clear weather)",
+      credit: "maru",
+    },
+    {
+      src: "/guides/reveal-glass.png",
+      alt: "Reveal Glass from Desert Pyramids (7.69% drop rate)",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function MeloettaImage() {
+  return (
+    <SingleImage
+      src="/guides/meloetta.png"
+      alt="Meloetta in Sunflower Plains"
+      credit="maru"
+    />
+  );
+}
+
+function GenesectImage() {
+  return (
+    <SingleImage
+      src="/guides/genesect.png"
+      alt="Genesect in Dripstone Caves"
+      credit="maru"
+    />
+  );
+}
+
+function DiancieImage() {
+  return (
+    <SingleImage
+      src="/guides/diancie.png"
+      alt="Diancie near Diamond Ore and Amethyst Blocks in Lush Caves"
+      credit="maru"
+    />
+  );
+}
+
+function HoopaImageSlider() {
+  const images = [
+    {
+      src: "/guides/hoopa.png",
+      alt: "Hoopa in The End",
+      credit: "maru",
+    },
+    {
+      src: "/guides/hoopa-unbound.png",
+      alt: "Hoopa in The End",
+      credit: "maru",
+    },
+    {
+      src: "/guides/prison-bottle.png",
+      alt: "Prison Bottle from Desert Wells (11.11% drop)",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function VolcanionImage() {
+  return (
+    <SingleImage
+      src="/guides/volcanion.png"
+      alt="Volcanion biomes: Meadow, Grove, Snowy Slopes, Jagged/Frozen/Stony Peaks"
       credit="maru"
     />
   );
