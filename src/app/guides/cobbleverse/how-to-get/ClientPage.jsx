@@ -1550,6 +1550,7 @@ function HowToGetPokemonPageInner() {
                   spectrier: "calyrex",
                   glastrier: "calyrex",
                   celebi: "celebi",
+                  victini: "victini",
                 };
 
                 // Find matching entry
@@ -1682,6 +1683,7 @@ function HowToGetPokemonPageInner() {
                     spectrier: "calyrex",
                     glastrier: "calyrex",
                     celebi: "celebi",
+                    victini: "victini",
                   };
 
                   // Check if the search query matches a mapped Pokémon with fuzzy matching
@@ -1836,6 +1838,7 @@ function HowToGetPokemonPageInner() {
                       spectrier: "calyrex",
                       glastrier: "calyrex",
                       celebi: "celebi",
+                      victini: "victini",
                     };
 
                     // Check if the search query matches a mapped Pokémon with fuzzy matching
@@ -2986,7 +2989,7 @@ function ArceusImageSlider() {
 function VictiniImage() {
   return (
     <SingleImage
-      src="/guides/Victini.png"
+      src="/guides/victini.png"
       alt="Victini in Mushroom Island"
       credit="maru"
     />
