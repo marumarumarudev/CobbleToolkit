@@ -4,7 +4,15 @@ import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { parseTrainersFromZip } from "@/utils/trainerParser";
 import Spinner from "./Spinner";
-import { X, ChevronDown, ChevronUp, Mars, Venus } from "lucide-react";
+import {
+  X,
+  ChevronDown,
+  ChevronUp,
+  Mars,
+  Venus,
+  Search,
+  Filter,
+} from "lucide-react";
 import Image from "next/image";
 import { useStorage, usePreferences } from "@/hooks/useStorage";
 import StorageInfo from "./StorageInfo";
@@ -13,6 +21,9 @@ export default function TrainerScanner() {
   const [fileReports, setFileReports] = useState([]);
   const [loading, setLoading] = useState(false);
   const [globalSearch, setGlobalSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [searchField, setSearchField] = useState("all");
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [sortBy, setSortBy] = useState("name");
   const [filterFormat, setFilterFormat] = useState("all");
   const [filterTeamSize, setFilterTeamSize] = useState("all");
@@ -43,6 +54,12 @@ export default function TrainerScanner() {
   useEffect(() => {
     document.title = "Trainer Scanner | CobbleToolkit";
   }, []);
+
+  // Debounce search
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(globalSearch), 300);
+    return () => clearTimeout(t);
+  }, [globalSearch]);
 
   // Handle storage errors
   useEffect(() => {
@@ -123,18 +140,69 @@ export default function TrainerScanner() {
     }))
   );
 
-  const searchTerm = globalSearch.toLowerCase();
+  // Available formats for filter
+  const availableFormats = Array.from(
+    new Set(allTrainers.map((t) => t.effectiveBattleFormat).filter(Boolean))
+  ).sort();
+
+  // Search fields
+  const SEARCH_FIELDS = [
+    { value: "all", label: "All Fields" },
+    { value: "name", label: "Name" },
+    { value: "identity", label: "Identity" },
+    { value: "species", label: "Species" },
+    { value: "moves", label: "Moves" },
+    { value: "heldItem", label: "Held Items" },
+    { value: "aiType", label: "AI Type" },
+    { value: "format", label: "Format" },
+    { value: "sourceFile", label: "Source File" },
+  ];
+
+  const searchTerm = debouncedSearch.toLowerCase();
   const filtered = allTrainers.filter((trainer) => {
-    const matchesSearch = [
-      trainer.name,
-      trainer.identity,
-      trainer.effectiveBattleFormat,
-      trainer.ai.type,
-      ...trainer.team.map((p) => p.species),
-      ...trainer.team.flatMap((p) => p.moveset),
-      ...trainer.team.flatMap((p) => p.heldItem),
-      trainer.sourceFile,
-    ].some((val) => val?.toLowerCase().includes(searchTerm));
+    const matchesByField = () => {
+      if (!searchTerm) return true;
+      switch (searchField) {
+        case "name":
+          return trainer.name?.toLowerCase().includes(searchTerm);
+        case "identity":
+          return trainer.identity?.toLowerCase().includes(searchTerm);
+        case "species":
+          return trainer.team.some((p) =>
+            p.species?.toLowerCase().includes(searchTerm)
+          );
+        case "moves":
+          return trainer.team.some((p) =>
+            p.moveset?.some((m) => m?.toLowerCase().includes(searchTerm))
+          );
+        case "heldItem":
+          return trainer.team.some((p) =>
+            (Array.isArray(p.heldItem) ? p.heldItem : [p.heldItem])
+              .filter(Boolean)
+              .some((i) => i?.toLowerCase().includes(searchTerm))
+          );
+        case "aiType":
+          return trainer.ai.type?.toLowerCase().includes(searchTerm);
+        case "format":
+          return trainer.effectiveBattleFormat
+            ?.toLowerCase()
+            .includes(searchTerm);
+        case "sourceFile":
+          return trainer.sourceFile?.toLowerCase().includes(searchTerm);
+        case "all":
+        default:
+          return [
+            trainer.name,
+            trainer.identity,
+            trainer.effectiveBattleFormat,
+            trainer.ai.type,
+            ...trainer.team.map((p) => p.species),
+            ...trainer.team.flatMap((p) => p.moveset),
+            ...trainer.team.flatMap((p) => p.heldItem),
+            trainer.sourceFile,
+          ].some((val) => val?.toLowerCase().includes(searchTerm));
+      }
+    };
 
     const matchesFormat =
       filterFormat === "all" || trainer.effectiveBattleFormat === filterFormat;
@@ -146,7 +214,7 @@ export default function TrainerScanner() {
         trainer.teamSize <= 5) ||
       (filterTeamSize === "large" && trainer.teamSize > 5);
 
-    return matchesSearch && matchesFormat && matchesTeamSize;
+    return matchesByField() && matchesFormat && matchesTeamSize;
   });
 
   const sorted = [...filtered].sort((a, b) => {
@@ -169,7 +237,7 @@ export default function TrainerScanner() {
   // Reset page when search/filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [globalSearch, filterFormat, filterTeamSize]);
+  }, [debouncedSearch, searchField, filterFormat, filterTeamSize]);
 
   const paginatedTrainers = sorted.slice(
     (currentPage - 1) * PAGE_SIZE,
@@ -1384,48 +1452,155 @@ export default function TrainerScanner() {
             <StorageInfo />
           </div>
 
-          {/* Search & Filters */}
-          <div className="flex flex-col md:flex-row gap-2 items-center mb-6 w-full max-w-4xl">
-            <input
-              type="text"
-              placeholder="🔍 Search trainers, Pokémon, moves..."
-              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full"
-              value={globalSearch}
-              onChange={(e) => setGlobalSearch(e.target.value)}
-            />
+          {/* Search & Advanced Filters */}
+          <div className="w-full max-w-4xl mb-6 px-4">
+            {/* Main Search Bar */}
+            <div className="flex flex-col lg:flex-row gap-3 mb-4">
+              <div className="relative flex-1">
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={18}
+                />
+                <input
+                  type="text"
+                  placeholder="🔍 Search trainers, Pokémon, moves..."
+                  className="w-full pl-10 pr-4 py-3 bg-[#2c2c2c] border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  value={globalSearch}
+                  onChange={(e) => setGlobalSearch(e.target.value)}
+                />
+                {globalSearch && (
+                  <button
+                    onClick={() => setGlobalSearch("")}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
 
-            <select
-              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full md:w-1/4"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-            >
-              <option value="name">Sort by Name</option>
-              <option value="level">Sort by Level</option>
-              <option value="teamSize">Sort by Team Size</option>
-              <option value="format">Sort by Format</option>
-              <option value="source">Sort by Source</option>
-            </select>
+              <button
+                onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+                className="flex items-center gap-2 px-4 py-3 bg-[#3a3a3a] hover:bg-[#4a4a4a] rounded-lg transition-colors duration-200 lg:w-auto w-full justify-center"
+              >
+                <Filter size={18} />
+                <span className="hidden sm:inline">Advanced</span>
+              </button>
+            </div>
 
-            <select
-              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full md:w-1/4"
-              value={filterFormat}
-              onChange={(e) => setFilterFormat(e.target.value)}
-            >
-              <option value="all">All Formats</option>
-              <option value="GEN_9_SINGLES">Gen 9 Singles</option>
-              <option value="GEN_9_DOUBLES">Gen 9 Doubles</option>
-            </select>
+            {/* Advanced Search Options */}
+            {showAdvancedSearch && (
+              <div className="bg-[#2a2a2a] rounded-lg p-4 border border-gray-700/50 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Search Field
+                    </label>
+                    <select
+                      value={searchField}
+                      onChange={(e) => setSearchField(e.target.value)}
+                      className="w-full bg-[#3a3a3a] border border-gray-600 text-white p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      {SEARCH_FIELDS.map((f) => (
+                        <option key={f.value} value={f.value}>
+                          {f.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-            <select
-              className="bg-[#2c2c2c] border border-gray-600 text-white p-2 rounded w-full md:w-1/4"
-              value={filterTeamSize}
-              onChange={(e) => setFilterTeamSize(e.target.value)}
-            >
-              <option value="all">All Team Sizes</option>
-              <option value="small">Small (1-3)</option>
-              <option value="medium">Medium (4-5)</option>
-              <option value="large">Large (6+)</option>
-            </select>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Format Filter
+                    </label>
+                    <select
+                      value={filterFormat}
+                      onChange={(e) => setFilterFormat(e.target.value)}
+                      className="w-full bg-[#3a3a3a] border border-gray-600 text-white p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="all">All Formats</option>
+                      {availableFormats.map((fmt) => (
+                        <option key={fmt} value={fmt}>
+                          {fmt}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Team Size Filter
+                    </label>
+                    <select
+                      className="w-full bg-[#3a3a3a] border border-gray-600 text-white p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      value={filterTeamSize}
+                      onChange={(e) => setFilterTeamSize(e.target.value)}
+                    >
+                      <option value="all">All Team Sizes</option>
+                      <option value="small">Small (1-3)</option>
+                      <option value="medium">Medium (4-5)</option>
+                      <option value="large">Large (6+)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Sort By
+                    </label>
+                    <select
+                      className="w-full bg-[#3a3a3a] border border-gray-600 text-white p-2 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                    >
+                      <option value="name">Sort by Name</option>
+                      <option value="level">Sort by Level</option>
+                      <option value="teamSize">Sort by Team Size</option>
+                      <option value="format">Sort by Format</option>
+                      <option value="source">Sort by Source</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-end">
+                    <button
+                      onClick={() => {
+                        setGlobalSearch("");
+                        setSearchField("all");
+                        setFilterFormat("all");
+                        setFilterTeamSize("all");
+                      }}
+                      className="w-full px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded transition-colors duration-200"
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Search Stats */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-400">
+              <div className="flex items-center gap-2">
+                <span>Results: {filtered.length}</span>
+                <span className="text-gray-600">|</span>
+                <span>Files: {fileReports.length}</span>
+                {debouncedSearch && (
+                  <>
+                    <span className="text-gray-600">|</span>
+                    <span className="text-blue-400">
+                      Matches: &quot;{debouncedSearch}&quot;
+                    </span>
+                  </>
+                )}
+              </div>
+
+              {debouncedSearch && (
+                <button
+                  onClick={() => setGlobalSearch("")}
+                  className="text-blue-400 hover:text-blue-300 transition-colors text-sm"
+                >
+                  Clear Search
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Clear Button */}
@@ -1440,17 +1615,6 @@ export default function TrainerScanner() {
             >
               <X size={16} /> Clear All
             </button>
-          </div>
-
-          {/* Results Summary */}
-          <div className="text-center mb-4 text-gray-300">
-            Showing {paginatedTrainers.length} of {sorted.length} trainers
-            {globalSearch && ` matching "${globalSearch}"`}
-            {persistenceDisabled && (
-              <div className="text-xs text-red-400 mt-1">
-                Local persistence disabled due to storage limits.
-              </div>
-            )}
           </div>
 
           {/* Trainer List */}

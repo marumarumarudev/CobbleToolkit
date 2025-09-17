@@ -177,120 +177,6 @@ export default function UploadArea() {
     // Weight multiplier (plural) summary
     { key: "weightMultipliers", label: "Weight Multipliers", sortable: false },
 
-    // Weight multiplier fields
-    {
-      key: "weightMultiplierMultiplier",
-      label: "Weight Multiplier",
-      sortable: true,
-    },
-    { key: "weightMultiplierBiomes", label: "WM-Biomes", sortable: true },
-    {
-      key: "weightMultiplierDimensions",
-      label: "WM-Dimensions",
-      sortable: true,
-    },
-    {
-      key: "weightMultiplierStructures",
-      label: "WM-Structures",
-      sortable: true,
-    },
-    {
-      key: "weightMultiplierNeededNearbyBlocks",
-      label: "WM-Nearby Blocks",
-      sortable: true,
-    },
-    {
-      key: "weightMultiplierNeededBaseBlocks",
-      label: "WM-Base Blocks",
-      sortable: true,
-    },
-    { key: "weightMultiplierLabels", label: "WM-Labels", sortable: true },
-    {
-      key: "weightMultiplierCanSeeSky",
-      label: "WM-Can See Sky",
-      sortable: true,
-    },
-    { key: "weightMultiplierIsRaining", label: "WM-Raining", sortable: true },
-    {
-      key: "weightMultiplierIsThundering",
-      label: "WM-Thundering",
-      sortable: true,
-    },
-    {
-      key: "weightMultiplierIsSlimeChunk",
-      label: "WM-Slime Chunk",
-      sortable: true,
-    },
-    {
-      key: "weightMultiplierFluidIsSource",
-      label: "WM-Fluid Is Source",
-      sortable: true,
-    },
-    {
-      key: "weightMultiplierMoonPhase",
-      label: "WM-Moon Phase",
-      sortable: true,
-    },
-    { key: "weightMultiplierMinX", label: "WM-Min X", sortable: true },
-    { key: "weightMultiplierMinY", label: "WM-Min Y", sortable: true },
-    { key: "weightMultiplierMinZ", label: "WM-Min Z", sortable: true },
-    { key: "weightMultiplierMaxX", label: "WM-Max X", sortable: true },
-    { key: "weightMultiplierMaxY", label: "WM-Max Y", sortable: true },
-    { key: "weightMultiplierMaxZ", label: "WM-Max Z", sortable: true },
-    { key: "weightMultiplierMinLight", label: "WM-Min Light", sortable: true },
-    { key: "weightMultiplierMaxLight", label: "WM-Max Light", sortable: true },
-    {
-      key: "weightMultiplierMinSkyLight",
-      label: "WM-Min Sky Light",
-      sortable: true,
-    },
-    {
-      key: "weightMultiplierMaxSkyLight",
-      label: "WM-Max Sky Light",
-      sortable: true,
-    },
-    { key: "weightMultiplierMinWidth", label: "WM-Min Width", sortable: true },
-    { key: "weightMultiplierMaxWidth", label: "WM-Max Width", sortable: true },
-    {
-      key: "weightMultiplierMinHeight",
-      label: "WM-Min Height",
-      sortable: true,
-    },
-    {
-      key: "weightMultiplierMaxHeight",
-      label: "WM-Max Height",
-      sortable: true,
-    },
-    { key: "weightMultiplierMinDepth", label: "WM-Min Depth", sortable: true },
-    { key: "weightMultiplierMaxDepth", label: "WM-Max Depth", sortable: true },
-    {
-      key: "weightMultiplierMinLureLevel",
-      label: "WM-Min Lure Level",
-      sortable: true,
-    },
-    {
-      key: "weightMultiplierMaxLureLevel",
-      label: "WM-Max Lure Level",
-      sortable: true,
-    },
-    {
-      key: "weightMultiplierTimeRange",
-      label: "WM-Time Range",
-      sortable: true,
-    },
-    {
-      key: "weightMultiplierFluidBlock",
-      label: "WM-Fluid Block",
-      sortable: true,
-    },
-    { key: "weightMultiplierBobber", label: "WM-Bobber", sortable: true },
-    { key: "weightMultiplierBait", label: "WM-Bait", sortable: true },
-    {
-      key: "weightMultiplierLabelMode",
-      label: "WM-Label Mode",
-      sortable: true,
-    },
-
     { key: "sourceFile", label: "Source File", sortable: true },
   ];
 
@@ -407,42 +293,6 @@ export default function UploadArea() {
         r.antiBobber,
         r.antiBait,
         r.antiLabelMode,
-        r.weightMultiplierMultiplier,
-        r.weightMultiplierBiomes,
-        r.weightMultiplierDimensions,
-        r.weightMultiplierStructures,
-        r.weightMultiplierNeededNearbyBlocks,
-        r.weightMultiplierNeededBaseBlocks,
-        r.weightMultiplierLabels,
-        r.weightMultiplierCanSeeSky?.toString(),
-        r.weightMultiplierIsRaining?.toString(),
-        r.weightMultiplierIsThundering?.toString(),
-        r.weightMultiplierIsSlimeChunk?.toString(),
-        r.weightMultiplierFluidIsSource?.toString(),
-        r.weightMultiplierMoonPhase,
-        r.weightMultiplierMinX,
-        r.weightMultiplierMinY,
-        r.weightMultiplierMinZ,
-        r.weightMultiplierMaxX,
-        r.weightMultiplierMaxY,
-        r.weightMultiplierMaxZ,
-        r.weightMultiplierMinLight,
-        r.weightMultiplierMaxLight,
-        r.weightMultiplierMinSkyLight,
-        r.weightMultiplierMaxSkyLight,
-        r.weightMultiplierMinWidth,
-        r.weightMultiplierMaxWidth,
-        r.weightMultiplierMinHeight,
-        r.weightMultiplierMaxHeight,
-        r.weightMultiplierMinDepth,
-        r.weightMultiplierMaxDepth,
-        r.weightMultiplierMinLureLevel,
-        r.weightMultiplierMaxLureLevel,
-        r.weightMultiplierTimeRange,
-        r.weightMultiplierFluidBlock,
-        r.weightMultiplierBobber,
-        r.weightMultiplierBait,
-        r.weightMultiplierLabelMode,
         r.sourceFile,
         // Serialize plural weight multipliers for search
         Array.isArray(r.weightMultipliers)
@@ -747,84 +597,8 @@ export default function UploadArea() {
     { value: "antiBobber", label: "Anti-Bobber" },
     { value: "antiBait", label: "Anti-Bait" },
     { value: "antiLabelMode", label: "Anti-Label Mode" },
-    { value: "weightMultiplierMultiplier", label: "Weight Multiplier" },
-    { value: "weightMultiplierBiomes", label: "WM-Biomes" },
-    { value: "weightMultiplierDimensions", label: "WM-Dimensions" },
-    { value: "weightMultiplierStructures", label: "WM-Structures" },
-    { value: "weightMultiplierNeededNearbyBlocks", label: "WM-Nearby Blocks" },
-    { value: "weightMultiplierNeededBaseBlocks", label: "WM-Base Blocks" },
-    { value: "weightMultiplierLabels", label: "WM-Labels" },
-    { value: "weightMultiplierCanSeeSky", label: "WM-Can See Sky" },
-    { value: "weightMultiplierIsRaining", label: "WM-Raining" },
-    { value: "weightMultiplierIsThundering", label: "WM-Thundering" },
-    { value: "weightMultiplierIsSlimeChunk", label: "WM-Slime Chunk" },
-    { value: "weightMultiplierFluidIsSource", label: "WM-Fluid Is Source" },
-    { value: "weightMultiplierMoonPhase", label: "WM-Moon Phase" },
-    { value: "weightMultiplierMinX", label: "WM-Min X" },
-    { value: "weightMultiplierMinY", label: "WM-Min Y" },
-    { value: "weightMultiplierMinZ", label: "WM-Min Z" },
-    { value: "weightMultiplierMaxX", label: "WM-Max X" },
-    { value: "weightMultiplierMaxY", label: "WM-Max Y" },
-    { value: "weightMultiplierMaxZ", label: "WM-Max Z" },
-    { value: "weightMultiplierMinLight", label: "WM-Min Light" },
-    { value: "weightMultiplierMaxLight", label: "WM-Max Light" },
-    { value: "weightMultiplierMinSkyLight", label: "WM-Min Sky Light" },
-    { value: "weightMultiplierMaxSkyLight", label: "WM-Max Sky Light" },
-    { value: "weightMultiplierMinWidth", label: "WM-Min Width" },
-    { value: "weightMultiplierMaxWidth", label: "WM-Max Width" },
-    { value: "weightMultiplierMinHeight", label: "WM-Min Height" },
-    { value: "weightMultiplierMaxHeight", label: "WM-Max Height" },
-    { value: "weightMultiplierMinDepth", label: "WM-Min Depth" },
-    { value: "weightMultiplierMaxDepth", label: "WM-Max Depth" },
-    { value: "weightMultiplierMinLureLevel", label: "WM-Min Lure Level" },
-    { value: "weightMultiplierMaxLureLevel", label: "WM-Max Lure Level" },
-    { value: "weightMultiplierTimeRange", label: "WM-Time Range" },
-    { value: "weightMultiplierFluidBlock", label: "WM-Fluid Block" },
-    { value: "weightMultiplierBobber", label: "WM-Bobber" },
-    { value: "weightMultiplierBait", label: "WM-Bait" },
-    { value: "weightMultiplierLabelMode", label: "WM-Label Mode" },
     { value: "weightMultipliers", label: "Weight Multipliers" },
   ];
-
-  // Memory cleanup for Chrome
-  const cleanupMemory = () => {
-    if (
-      navigator.userAgent.includes("Chrome") ||
-      navigator.userAgent.includes("Chromium")
-    ) {
-      // Force garbage collection if available
-      if (typeof window !== "undefined" && window.gc) {
-        try {
-          window.gc();
-        } catch (e) {
-          // gc() might not be available
-        }
-      }
-
-      // Clear any cached data
-      if ("caches" in window) {
-        try {
-          caches
-            .keys()
-            .then((names) =>
-              Promise.allSettled(names.map((name) => caches.delete(name)))
-            )
-            .catch(() => {});
-        } catch (e) {
-          // ignore
-        }
-      }
-
-      // Clear console to free memory
-      if (console.clear) {
-        try {
-          console.clear();
-        } catch (e) {
-          // console.clear might not be available
-        }
-      }
-    }
-  };
 
   return (
     <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-8 flex flex-col items-center">
@@ -1050,18 +824,6 @@ export default function UploadArea() {
             >
               <X size={16} /> Clear All
             </button>
-          </div>
-
-          {/* Results Summary */}
-          <div className="text-center mb-4 text-gray-300">
-            Showing {filteredData.length} spawn entries from{" "}
-            {fileReports.filter((r) => !r.error).length} files
-            {searchTerm && (
-              <span className="text-blue-400">
-                {" "}
-                • {filteredData.length} matches for &ldquo;{searchTerm}&rdquo;
-              </span>
-            )}
           </div>
         </>
       )}

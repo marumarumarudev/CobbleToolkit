@@ -36,7 +36,7 @@ function HowToGetPokemonPageInner() {
               <ul className="list-disc list-inside ml-6">
                 <li>
                   <b>Ancient Origin Ball</b> — obtained by defeating{" "}
-                  <b>Kanto Champion Blue</b>.
+                  <b>Kanto Champion Blue</b> & <b>Johto Champion Lance</b>.
                 </li>
                 <li>
                   <b>Ancient DNA</b> — dropped once by{" "}
@@ -527,6 +527,39 @@ function HowToGetPokemonPageInner() {
             <code>/locate structure cobbleverse:bell_tower</code>
           </p>
           <HoohImageSlider />
+        </div>
+      ),
+    },
+    celebi: {
+      title: "Celebi",
+      series: "Johto Series",
+      levelCap: "100+",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Must be in <b>Johto Series</b> with <b>level cap 100+</b> (defeat
+              the whole Johto League).
+            </li>
+            <li>
+              <b>Celebi Shrine</b> generates in <b>Taiga biomes</b>.
+            </li>
+            <li>
+              To summon Celebi, you need to defeat <b>Rival Red</b> which is
+              standing around the shrine.
+            </li>
+            <li>
+              Once defeated, Red drops <b>GS Ball</b>.
+            </li>
+            <li>
+              Press the button while holding the <b>GS Ball</b> near the shrine
+              to summon Celebi.
+            </li>
+          </ul>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:celebi_shrine</code>
+          </p>
+          <CelebiImageSlider />
         </div>
       ),
     },
@@ -1133,8 +1166,7 @@ function HowToGetPokemonPageInner() {
             </li>
           </ul>
           <p className="text-xs opacity-50 italic">
-            Use{" "}
-            <code>/locate structure cobbleverse:legendary/regidrago_cave</code>
+            Use <code>/locate structure legendary:regidrago_cave</code>
           </p>
 
           <h4
@@ -1150,8 +1182,7 @@ function HowToGetPokemonPageInner() {
             </li>
           </ul>
           <p className="text-xs opacity-50 italic">
-            Use{" "}
-            <code>/locate structure cobbleverse:legendary/regieleki_cave</code>
+            Use <code>/locate structure legendary:regieleki_cave</code>
           </p>
 
           <h4
@@ -1167,10 +1198,7 @@ function HowToGetPokemonPageInner() {
             </li>
           </ul>
           <p className="text-xs opacity-50 italic">
-            Use{" "}
-            <code>
-              /locate structure cobbleverse:legendary/snowpoint_temple
-            </code>
+            Use <code>/locate structure legendary:snowpoint_temple</code>
           </p>
 
           <NewTitansImageSlider />
@@ -1364,6 +1392,10 @@ function HowToGetPokemonPageInner() {
                   latios: "eon_duo",
                   latias: "eon_duo",
                   jirachi: "jirachi",
+                  calyrex: "calyrex",
+                  spectrier: "calyrex",
+                  glastrier: "calyrex",
+                  celebi: "celebi",
                 };
 
                 // Find matching entry
@@ -1485,6 +1517,10 @@ function HowToGetPokemonPageInner() {
                     latios: "eon_duo",
                     latias: "eon_duo",
                     jirachi: "jirachi",
+                    calyrex: "calyrex",
+                    spectrier: "calyrex",
+                    glastrier: "calyrex",
+                    celebi: "celebi",
                   };
 
                   // Check if the search query matches a mapped Pokémon with fuzzy matching
@@ -1628,6 +1664,10 @@ function HowToGetPokemonPageInner() {
                       latios: "eon_duo",
                       latias: "eon_duo",
                       jirachi: "jirachi",
+                      calyrex: "calyrex",
+                      spectrier: "calyrex",
+                      glastrier: "calyrex",
+                      celebi: "celebi",
                     };
 
                     // Check if the search query matches a mapped Pokémon with fuzzy matching
@@ -2686,6 +2726,27 @@ function JirachiImageSlider() {
     {
       src: "/guides/melodic-tape.png",
       alt: "Melodic Tape in barrel at top of structure",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function CelebiImageSlider() {
+  const images = [
+    {
+      src: "/guides/celebi-shrine.png",
+      alt: "Celebi Shrine in Taiga biome",
+      credit: "maru",
+    },
+    {
+      src: "/guides/rival-red.png",
+      alt: "Rival Red at Celebi Shrine",
+      credit: "maru",
+    },
+    {
+      src: "/guides/celebi-summon.png",
+      alt: "Celebi being summoned at Celebi Shrine",
       credit: "maru",
     },
   ];
