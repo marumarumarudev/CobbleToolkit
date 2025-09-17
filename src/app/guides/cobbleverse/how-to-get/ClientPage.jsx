@@ -1299,6 +1299,153 @@ function HowToGetPokemonPageInner() {
         </div>
       ),
     },
+    lunar_duo: {
+      title: "Lunar Duo",
+      series: "Legendary/Mythical",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <h4 className="font-bold text-lg">Cresselia</h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Cresselia</b> spawns in <b>Cherry Groves</b> during{" "}
+              <b>nighttime</b>.
+            </li>
+          </ul>
+
+          <h4 className="font-bold text-lg">Darkrai</h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Darkrai</b> spawns in <b>Dark Forests</b> during{" "}
+              <b>nighttime</b>.
+            </li>
+          </ul>
+
+          <LunarDuoImageSlider />
+        </div>
+      ),
+    },
+    sea_guardians: {
+      title: "Sea Guardians",
+      series: "Mythical",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Manaphy</b> and <b>Phione</b> spawn in <b>any Ocean biomes</b>.
+            </li>
+          </ul>
+
+          <SeaGuardiansImage />
+        </div>
+      ),
+    },
+    heatran: {
+      title: "Heatran",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Heatran</b> spawns in <b>Nether Wastes</b>.
+            </li>
+          </ul>
+
+          <HeatranImage />
+        </div>
+      ),
+    },
+    shaymin: {
+      title: "Shaymin",
+      series: "Mythical",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Shaymin</b> spawns in <b>Floral biomes</b> during{" "}
+              <b>daytime</b> with <b>clear weather</b>.
+            </li>
+            <li>
+              <span className="text-red-300">Note:</span> <b>Gracidea Flower</b>{" "}
+              (Sky Form change) is unobtainable as of writing.
+            </li>
+          </ul>
+
+          <ShayminImage />
+        </div>
+      ),
+    },
+    arceus: {
+      title: "Arceus",
+      series: "Mythical",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Arceus</b> can be found in the <b>End dimension</b>.
+            </li>
+            <li>
+              <b>Arceus Plates</b> can only be obtained through{" "}
+              <b>Ominous Trial Vaults</b> in <b>Trial Chambers</b>.
+            </li>
+            <li>
+              Arceus Plates drop rates: <b>0.45%</b> in Vaults.{" "}
+              <b>Silvally Memory Discs</b> also drop at <b>0.99%</b>.
+            </li>
+            <li>
+              <b>Ominous Keys</b> can be found in <b>Rocket Tower</b> or as a{" "}
+              <b>5%</b> drop by a <b>Klefki</b>.
+            </li>
+          </ul>
+
+          <ArceusImageSlider />
+        </div>
+      ),
+    },
+    victini: {
+      title: "Victini",
+      series: "Mythical",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Victini</b> spawns in{" "}
+              <b>
+                Mushroom Fields, Alpha Islands, Alpha Islands Winter, Mirage
+                Isles, Warped Mesa
+              </b>{" "}
+              biomes.
+            </li>
+            <li>
+              It has a <b>3x spawn multiplier</b> in the{" "}
+              <span className="text-yellow-300">morning</span>.
+            </li>
+            <li>
+              If you <b>Shoulder Mount Victini</b>, it grants you{" "}
+              <span className="text-green-300">Luck V</span> buff.
+            </li>
+            <li>
+              One of the <b>best Pokémon</b> to put in a <b>Pasture Block</b> to
+              farm valuable drops:
+              <ul className="list-disc list-inside ml-6">
+                <li>Nether Stars</li>
+                <li>Rare Candies</li>
+                <li>Fire Gems</li>
+                <li>Ability Capsules</li>
+                <li>Ability Patch</li>
+              </ul>
+            </li>
+          </ul>
+
+          <VictiniImage />
+        </div>
+      ),
+    },
   };
 
   React.useEffect(() => {
@@ -1356,6 +1503,13 @@ function HowToGetPokemonPageInner() {
               if (e.key === "Enter") {
                 const query = searchQuery.toLowerCase();
                 const pokemonMappings = {
+                  cresselia: "lunar_duo",
+                  darkrai: "lunar_duo",
+                  manaphy: "sea_guardians",
+                  phione: "sea_guardians",
+                  heatran: "heatran",
+                  shaymin: "shaymin",
+                  arceus: "arceus",
                   palkia: "creation_trio",
                   dialga: "creation_trio",
                   giratina: "creation_trio",
@@ -1481,6 +1635,13 @@ function HowToGetPokemonPageInner() {
 
                   // Map specific Pokémon names to their entries with fuzzy matching
                   const pokemonMappings = {
+                    cresselia: "lunar_duo",
+                    darkrai: "lunar_duo",
+                    manaphy: "sea_guardians",
+                    phione: "sea_guardians",
+                    heatran: "heatran",
+                    shaymin: "shaymin",
+                    arceus: "arceus",
                     palkia: "creation_trio",
                     dialga: "creation_trio",
                     giratina: "creation_trio",
@@ -1628,6 +1789,13 @@ function HowToGetPokemonPageInner() {
 
                     // Map specific Pokémon names to their entries with fuzzy matching
                     const pokemonMappings = {
+                      cresselia: "lunar_duo",
+                      darkrai: "lunar_duo",
+                      manaphy: "sea_guardians",
+                      phione: "sea_guardians",
+                      heatran: "heatran",
+                      shaymin: "shaymin",
+                      arceus: "arceus",
                       palkia: "creation_trio",
                       dialga: "creation_trio",
                       giratina: "creation_trio",
@@ -2388,6 +2556,22 @@ function RiverGuardiansImageSlider() {
   return <ImageCarousel images={images} />;
 }
 
+function LunarDuoImageSlider() {
+  const images = [
+    {
+      src: "/guides/cresselia.png",
+      alt: "Cresselia in Cherry Groves (night)",
+      credit: "maru",
+    },
+    {
+      src: "/guides/darkrai.png",
+      alt: "Darkrai in Dark Forests (night)",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
 function XerneasImage() {
   return (
     <SingleImage
@@ -2494,6 +2678,16 @@ function CombatTrioImageSlider() {
     },
   ];
   return <ImageCarousel images={images} />;
+}
+
+function SeaGuardiansImage() {
+  return (
+    <SingleImage
+      src="/guides/sea-guardians.png"
+      alt="Sea Guardians"
+      credit="maru"
+    />
+  );
 }
 
 /* === TABS CAROUSEL COMPONENT === */
@@ -2751,4 +2945,50 @@ function CelebiImageSlider() {
     },
   ];
   return <ImageCarousel images={images} />;
+}
+
+function HeatranImage() {
+  return (
+    <SingleImage
+      src="/guides/heatran.png"
+      alt="Heatran spawns in Nether Wastes"
+      credit="maru"
+    />
+  );
+}
+
+function ShayminImage() {
+  return (
+    <SingleImage
+      src="/guides/shaymin.png"
+      alt="Shaymin in Floral biomes (day, clear)"
+      credit="maru"
+    />
+  );
+}
+
+function ArceusImageSlider() {
+  const images = [
+    {
+      src: "/guides/arceus.png",
+      alt: "Arceus in The End",
+      credit: "maru",
+    },
+    {
+      src: "/guides/ominous-vault.png",
+      alt: "Ominous Trial Vaults",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function VictiniImage() {
+  return (
+    <SingleImage
+      src="/guides/Victini.png"
+      alt="Victini in Mushroom Island"
+      credit="maru"
+    />
+  );
 }
