@@ -1460,7 +1460,7 @@ function HowToGetPokemonPageInner() {
     },
     swords_of_justice: {
       title: "Swords of Justice",
-      series: "Legendary",
+      series: "Legendary/Mythical",
       levelCap: "Any",
       content: (
         <div className="space-y-6">
@@ -1706,6 +1706,464 @@ function HowToGetPokemonPageInner() {
         </div>
       ),
     },
+    guardian_deities: {
+      title: "Guardian Deities",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-yellow-400 to-amber-600 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(245,158,11,0.7)" }}
+          >
+            Tapu Koko
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Tapu Koko</b> spawns in <b>Savanna</b> and <b>Jungle</b>{" "}
+              biomes.
+            </li>
+          </ul>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-pink-400 to-fuchsia-600 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(217,70,239,0.7)" }}
+          >
+            Tapu Lele
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Tapu Lele</b> spawns in <b>Floral</b> and <b>Beach</b> biomes.
+            </li>
+          </ul>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(16,185,129,0.7)" }}
+          >
+            Tapu Bulu
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Tapu Bulu</b> spawns in <b>Rivers</b> and <b>Jungle</b> biomes.
+            </li>
+          </ul>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(59,130,246,0.7)" }}
+          >
+            Tapu Fini
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Tapu Fini</b> spawns in <b>Rivers</b> and <b>Beach</b> biomes.
+            </li>
+          </ul>
+
+          <GuardianDeitiesImageSlider />
+        </div>
+      ),
+    },
+    light_trio: {
+      title: "Light Trio",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Cosmog</b> and <b>Cosmoem</b> spawn in the <b>End dimension</b>
+              .
+            </li>
+            <li>
+              <b>Cosmoem</b> evolves at <b>level 53</b>:
+              <ul className="list-disc list-inside ml-6">
+                <li>
+                  <b>Daytime</b> → evolves into <b>Solgaleo</b>.
+                </li>
+                <li>
+                  <b>Nighttime</b> → evolves into <b>Lunala</b>.
+                </li>
+              </ul>
+            </li>
+            <li>
+              <b>Solgaleo</b> spawns in <b>Savanna</b> biomes and in the{" "}
+              <b>End</b>.
+            </li>
+            <li>
+              <b>Lunala</b> spawns in <b>Dark Forests</b> and in the <b>End</b>.
+            </li>
+            <li>
+              <b>Necrozma</b> spawns in the <b>End</b>.
+            </li>
+          </ul>
+
+          <h4 className="font-medium">Fusion</h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              Fuse <b>Lunala/Solgaleo</b> with <b>Necrozma</b> by using or
+              interacting a<b> N-Solarizer</b>/<b> Lunarizer</b> on{" "}
+              <b>Solgaleo/Lunala</b> and on <b>Necrozma</b>.
+            </li>
+            <li>You can unfuse them using the same item.</li>
+            <li>
+              You can also find an already fused Necrozma in <b>Dusk</b> and{" "}
+              <b>Dawn Towers</b> in the <b>End</b>, but you can't unfuse those.
+            </li>
+          </ul>
+
+          <h4 className="font-medium">Ultra Necrozma</h4>
+          <p>
+            To get <b>Ultra Necrozma</b>, use <b>Ultranecrozium Z</b> to trigger
+            Ultra Burst. This upgrades <b>Photon Geyser</b> into the Z-Move{" "}
+            <i>Light That Burns the Sky</i>. While holding Ultranecrozium Z,
+            Necrozma cannot use other Z-Moves.
+          </p>
+          <p className="text-xs opacity-50 italic">
+            Use <code>/locate structure cobbleverse:dusk_tower</code> or{" "}
+            <code>/locate structure cobbleverse:dawn_tower</code>
+          </p>
+
+          <LightTrioImageSlider />
+        </div>
+      ),
+    },
+    ultra_beasts: {
+      title: "Ultra Beasts",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Nihilego</b> spawns in the <b>End Dimension</b>.
+            </li>
+            <li>
+              <b>Poipole</b> spawns around Necrozma's <b>Dawn/Dusk Tower</b> in
+              the <b>End</b>.
+            </li>
+            <li>
+              <b>Naganadel</b> spawns in the <b>End Dimension</b> near{" "}
+              <b>Purpur Blocks</b>.
+            </li>
+            <li>
+              <b>Pheromosa</b> spawns in the <b>End Dimension</b> and also in{" "}
+              <b>Blooming Valley</b>, <b>Steppe</b>, <b>White Cliffs</b>{" "}
+              (Terralith biomes).
+            </li>
+            <li>
+              <b>Guzzlord</b> spawns in <b>End Barrens</b> and <b>Deep Dark</b>.
+            </li>
+            <li>
+              <b>Stakataka</b> spawns in <b>Deep Dark</b>.
+            </li>
+            <li>
+              <b>Buzzwole</b> spawns in <b>Swamp Biomes</b>.
+            </li>
+            <li>
+              <b>Xurkitree</b> spawns in <b>Mangrove Swamps</b>.
+            </li>
+            <li>
+              <b>Celesteela</b> spawns in <b>Desert biomes</b>.
+            </li>
+            <li>
+              <b>Kartana</b> spawns in <b>Bamboo Jungles</b>.
+            </li>
+            <li>
+              <b>Blacephalon</b> spawns in <b>Dark Forests</b>.
+            </li>
+          </ul>
+
+          <UltraBeastsImageSlider />
+        </div>
+      ),
+    },
+    gen7_mythicals: {
+      title: "Gen 7 Mythicals",
+      series: "Mythical",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(250,204,21,0.7)" }}
+          >
+            Zeraora
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Zeraora</b> spawns in <b>Badlands</b> and <b>all Forest</b>{" "}
+              biomes.
+            </li>
+          </ul>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-pink-400 to-purple-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(244,114,182,0.7)" }}
+          >
+            Magearna
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Magearna</b> spawns in <b>all Taiga</b> biomes.
+            </li>
+          </ul>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(147,51,234,0.7)" }}
+          >
+            Marshadow
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Marshadow</b> spawns in <b>Deep Dark</b>.
+            </li>
+          </ul>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-gray-400 to-gray-600 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(107,114,128,0.7)" }}
+          >
+            Meltan
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Meltan</b> spawns in <b>All Overworld</b> biomes near{" "}
+              <b>Iron Blocks</b> or in <b>Beach</b> biome.
+            </li>
+            <li>
+              <b>Meltan</b> evolves into <b>Melmetal</b> at <b>level 70</b>{" "}
+              while holding an <b>Anvil</b>.
+            </li>
+          </ul>
+
+          <Gen7MythicalsImageSlider />
+        </div>
+      ),
+    },
+    paradox_ancient: {
+      title: "Paradox: Ancient",
+      series: "Paradox",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Great Tusk</b>: Savanna, Savanna Plateau, Badlands, Desert.
+            </li>
+            <li>
+              <b>Scream Tail</b>: Cherry Grove, Flower Forest, Meadow, Sunflower
+              Plains, Floral biomes while raining.
+            </li>
+            <li>
+              <b>Brute Bonnet</b>: Jungle biomes.
+            </li>
+            <li>
+              <b>Flutter Mane</b>: Dark Forests and Deep Dark.
+            </li>
+            <li>
+              <b>Slither Wing</b>: Nether Crimson Forests (Rare) or Jungles
+              (Ultra-Rare).
+            </li>
+            <li>
+              <b>Sandy Shocks</b>: Desert, Badlands, Savanna.
+            </li>
+            <li>
+              <b>Roaring Moon</b>: Meadow, Grove, Snowy Slopes, Jagged Peaks,
+              Frozen Peaks, Stony Peaks (night).
+            </li>
+            <li>
+              <b>Koraidon</b>: Beach biome.
+            </li>
+            <li>
+              <b>Walking Wake</b>: Meadow, Grove, Snowy Slopes, Jagged Peaks,
+              Frozen Peaks, Stony Peaks (raining).
+            </li>
+            <li>
+              <b>Gouging Fire</b>: Basalt Deltas.
+            </li>
+            <li>
+              <b>Raging Bolt</b>: Savanna, Savanna Plateau, Badlands, Desert.
+              1.5x when raining. 3x when Thundering.
+            </li>
+          </ul>
+
+          <ParadoxAncientImageSlider />
+        </div>
+      ),
+    },
+    paradox_future: {
+      title: "Paradox: Future",
+      series: "Paradox",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Iron Treads</b>: Badlands, Desert, Savanna, Meadow, Grove,
+              Snowy Slopes, Jagged Peaks, Frozen Peaks, Stony Peaks.
+            </li>
+            <li>
+              <b>Iron Bundle</b>: Frozen Peaks, Ice Spikes, Snowy Plains, Frozen
+              River, Jagged Peaks, Snowy Beach, Snowy Slopes.
+            </li>
+            <li>
+              <b>Iron Hands</b>: Desert (night).
+            </li>
+            <li>
+              <b>Iron Jugulis</b>: Meadow, Grove, Snowy Slopes, Jagged Peaks,
+              Frozen Peaks, Stony Peaks (night).
+            </li>
+            <li>
+              <b>Iron Moth</b>: All Hills biomes (daytime).
+            </li>
+            <li>
+              <b>Iron Thorns</b>: Meadow, Grove, Snowy Slopes, Jagged Peaks,
+              Frozen Peaks, Stony Peaks.
+            </li>
+            <li>
+              <b>Iron Valiant</b>: All Plains biomes near a lightning rod.
+            </li>
+            <li>
+              <b>Miraidon</b>: Beach biome.
+            </li>
+            <li>
+              <b>Iron Leaves</b>: All Forest biomes (night).
+            </li>
+            <li>
+              <b>Iron Boulder</b>: Dark Forests (night).
+            </li>
+            <li>
+              <b>Iron Crown</b>: Lush Caves and Underground Jungle (night).
+            </li>
+          </ul>
+
+          <ParadoxFutureImageSlider />
+        </div>
+      ),
+    },
+    treasures_of_ruin: {
+      title: "Treasures of Ruin",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Wo-Chien</b>: Mangrove Swamps.
+            </li>
+            <li>
+              <b>Chien-Pao</b>: Frozen River, Jagged Peaks, Snowy Beach, Snowy
+              Plains.
+            </li>
+            <li>
+              <b>Ting-Lu</b>: Dark Forests.
+            </li>
+            <li>
+              <b>Chi-Yu</b>: Basalt Deltas.
+            </li>
+          </ul>
+
+          <TreasuresOfRuinImageSlider />
+        </div>
+      ),
+    },
+    ogerpon: {
+      title: "Ogerpon",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Ogerpon</b> spawns in <b>Lush Caves</b> and
+              <b> Underground Jungle</b>.
+            </li>
+          </ul>
+
+          <h4 className="font-medium">Ogerpon Masks</h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>Masks can be obtained by brushing suspicious sands/gravels.</li>
+            <li>
+              <b>Wellspring Mask</b>: Frozen Gimmighoul Tower — <b>16.67%</b>.
+            </li>
+            <p className="text-xs opacity-50 italic">
+              Use{" "}
+              <code>/locate structure cobblemon:ruins/frozen_gimmi_tower</code>
+            </p>
+            <li>
+              <b>Cornerstone Mask</b>: Lush Gimmighoul Tower — <b>16.67%</b>.
+            </li>
+            <p className="text-xs opacity-50 italic">
+              Use{" "}
+              <code>/locate structure cobblemon:ruins/lush_gimmi_tower</code>
+            </p>
+            <li>
+              <b>Hearthflame Mask</b>: Deserted Gimmighoul Tower —<b> 14.29%</b>
+              .
+            </li>
+            <p className="text-xs opacity-50 italic">
+              Use{" "}
+              <code>
+                /locate structure cobblemon:ruins/deserted_gimmi_tower
+              </code>
+            </p>
+          </ul>
+
+          <OgerponImageSlider />
+        </div>
+      ),
+    },
+    loyal_three: {
+      title: "Loyal Three",
+      series: "Legendary/Mythical",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Okidogi</b>: Savanna biomes.
+            </li>
+            <li>
+              <b>Munkidori</b>: Jungle biomes.
+            </li>
+            <li>
+              <b>Fezandipiti</b>: Frozen Peaks, Jagged Peaks, Snowy Slopes.
+            </li>
+            <li>
+              Leader <b>Pecharunt</b>: Dark Forests.
+            </li>
+          </ul>
+
+          <LoyalThreeImageSlider />
+        </div>
+      ),
+    },
+    terapagos: {
+      title: "Terapagos",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Terapagos</b> can spawn in <b>Lush Caves</b> and
+              <b> Underground Jungles</b> near amethyst-related blocks. Y level
+              must be ≤ 0.
+            </li>
+            <li>
+              Another way: equip <b>Liko's Pendant</b> and wait 1 hour. The
+              pendant is unobtainable in survival, use command:
+              <code> /give @s mega_showdown:likos_pendant</code>
+            </li>
+          </ul>
+
+          <TerapagosImage />
+        </div>
+      ),
+    },
   };
 
   React.useEffect(() => {
@@ -1783,6 +2241,64 @@ function HowToGetPokemonPageInner() {
                   diancie: "diancie",
                   hoopa: "hoopa",
                   volcanion: "volcanion",
+                  tapu: "guardian_deities",
+                  "tapu koko": "guardian_deities",
+                  "tapu lele": "guardian_deities",
+                  "tapu bulu": "guardian_deities",
+                  "tapu fini": "guardian_deities",
+                  cosmog: "light_trio",
+                  cosmoem: "light_trio",
+                  solgaleo: "light_trio",
+                  lunala: "light_trio",
+                  necrozma: "light_trio",
+                  nihilego: "ultra_beasts",
+                  poipole: "ultra_beasts",
+                  naganadel: "ultra_beasts",
+                  pheromosa: "ultra_beasts",
+                  guzzlord: "ultra_beasts",
+                  stakataka: "ultra_beasts",
+                  buzzwole: "ultra_beasts",
+                  xurkitree: "ultra_beasts",
+                  celesteela: "ultra_beasts",
+                  kartana: "ultra_beasts",
+                  blacephalon: "ultra_beasts",
+                  zeraora: "gen7_mythicals",
+                  magearna: "gen7_mythicals",
+                  marshadow: "gen7_mythicals",
+                  meltan: "gen7_mythicals",
+                  melmetal: "gen7_mythicals",
+                  "great tusk": "paradox_ancient",
+                  "scream tail": "paradox_ancient",
+                  "brute bonnet": "paradox_ancient",
+                  "flutter mane": "paradox_ancient",
+                  "slither wing": "paradox_ancient",
+                  "sandy shocks": "paradox_ancient",
+                  "roaring moon": "paradox_ancient",
+                  koraidon: "paradox_ancient",
+                  "walking wake": "paradox_ancient",
+                  "gouging fire": "paradox_ancient",
+                  "raging bolt": "paradox_ancient",
+                  "iron treads": "paradox_future",
+                  "iron bundle": "paradox_future",
+                  "iron hands": "paradox_future",
+                  "iron jugulis": "paradox_future",
+                  "iron moth": "paradox_future",
+                  "iron thorns": "paradox_future",
+                  "iron valiant": "paradox_future",
+                  miraidon: "paradox_future",
+                  "iron leaves": "paradox_future",
+                  "iron boulder": "paradox_future",
+                  "iron crown": "paradox_future",
+                  "wo-chien": "treasures_of_ruin",
+                  "chien-pao": "treasures_of_ruin",
+                  "ting-lu": "treasures_of_ruin",
+                  "chi-yu": "treasures_of_ruin",
+                  ogerpon: "ogerpon",
+                  okidogi: "loyal_three",
+                  munkidori: "loyal_three",
+                  fezandipiti: "loyal_three",
+                  pecharunt: "loyal_three",
+                  terapagos: "terapagos",
                   palkia: "creation_trio",
                   dialga: "creation_trio",
                   giratina: "creation_trio",
@@ -1929,6 +2445,64 @@ function HowToGetPokemonPageInner() {
                     diancie: "diancie",
                     hoopa: "hoopa",
                     volcanion: "volcanion",
+                    tapu: "guardian_deities",
+                    "tapu koko": "guardian_deities",
+                    "tapu lele": "guardian_deities",
+                    "tapu bulu": "guardian_deities",
+                    "tapu fini": "guardian_deities",
+                    cosmog: "light_trio",
+                    cosmoem: "light_trio",
+                    solgaleo: "light_trio",
+                    lunala: "light_trio",
+                    necrozma: "light_trio",
+                    nihilego: "ultra_beasts",
+                    poipole: "ultra_beasts",
+                    naganadel: "ultra_beasts",
+                    pheromosa: "ultra_beasts",
+                    guzzlord: "ultra_beasts",
+                    stakataka: "ultra_beasts",
+                    buzzwole: "ultra_beasts",
+                    xurkitree: "ultra_beasts",
+                    celesteela: "ultra_beasts",
+                    kartana: "ultra_beasts",
+                    blacephalon: "ultra_beasts",
+                    zeraora: "gen7_mythicals",
+                    magearna: "gen7_mythicals",
+                    marshadow: "gen7_mythicals",
+                    meltan: "gen7_mythicals",
+                    melmetal: "gen7_mythicals",
+                    "great tusk": "paradox_ancient",
+                    "scream tail": "paradox_ancient",
+                    "brute bonnet": "paradox_ancient",
+                    "flutter mane": "paradox_ancient",
+                    "slither wing": "paradox_ancient",
+                    "sandy shocks": "paradox_ancient",
+                    "roaring moon": "paradox_ancient",
+                    koraidon: "paradox_ancient",
+                    "walking wake": "paradox_ancient",
+                    "gouging fire": "paradox_ancient",
+                    "raging bolt": "paradox_ancient",
+                    "iron treads": "paradox_future",
+                    "iron bundle": "paradox_future",
+                    "iron hands": "paradox_future",
+                    "iron jugulis": "paradox_future",
+                    "iron moth": "paradox_future",
+                    "iron thorns": "paradox_future",
+                    "iron valiant": "paradox_future",
+                    miraidon: "paradox_future",
+                    "iron leaves": "paradox_future",
+                    "iron boulder": "paradox_future",
+                    "iron crown": "paradox_future",
+                    "wo-chien": "treasures_of_ruin",
+                    "chien-pao": "treasures_of_ruin",
+                    "ting-lu": "treasures_of_ruin",
+                    "chi-yu": "treasures_of_ruin",
+                    ogerpon: "ogerpon",
+                    okidogi: "loyal_three",
+                    munkidori: "loyal_three",
+                    fezandipiti: "loyal_three",
+                    pecharunt: "loyal_three",
+                    terapagos: "terapagos",
                     palkia: "creation_trio",
                     dialga: "creation_trio",
                     giratina: "creation_trio",
@@ -2097,6 +2671,64 @@ function HowToGetPokemonPageInner() {
                       diancie: "diancie",
                       hoopa: "hoopa",
                       volcanion: "volcanion",
+                      tapu: "guardian_deities",
+                      "tapu koko": "guardian_deities",
+                      "tapu lele": "guardian_deities",
+                      "tapu bulu": "guardian_deities",
+                      "tapu fini": "guardian_deities",
+                      cosmog: "light_trio",
+                      cosmoem: "light_trio",
+                      solgaleo: "light_trio",
+                      lunala: "light_trio",
+                      necrozma: "light_trio",
+                      nihilego: "ultra_beasts",
+                      poipole: "ultra_beasts",
+                      naganadel: "ultra_beasts",
+                      pheromosa: "ultra_beasts",
+                      guzzlord: "ultra_beasts",
+                      stakataka: "ultra_beasts",
+                      buzzwole: "ultra_beasts",
+                      xurkitree: "ultra_beasts",
+                      celesteela: "ultra_beasts",
+                      kartana: "ultra_beasts",
+                      blacephalon: "ultra_beasts",
+                      zeraora: "gen7_mythicals",
+                      magearna: "gen7_mythicals",
+                      marshadow: "gen7_mythicals",
+                      meltan: "gen7_mythicals",
+                      melmetal: "gen7_mythicals",
+                      "great tusk": "paradox_ancient",
+                      "scream tail": "paradox_ancient",
+                      "brute bonnet": "paradox_ancient",
+                      "flutter mane": "paradox_ancient",
+                      "slither wing": "paradox_ancient",
+                      "sandy shocks": "paradox_ancient",
+                      "roaring moon": "paradox_ancient",
+                      koraidon: "paradox_ancient",
+                      "walking wake": "paradox_ancient",
+                      "gouging fire": "paradox_ancient",
+                      "raging bolt": "paradox_ancient",
+                      "iron treads": "paradox_future",
+                      "iron bundle": "paradox_future",
+                      "iron hands": "paradox_future",
+                      "iron jugulis": "paradox_future",
+                      "iron moth": "paradox_future",
+                      "iron thorns": "paradox_future",
+                      "iron valiant": "paradox_future",
+                      miraidon: "paradox_future",
+                      "iron leaves": "paradox_future",
+                      "iron boulder": "paradox_future",
+                      "iron crown": "paradox_future",
+                      "wo-chien": "treasures_of_ruin",
+                      "chien-pao": "treasures_of_ruin",
+                      "ting-lu": "treasures_of_ruin",
+                      "chi-yu": "treasures_of_ruin",
+                      ogerpon: "ogerpon",
+                      okidogi: "loyal_three",
+                      munkidori: "loyal_three",
+                      fezandipiti: "loyal_three",
+                      pecharunt: "loyal_three",
+                      terapagos: "terapagos",
                       palkia: "creation_trio",
                       dialga: "creation_trio",
                       giratina: "creation_trio",
@@ -2377,6 +3009,8 @@ function ImageCarousel({ images }) {
               sizes="100vw"
               className="object-contain"
               style={{ maxHeight: "100vh", maxWidth: "100vw" }}
+              quality={100}
+              priority={true}
             />
           </div>
           <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur px-4 py-2 rounded-lg text-gray-100 text-sm shadow-lg">
@@ -2406,6 +3040,9 @@ function ImageCarousel({ images }) {
                   alt={img.alt}
                   fill
                   className="object-cover"
+                  quality={100}
+                  priority={idx === 0}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-black/40 backdrop-blur px-3 py-2 text-sm text-gray-100">
                   <span className="font-medium">Credit:</span> {img.credit}
@@ -3117,6 +3754,8 @@ function SingleImage({ src, alt, credit }) {
               sizes="100vw"
               className="object-contain"
               style={{ maxHeight: "100vh", maxWidth: "100vw" }}
+              quality={100}
+              priority={true}
             />
           </div>
           <p className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur px-4 py-2 rounded-lg text-gray-100 text-sm shadow-lg">
@@ -3134,7 +3773,15 @@ function SingleImage({ src, alt, credit }) {
           className="relative w-full h-full overflow-hidden rounded-2xl"
           onClick={() => setFullscreen({ src, alt, credit })}
         >
-          <Image src={src} alt={alt} fill className="object-cover" />
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            className="object-cover"
+            quality={100}
+            priority={true}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
+          />
           <div className="absolute inset-x-0 bottom-0 bg-black/40 backdrop-blur px-3 py-2 text-sm text-gray-100">
             <span className="font-medium">Credit:</span> {credit}
           </div>
@@ -3406,4 +4053,356 @@ function VolcanionImage() {
       credit="maru"
     />
   );
+}
+
+function GuardianDeitiesImageSlider() {
+  const images = [
+    {
+      src: "/guides/tapu-koko.png",
+      alt: "Tapu Koko in Savanna/Jungle",
+      credit: "maru",
+    },
+    {
+      src: "/guides/tapu-lele.png",
+      alt: "Tapu Lele in Floral/Beach",
+      credit: "maru",
+    },
+    {
+      src: "/guides/tapu-bulu.png",
+      alt: "Tapu Bulu in Rivers/Jungle",
+      credit: "maru",
+    },
+    {
+      src: "/guides/tapu-fini.png",
+      alt: "Tapu Fini in Rivers/Beach",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function LightTrioImageSlider() {
+  const images = [
+    { src: "/guides/cosmog.png", alt: "Cosmog in End", credit: "maru" },
+    {
+      src: "/guides/solgaleo.png",
+      alt: "Solgaleo in Savanna/End",
+      credit: "maru",
+    },
+    {
+      src: "/guides/lunala.png",
+      alt: "Lunala in Dark Forest/End",
+      credit: "maru",
+    },
+    {
+      src: "/guides/dusk-tower.png",
+      alt: "Dusk/Dawn Towers in End",
+      credit: "maru",
+    },
+    {
+      src: "/guides/dawn-tower.png",
+      alt: "Dusk/Dawn Towers in End",
+      credit: "maru",
+    },
+    { src: "/guides/necrozma.png", alt: "Necrozma in End", credit: "maru" },
+    {
+      src: "/guides/fused-necrozma.png",
+      alt: "Necrozma in End",
+      credit: "maru",
+    },
+    {
+      src: "/guides/ultra-necrozma.png",
+      alt: "Necrozma in End",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function UltraBeastsImageSlider() {
+  const images = [
+    {
+      src: "/guides/nihilego.png",
+      alt: "Nihilego in End Dimension",
+      credit: "maru",
+    },
+    {
+      src: "/guides/poipole.png",
+      alt: "Poipole around Dawn/Dusk Tower",
+      credit: "maru",
+    },
+    {
+      src: "/guides/naganadel.png",
+      alt: "Naganadel near Purpur Blocks",
+      credit: "maru",
+    },
+    {
+      src: "/guides/pheromosa.png",
+      alt: "Pheromosa in End/Terralith biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/guzzlord.png",
+      alt: "Guzzlord in End Barrens/Deep Dark",
+      credit: "maru",
+    },
+    {
+      src: "/guides/stakataka.png",
+      alt: "Stakataka in Deep Dark",
+      credit: "maru",
+    },
+    {
+      src: "/guides/buzzwole.png",
+      alt: "Buzzwole in Swamp Biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/xurkitree.png",
+      alt: "Xurkitree in Mangrove Swamps",
+      credit: "maru",
+    },
+    {
+      src: "/guides/celesteela.png",
+      alt: "Celesteela in Desert biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/kartana.png",
+      alt: "Kartana in Bamboo Jungles",
+      credit: "maru",
+    },
+    {
+      src: "/guides/blacephalon.png",
+      alt: "Blacephalon in Dark Forests",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function Gen7MythicalsImageSlider() {
+  const images = [
+    {
+      src: "/guides/zeraora.png",
+      alt: "Zeraora in Badlands/Forest biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/magearna.png",
+      alt: "Magearna in Taiga biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/marshadow.png",
+      alt: "Marshadow in Deep Dark",
+      credit: "maru",
+    },
+    {
+      src: "/guides/meltan.png",
+      alt: "Meltan near Iron Blocks/Beach",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function TreasuresOfRuinImageSlider() {
+  const images = [
+    {
+      src: "/guides/wo-chien.png",
+      alt: "Wo-Chien in Mangrove Swamps",
+      credit: "maru",
+    },
+    {
+      src: "/guides/chien-pao.png",
+      alt: "Chien-Pao snowy biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/ting-lu.png",
+      alt: "Ting-Lu in Dark Forests",
+      credit: "maru",
+    },
+    {
+      src: "/guides/chi-yu.png",
+      alt: "Chi-Yu in Basalt Deltas",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function OgerponImageSlider() {
+  const images = [
+    {
+      src: "/guides/ogerpon.png",
+      alt: "Ogerpon in Lush Caves/Underground Jungle",
+      credit: "maru",
+    },
+    {
+      src: "/guides/frozen-gimmi.png",
+      alt: "Ogerpon Masks & towers",
+      credit: "maru",
+    },
+    {
+      src: "/guides/lush-gimmi.png",
+      alt: "Ogerpon Masks & towers",
+      credit: "maru",
+    },
+    {
+      src: "/guides/deserted-gimmi.png",
+      alt: "Ogerpon Masks & towers",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function LoyalThreeImageSlider() {
+  const images = [
+    { src: "/guides/okidogi.png", alt: "Okidogi in Savanna", credit: "maru" },
+    {
+      src: "/guides/munkidori.png",
+      alt: "Munkidori in Jungle",
+      credit: "maru",
+    },
+    {
+      src: "/guides/fezandipiti.png",
+      alt: "Fezandipiti in snowy biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/pecharunt.png",
+      alt: "Pecharunt in Dark Forests",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function TerapagosImage() {
+  return (
+    <SingleImage
+      src="/guides/terapagos.png"
+      alt="Terapagos spawn info"
+      credit="maru"
+    />
+  );
+}
+function ParadoxAncientImageSlider() {
+  const images = [
+    { src: "/guides/great-tusk.png", alt: "Great Tusk biomes", credit: "maru" },
+    {
+      src: "/guides/scream-tail.png",
+      alt: "Scream Tail biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/brute-bonnet.png",
+      alt: "Brute Bonnet in Jungles",
+      credit: "maru",
+    },
+    {
+      src: "/guides/flutter-mane.png",
+      alt: "Flutter Mane in Deep Dark/Dark Forests",
+      credit: "maru",
+    },
+    {
+      src: "/guides/slither-wing.png",
+      alt: "Slither Wing spawn",
+      credit: "maru",
+    },
+    {
+      src: "/guides/sandy-shocks.png",
+      alt: "Sandy Shocks biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/roaring-moon.png",
+      alt: "Roaring Moon (night) biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/paradox-duo.png",
+      alt: "Koraidon in Beach",
+      credit: "maru",
+    },
+    {
+      src: "/guides/walking-wake.png",
+      alt: "Walking Wake (raining) biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/gouging-fire.png",
+      alt: "Gouging Fire in Basalt Deltas",
+      credit: "maru",
+    },
+    {
+      src: "/guides/raging-bolt.png",
+      alt: "Raging Bolt biomes",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
+function ParadoxFutureImageSlider() {
+  const images = [
+    {
+      src: "/guides/iron-treads.png",
+      alt: "Iron Treads biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/iron-bundle.png",
+      alt: "Iron Bundle snowy biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/iron-hands.png",
+      alt: "Iron Hands in Desert (night)",
+      credit: "maru",
+    },
+    {
+      src: "/guides/iron-jugulis.png",
+      alt: "Iron Jugulis (night) biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/iron-moth.png",
+      alt: "Iron Moth in Hills (daytime)",
+      credit: "maru",
+    },
+    {
+      src: "/guides/iron-thorns.png",
+      alt: "Iron Thorns biomes",
+      credit: "maru",
+    },
+    {
+      src: "/guides/iron-valiant.png",
+      alt: "Iron Valiant near lightning rod",
+      credit: "maru",
+    },
+    {
+      src: "/guides/paradox-duo.png",
+      alt: "Miraidon in Beach",
+      credit: "maru",
+    },
+    {
+      src: "/guides/iron-leaves.png",
+      alt: "Iron Leaves in Forests (night)",
+      credit: "maru",
+    },
+    {
+      src: "/guides/iron-boulder.png",
+      alt: "Iron Boulder in Dark Forests (night)",
+      credit: "maru",
+    },
+    {
+      src: "/guides/iron-crown.png",
+      alt: "Iron Crown in Lush Caves/Underground Jungle (night)",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
 }
