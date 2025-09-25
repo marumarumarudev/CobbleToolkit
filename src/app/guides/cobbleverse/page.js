@@ -10,6 +10,7 @@ import {
   ArrowRight,
   BookOpen,
   HelpCircle,
+  Settings,
 } from "lucide-react";
 
 export const metadata = {
@@ -70,6 +71,12 @@ export default function CobbleverseOverviewPage() {
       description: "Understanding Pokémon spawn mechanics and rates",
       href: "/guides/cobbleverse/spawnrates",
       icon: BarChart3,
+    },
+    {
+      title: "Setup Guide",
+      description: "How to setup Cobbleverse",
+      href: "/guides/cobbleverse/setup",
+      icon: Settings,
     },
   ];
 

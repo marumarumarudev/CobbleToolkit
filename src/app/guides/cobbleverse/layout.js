@@ -13,6 +13,7 @@ import {
   BarChart3,
   ChevronRight,
   HelpCircle,
+  Settings,
 } from "lucide-react";
 
 export default function CobbleverseLayout({ children }) {
@@ -52,6 +53,11 @@ export default function CobbleverseLayout({ children }) {
       name: "Spawn Rates",
       href: "/guides/cobbleverse/spawnrates",
       icon: BarChart3,
+    },
+    {
+      name: "Setup Guide",
+      href: "/guides/cobbleverse/setup",
+      icon: Settings,
     },
   ];
 
@@ -109,11 +115,11 @@ export default function CobbleverseLayout({ children }) {
             <div className="text-xs text-gray-400 space-y-1">
               <div className="flex justify-between">
                 <span>Total Guides:</span>
-                <span className="text-yellow-400">8</span>
+                <span className="text-yellow-400">9</span>
               </div>
               <div className="flex justify-between">
                 <span>Last Updated:</span>
-                <span className="text-yellow-400">9/21/25</span>
+                <span className="text-yellow-400">9/25/25</span>
               </div>
             </div>
           </div>

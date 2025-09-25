@@ -222,11 +222,29 @@ export default function LootScanner() {
     }
   });
 
-  // Sort the filtered data
+  // Sort the filtered data (numeric for chance, lexicographic otherwise)
   const sortedData = [...filtered].sort((a, b) => {
     const { column, direction } = sort;
     let valA = a[column] ?? "";
     let valB = b[column] ?? "";
+
+    // If sorting by percentage chance (stored like "12%"), compare numerically
+    if (column === "chance") {
+      const numA =
+        typeof valA === "string"
+          ? parseFloat(valA.replace("%", ""))
+          : Number(valA);
+      const numB =
+        typeof valB === "string"
+          ? parseFloat(valB.replace("%", ""))
+          : Number(valB);
+      if (isNaN(numA) && isNaN(numB)) return 0;
+      if (isNaN(numA)) return direction === "asc" ? 1 : -1;
+      if (isNaN(numB)) return direction === "asc" ? -1 : 1;
+      if (numA < numB) return direction === "asc" ? -1 : 1;
+      if (numA > numB) return direction === "asc" ? 1 : -1;
+      return 0;
+    }
 
     if (valA < valB) return direction === "asc" ? -1 : 1;
     if (valA > valB) return direction === "asc" ? 1 : -1;

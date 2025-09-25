@@ -322,11 +322,12 @@ function HowToGetPokemonPageInner() {
               Find <b>Ash's House</b> in <b>Plains biomes</b>.
             </li>
             <li>
-              Defeat Ash to obtain <b>Ash's Cap</b>.
+              <b>Ash's Cap</b> is found inside a drawer in <b>Ash's room</b>.
             </li>
             <li>
-              (CurseForge users: Ash's Cap can be found free in a drawer inside
-              his room.)
+              Defeating <b>Ash</b> no longer drops the cap. Instead, he now has
+              a chance to drop <b>Pika Cases</b>, various <b>TMs</b>, and the
+              <b> Light Ball</b>.
             </li>
             <li>
               To obtain <b>Ash's Greninja</b>, right-click a Greninja while
@@ -377,8 +378,7 @@ function HowToGetPokemonPageInner() {
               Must be in <b>Kanto Series</b> with <b>level cap 40+</b>.
             </li>
             <li>
-              Obtain <b>Ash's Cap</b> from Ash (or his drawer if using
-              CurseForge).
+              Obtain <b>Ash's Cap</b> from the drawer in <b>Ash's room</b>.
             </li>
             <li>
               Right-click a <b>Pikachu</b> with Ash's Cap in your main hand to
@@ -432,6 +432,10 @@ function HowToGetPokemonPageInner() {
             </li>
             <li>
               Use the Silver Wing at <b>Whirl Island</b> to spawn Lugia.
+              <span className="block text-xs opacity-75">
+                Whirl Island structure generates in <b>Deep Cold Ocean</b>{" "}
+                biomes.
+              </span>
             </li>
             <li>
               Secrets inside the tower:
@@ -1164,6 +1168,9 @@ function HowToGetPokemonPageInner() {
             <li>
               Structure generates in underground <b>Caves</b>.
             </li>
+            <li>
+              <b>Also spawns naturally</b> in <b>all Cave biomes</b>.
+            </li>
           </ul>
           <p className="text-xs opacity-50 italic">
             Use <code>/locate structure legendary:regidrago_cave</code>
@@ -1179,6 +1186,9 @@ function HowToGetPokemonPageInner() {
             <li>No series required.</li>
             <li>
               Structure generates in <b>Desert Biomes</b>.
+            </li>
+            <li>
+              <b>Also spawns naturally</b> in <b>Desert biomes</b>.
             </li>
           </ul>
           <p className="text-xs opacity-50 italic">
@@ -1196,12 +1206,15 @@ function HowToGetPokemonPageInner() {
             <li>
               Structure generates in <b>Snowy Taiga Biomes</b>.
             </li>
+            <li>
+              <b>Also spawns naturally</b> in the <b>Snowy Taiga</b> biome.
+            </li>
           </ul>
           <p className="text-xs opacity-50 italic">
             Use <code>/locate structure legendary:snowpoint_temple</code>
           </p>
 
-          <NewTitansImageSlider />
+          {/* Removed per request: NewTitansImageSlider */}
         </div>
       ),
     },
@@ -1651,8 +1664,8 @@ function HowToGetPokemonPageInner() {
         <div className="space-y-6">
           <ul className="list-disc list-inside space-y-1">
             <li>
-              <b>Diancie</b> spawns near <b>Diamond Ores</b> (not Deepslate
-              Diamond Ore) and <b>Amethyst Blocks</b> in <b>Lush Caves</b>.
+              <b>Diancie</b> spawns in <b>Lush Caves</b> with{" "}
+              <b>light level 0–7</b>.
             </li>
           </ul>
 
