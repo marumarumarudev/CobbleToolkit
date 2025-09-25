@@ -41,7 +41,7 @@ export default function SetupCobbleversePage() {
           Cobbleverse Server Pack
         </h2>
         <p className="text-gray-300">
-          Use the official server pack for servers.{" "}
+          Use the modpack for servers.{" "}
           <strong>NO PUBLIC SERVERS PLEASE!!!</strong>
         </p>
         <ImageWithFullscreen
@@ -49,7 +49,7 @@ export default function SetupCobbleversePage() {
           alt="Cobbleverse server pack files"
         />
         <div className="p-3 rounded-lg bg-yellow-900/20 border border-yellow-700/40 text-yellow-200 text-sm">
-          <p className="font-medium">Remove these mods on servers:</p>
+          <p className="font-medium">Additional mods to remove on servers:</p>
           <ul className="list-disc pl-5 mt-1 space-y-0.5">
             <li>DropConfirm</li>
             <li>Interactic</li>
