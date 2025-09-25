@@ -169,7 +169,7 @@ export default function CobbleverseOverviewPage() {
             <div className="text-sm text-gray-400">Total Guides</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-yellow-400">8</div>
+            <div className="text-2xl font-bold text-yellow-400">9</div>
             <div className="text-sm text-gray-400">Categories</div>
           </div>
           <div className="text-center">
