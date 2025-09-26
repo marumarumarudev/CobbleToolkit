@@ -81,10 +81,6 @@ function HowToGetPokemonPageInner() {
               Find <b>Team Rocket Tower</b> in the Badlands biome.
             </li>
             <li>
-              Optional: defeat researcher NPC for Fossilized Helmet (revives
-              Type: Null).
-            </li>
-            <li>
               On the top floor, mine beneath General Archer to reach Admin
               Atena.
             </li>
@@ -1418,8 +1414,7 @@ function HowToGetPokemonPageInner() {
               <b>Ominous Trial Vaults</b> in <b>Trial Chambers</b>.
             </li>
             <li>
-              Arceus Plates drop rates: <b>0.45%</b> in Vaults.{" "}
-              <b>Silvally Memory Discs</b> also drop at <b>0.99%</b>.
+              Arceus Plates drop rates: <b>0.45%</b> in Vaults.
             </li>
             <li>
               <b>Ominous Keys</b> can be found in <b>Rocket Tower</b> or as a{" "}
@@ -1653,6 +1648,54 @@ function HowToGetPokemonPageInner() {
           </p>
 
           <GenesectImage />
+        </div>
+      ),
+    },
+    type_null_silvally: {
+      title: "Type: Null & Silvally",
+      series: "Legendary",
+      levelCap: "Any",
+      content: (
+        <div className="space-y-6">
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-gray-300 to-gray-500 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(209,213,219,0.6)" }}
+          >
+            Type: Null
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              To get <b>Type: Null</b>, you need a <b>Fossilized Helmet</b>.
+            </li>
+            <li>
+              Obtain the <b>Fossilized Helmet</b> by defeating a{" "}
+              <b>Team Rocket Scientist</b> in the <b>Team Rocket Tower</b>{" "}
+              located in the <b>Badlands</b> biome.
+            </li>
+            <li>
+              Put the <b>Fossilized Helmet</b> into a{" "}
+              <b>Fossil Resurrection Machine</b> to obtain <b>Type: Null</b>.
+            </li>
+          </ul>
+
+          <h4
+            className="font-bold text-lg bg-gradient-to-r from-slate-400 to-indigo-400 bg-clip-text text-transparent"
+            style={{ textShadow: "0 0 6px rgba(148,163,184,0.6)" }}
+          >
+            Silvally
+          </h4>
+          <ul className="list-disc list-inside space-y-1">
+            <li>
+              <b>Type: Null</b> evolves into <b>Silvally</b> with{" "}
+              <b>160 Friendship</b>.
+            </li>
+            <li>
+              <b>Silvally Memory Discs</b> can be found in{" "}
+              <b>Ominous Trial Vaults</b> with a <b>0.99%</b> drop chance.
+            </li>
+          </ul>
+
+          <TypeNullSilvallyImageSlider />
         </div>
       ),
     },
@@ -2353,6 +2396,11 @@ function HowToGetPokemonPageInner() {
                   glastrier: "calyrex",
                   celebi: "celebi",
                   victini: "victini",
+                  typenull: "typenull_silvally",
+                  silvally: "typenull_silvally",
+                  entei: "hooh",
+                  suicune: "hooh",
+                  raikou: "hooh",
                 };
 
                 // Find matching entry
@@ -2557,6 +2605,11 @@ function HowToGetPokemonPageInner() {
                     glastrier: "calyrex",
                     celebi: "celebi",
                     victini: "victini",
+                    typenull: "typenull_silvally",
+                    silvally: "typenull_silvally",
+                    entei: "hooh",
+                    suicune: "hooh",
+                    raikou: "hooh",
                   };
 
                   // Check if the search query matches a mapped Pokémon with fuzzy matching
@@ -2783,6 +2836,11 @@ function HowToGetPokemonPageInner() {
                       glastrier: "calyrex",
                       celebi: "celebi",
                       victini: "victini",
+                      typenull: "typenull_silvally",
+                      silvally: "typenull_silvally",
+                      entei: "hooh",
+                      suicune: "hooh",
+                      raikou: "hooh",
                     };
 
                     // Check if the search query matches a mapped Pokémon with fuzzy matching
@@ -3116,6 +3174,22 @@ function MewTwoImageSlider() {
   return <ImageCarousel images={images} />;
 }
 
+function TypeNullSilvallyImageSlider() {
+  const images = [
+    {
+      src: "/guides/fossilized-helmet.png",
+      alt: "Fossilized Helmet",
+      credit: "maru",
+    },
+    {
+      src: "/guides/typenull.png",
+      alt: "Type Null + Silvally",
+      credit: "maru",
+    },
+  ];
+  return <ImageCarousel images={images} />;
+}
+
 function KyogreImageSlider() {
   const images = [
     {
@@ -3251,6 +3325,11 @@ function HoohImageSlider() {
       src: "/guides/bell-tower.png",
       alt: "Bell Tower",
       credit: "COBBLEVERSE",
+    },
+    {
+      src: "/guides/legendary-beasts.png",
+      alt: "Legendary Beasts",
+      credit: "maru",
     },
   ];
   return <ImageCarousel images={images} />;
@@ -3830,27 +3909,6 @@ function OriginalTitansImageSlider() {
   return <ImageCarousel images={images} />;
 }
 
-function NewTitansImageSlider() {
-  const images = [
-    {
-      src: "/guides/regidrago.png",
-      alt: "Regidrago Cave Structure",
-      credit: "maru",
-    },
-    {
-      src: "/guides/regieleki.png",
-      alt: "Regieleki Cave Structure",
-      credit: "maru",
-    },
-    {
-      src: "/guides/regigigas.png",
-      alt: "Snowpoint Temple Structure",
-      credit: "maru",
-    },
-  ];
-  return <ImageCarousel images={images} />;
-}
-
 function EonDuoImageSlider() {
   const images = [
     {
@@ -4302,6 +4360,7 @@ function TerapagosImage() {
     />
   );
 }
+
 function ParadoxAncientImageSlider() {
   const images = [
     { src: "/guides/great-tusk.png", alt: "Great Tusk biomes", credit: "maru" },
