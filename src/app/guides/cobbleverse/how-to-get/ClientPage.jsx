@@ -608,6 +608,13 @@ function HowToGetPokemonPageInner() {
               the world.
             </li>
             <li>
+              <b>Crown Cemetery</b> generates in <b>Old Growth Pine Taiga</b>{" "}
+              biome.
+            </li>
+            <li>
+              <b>Crown Spire</b> generates in <b>Snowy Plains</b> biome.
+            </li>
+            <li>
               Find their respective <b>carrots</b> and throw it into:
               <ul className="list-disc list-inside ml-6">
                 <li>
@@ -1419,6 +1426,12 @@ function HowToGetPokemonPageInner() {
             <li>
               <b>Ominous Keys</b> can be found in <b>Rocket Tower</b> or as a{" "}
               <b>5%</b> drop by a <b>Klefki</b>.
+            </li>
+            <li>
+              You can also change <b>Arceus’ type</b> using <b>Z-Crystals</b>,
+              but this does <u>not</u> change the damage type of Arceus’
+              signature move <b>Judgment</b>. Only <b>Arceus Plates</b> alter
+              the damage type of Judgment.
             </li>
           </ul>
 

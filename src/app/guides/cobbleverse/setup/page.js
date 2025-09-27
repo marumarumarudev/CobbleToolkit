@@ -1,10 +1,10 @@
 import React from "react";
-import ImageWithFullscreen from "./ClientPage";
+import ImageWithFullscreen, { UpdateCarousels } from "./ClientPage";
 
 export const metadata = {
-  title: "Setup Cobbleverse | CobbleToolkit",
+  title: "Cobbleverse Setup | CobbleToolkit",
   description:
-    "How to install Cobbleverse and transfer from CurseForge to Modrinth",
+    "How to install Cobbleverse and transfer from CurseForge to Modrinth and how to update.",
 };
 
 export default function SetupCobbleversePage() {
@@ -71,7 +71,9 @@ export default function SetupCobbleversePage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <h3 className="text-xl font-semibold text-white">Singleplayer</h3>
+            <h3 className="text-xl font-semibold text-white">
+              Singleplayer/Client
+            </h3>
             <ol className="list-decimal pl-5 space-y-1 text-gray-300">
               <li>
                 Install a fresh <span className="font-medium">Cobbleverse</span>{" "}
@@ -111,16 +113,13 @@ export default function SetupCobbleversePage() {
                 instance in the Modrinth App.
               </li>
               <li>
-                From your CurseForge instance, copy your <code>world</code> or{" "}
-                <code>worlds</code> folder(s) and the <code>xaero</code> folder.
-                If you edited configs, also copy the <code>config</code> folder.
+                In your server host, delete/replace the <code>config</code>,{" "}
+                <code>datapacks</code>, and <code>mods</code> folders.
               </li>
               <li>
-                Paste them into the new Modrinth instance in the same locations.
-              </li>
-              <li>
-                Upload the server files (including the copied folders) to your
-                host.
+                Upload the <code>config</code>, <code>datapacks</code>, and{" "}
+                <code>mods</code> folders from your fresh Modrinth instance to
+                your server.
               </li>
               <li>
                 Delete these client-only mods from the <code>mods</code> folder:{" "}
@@ -133,14 +132,41 @@ export default function SetupCobbleversePage() {
             <div className="text-sm text-gray-400">
               <p className="font-medium">Tips</p>
               <ul className="list-disc pl-5 mt-1 space-y-0.5">
-                <li>Keep a backup before moving files.</li>
+                <li>Keep a backup before updating server files.</li>
                 <li>
                   Match the same Cobbleverse version on client and server.
+                </li>
+                <li>
+                  If you have custom world data, copy your <code>world</code> or{" "}
+                  <code>worlds</code> folder after updating the server files.
                 </li>
               </ul>
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold text-white">
+          How to Update Cobbleverse in Modrinth
+        </h2>
+        <p className="text-gray-300">To update:</p>
+        <UpdateCarousels type="modrinth-update" />
+
+        <div className="mt-4 p-3 rounded-lg bg-blue-900/20 border border-blue-700/40 text-blue-200 text-sm">
+          <p className="font-medium">
+            If the latest version is not on the version list:
+          </p>
+          <p className="mt-1">Purge Modrinth App cache:</p>
+        </div>
+        <UpdateCarousels type="purge-cache" />
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold text-white">
+          How to Update Cobbleverse in CurseForge
+        </h2>
+        <UpdateCarousels type="curseforge-update" />
       </section>
     </div>
   );
