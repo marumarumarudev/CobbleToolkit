@@ -67,8 +67,7 @@ function HowToGetPokemonPageInner() {
           </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
-              Must be in <b>Kanto Series</b> with level cap 80+ (check trainer
-              card).
+              Must be in <b>Kanto Series</b>.
             </li>
             <li>
               Obtain <b>Ancient DNA</b>:
@@ -76,6 +75,10 @@ function HowToGetPokemonPageInner() {
                 <li>Defeat Gym Leader Giovanni (drops once), OR</li>
                 <li>Find Mew's Temple in Jungle biome.</li>
               </ul>
+            </li>
+            <li>
+              To battle <b>Atena</b>, you need <b>Level 100</b> level cap
+              (available after <b>Elite 4 Lance</b> or <b>Champion Blue</b>).
             </li>
             <li>
               Find <b>Team Rocket Tower</b> in the Badlands biome.
@@ -518,7 +521,7 @@ function HowToGetPokemonPageInner() {
               only spawn around the Burned Tower — use Pokénav to track them.
             </li>
             <li>
-              Locate the <b>Bell Tower</b> (found in Plains biomes) and use the
+              Locate the <b>Bell Tower</b> (found in Forest biomes) and use the
               Rainbow Wing there to summon Ho-oh.
             </li>
           </ul>
@@ -572,6 +575,9 @@ function HowToGetPokemonPageInner() {
           <ul className="list-disc list-inside space-y-1">
             <li>
               Structure only generates when <b>Hoenn</b> is activated.
+            </li>
+            <li>
+              Structure generates on <b>Small End Islands</b> biome.
             </li>
             <li>
               Travel to the <b>End</b> and locate the massive{" "}
@@ -750,8 +756,8 @@ function HowToGetPokemonPageInner() {
           </p>
           <ul className="list-disc list-inside space-y-1">
             <li>
-              <b>Dyna Tree</b> spawns when <b>Hoenn</b> is activated. No level
-              cap.
+              <b>Dyna Tree</b> spawns when <b>Hoenn</b> is activated. Generates
+              in <b>Sakura Grove</b> (<b>Terralith</b> biome). No level cap.
             </li>
             <li>
               Spawns <b>Galarian</b> Articuno, Zapdos, Moltres. Not guaranteed;
@@ -2219,7 +2225,8 @@ function HowToGetPokemonPageInner() {
           <ul className="list-disc list-inside space-y-1">
             <li>
               <b>Terapagos</b> can spawn in <b>Lush Caves</b> and
-              <b> Underground Jungles</b> near amethyst-related blocks. Y level
+              <b> Underground Jungles</b> near <b>Large Amethyst Bud</b>,{" "}
+              <b>Medium Amethyst Bud</b>, and <b>Small Amethyst Bud</b>. Y level
               must be ≤ 0.
             </li>
             <li>
@@ -2290,6 +2297,33 @@ function HowToGetPokemonPageInner() {
               if (e.key === "Enter") {
                 const query = searchQuery.toLowerCase();
                 const pokemonMappings = {
+                  "rusted sword": "combat_trio",
+                  "rusted shield": "combat_trio",
+                  "prison bottle": "hoopa",
+                  "dyna tree": "legendary_birds_trio",
+                  meteorite: "deoxys",
+                  "mega meteorite": "deoxys",
+                  "arceus plates": "arceus",
+                  plates: "arceus",
+                  "mew's altar": "mew_duo",
+                  "origin fossil": "mew_duo",
+                  "ancient origin ball": "mew_duo",
+                  "ancient dna": "mew_duo",
+                  "cloning catalyst": "mew_duo",
+                  "dna splicer": "tao_trio",
+                  "adamant crystal": "creation_trio",
+                  "lustrous globe": "creation_trio",
+                  "griseous core": "creation_trio",
+                  "secret garden": "eon_duo",
+                  "ruby dew": "eon_duo",
+                  "sapphire dew": "eon_duo",
+                  "celebi shrine": "celebi",
+                  "dawn tower": "light_trio",
+                  "dusk tower": "light_trio",
+                  gracidea: "shaymin",
+                  "reins of unity": "calyrex",
+                  "ice carrot": "calyrex",
+                  "shadow carrot": "calyrex",
                   cresselia: "lunar_duo",
                   darkrai: "lunar_duo",
                   manaphy: "sea_guardians",
@@ -2414,6 +2448,7 @@ function HowToGetPokemonPageInner() {
                   entei: "hooh",
                   suicune: "hooh",
                   raikou: "hooh",
+                  "legendary beasts": "hooh",
                 };
 
                 // Find matching entry
@@ -2499,6 +2534,33 @@ function HowToGetPokemonPageInner() {
 
                   // Map specific Pokémon names to their entries with fuzzy matching
                   const pokemonMappings = {
+                    "rusted sword": "combat_trio",
+                    "rusted shield": "combat_trio",
+                    "prison bottle": "hoopa",
+                    "dyna tree": "legendary_birds_trio",
+                    meteorite: "deoxys",
+                    "mega meteorite": "deoxys",
+                    "arceus plates": "arceus",
+                    plates: "arceus",
+                    "mew's altar": "mew_duo",
+                    "origin fossil": "mew_duo",
+                    "ancient origin ball": "mew_duo",
+                    "ancient dna": "mew_duo",
+                    "cloning catalyst": "mew_duo",
+                    "dna splicer": "tao_trio",
+                    "adamant crystal": "creation_trio",
+                    "lustrous globe": "creation_trio",
+                    "griseous core": "creation_trio",
+                    "secret garden": "eon_duo",
+                    "ruby dew": "eon_duo",
+                    "sapphire dew": "eon_duo",
+                    "celebi shrine": "celebi",
+                    "dawn tower": "light_trio",
+                    "dusk tower": "light_trio",
+                    gracidea: "shaymin",
+                    "reins of unity": "calyrex",
+                    "ice carrot": "calyrex",
+                    "shadow carrot": "calyrex",
                     cresselia: "lunar_duo",
                     darkrai: "lunar_duo",
                     manaphy: "sea_guardians",
@@ -2623,6 +2685,7 @@ function HowToGetPokemonPageInner() {
                     entei: "hooh",
                     suicune: "hooh",
                     raikou: "hooh",
+                    "legendary beasts": "hooh",
                   };
 
                   // Check if the search query matches a mapped Pokémon with fuzzy matching
@@ -2730,6 +2793,33 @@ function HowToGetPokemonPageInner() {
 
                     // Map specific Pokémon names to their entries with fuzzy matching
                     const pokemonMappings = {
+                      "rusted sword": "combat_trio",
+                      "rusted shield": "combat_trio",
+                      "prison bottle": "hoopa",
+                      "dyna tree": "legendary_birds_trio",
+                      meteorite: "deoxys",
+                      "mega meteorite": "deoxys",
+                      "arceus plates": "arceus",
+                      plates: "arceus",
+                      "mew's altar": "mew_duo",
+                      "origin fossil": "mew_duo",
+                      "ancient origin ball": "mew_duo",
+                      "ancient dna": "mew_duo",
+                      "cloning catalyst": "mew_duo",
+                      "dna splicer": "tao_trio",
+                      "adamant crystal": "creation_trio",
+                      "lustrous globe": "creation_trio",
+                      "griseous core": "creation_trio",
+                      "secret garden": "eon_duo",
+                      "ruby dew": "eon_duo",
+                      "sapphire dew": "eon_duo",
+                      "celebi shrine": "celebi",
+                      "dawn tower": "light_trio",
+                      "dusk tower": "light_trio",
+                      gracidea: "shaymin",
+                      "reins of unity": "calyrex",
+                      "ice carrot": "calyrex",
+                      "shadow carrot": "calyrex",
                       cresselia: "lunar_duo",
                       darkrai: "lunar_duo",
                       manaphy: "sea_guardians",
@@ -2854,6 +2944,7 @@ function HowToGetPokemonPageInner() {
                       entei: "hooh",
                       suicune: "hooh",
                       raikou: "hooh",
+                      "legendary beasts": "hooh",
                     };
 
                     // Check if the search query matches a mapped Pokémon with fuzzy matching
