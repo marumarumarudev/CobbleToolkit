@@ -24,7 +24,7 @@ export default function BreedingGuidePage() {
         <span className="font-medium">requiem</span>.
         <br />
         <span className="text-xs opacity-50 italic">
-          requiem wants to do cobbreeding with azera. 😳
+          requiem misses azera and maru. 💖
         </span>
       </p>
 
@@ -472,7 +472,7 @@ export default function BreedingGuidePage() {
           >
             Cobblemon Utility+
           </a>{" "}
-          because <span className="italic">fuck breeding</span>.
+          because <span className="italic">screw breeding</span>.
         </p>
       </section>
 

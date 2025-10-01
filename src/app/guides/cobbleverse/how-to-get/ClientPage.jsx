@@ -29,6 +29,9 @@ function HowToGetPokemonPageInner() {
               Must be in <b>Kanto Series</b>.
             </li>
             <li>
+              Spawn Level: <b>Lvl 75</b>
+            </li>
+            <li>
               Craft the <b>Origin Fossil</b> to obtain Mew.
             </li>
             <li>
@@ -182,6 +185,9 @@ function HowToGetPokemonPageInner() {
               Must be in <b>Hoenn Series</b>.
             </li>
             <li>
+              Spawn Level: <b>Lvl 60–70</b>
+            </li>
+            <li>
               Locate Kyogre's structure in <b>Deep Cold Ocean</b> biomes.
             </li>
             <li>
@@ -215,6 +221,9 @@ function HowToGetPokemonPageInner() {
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Hoenn Series</b>.
+            </li>
+            <li>
+              Spawn Level: <b>Lvl 60–70</b>
             </li>
             <li>
               Locate Groudon's structure in <b>Deep Warm Ocean</b> (Terralith
@@ -260,6 +269,9 @@ function HowToGetPokemonPageInner() {
               Must be in <b>Hoenn Series</b>.
             </li>
             <li>
+              Spawn Level: <b>Lvl 70</b>
+            </li>
+            <li>
               Head to the <b>Sky Pillar</b>. (Deep Ocean Biome)
             </li>
             <li>
@@ -267,6 +279,14 @@ function HowToGetPokemonPageInner() {
               located in the room with the crafters, hidden behind the chest.
             </li>
           </ul>
+
+          <p className="text-sm">
+            You can also find a <b>Lvl 100 Shiny Rayquaza</b> when you enter the
+            <b> End</b> for the first time. This replaces the Ender Dragon and
+            can be disabled by deleting the <b>COBBLEVERSE - No Ender Dragon</b>
+            datapack. The only way to respawn this is via commands:
+            <code> /function cobbleverse:spawn_rayquaza</code>
+          </p>
 
           <h4 className="font-medium">Secrets Inside Sky Pillar</h4>
           <ul className="list-disc list-inside ml-6 space-y-1">
@@ -423,6 +443,9 @@ function HowToGetPokemonPageInner() {
               card).
             </li>
             <li>
+              Spawn Level: <b>Lvl 70</b>
+            </li>
+            <li>
               Find <b>Team Rocket Radio Tower</b> in Savanna biomes.
             </li>
             <li>
@@ -510,6 +533,9 @@ function HowToGetPokemonPageInner() {
               card).
             </li>
             <li>
+              Spawn Level: <b>Lvl 70</b>
+            </li>
+            <li>
               Find the <b>Burned Tower</b> (commonly near Birch Forests).
             </li>
             <li>
@@ -519,6 +545,9 @@ function HowToGetPokemonPageInner() {
             <li>
               Side note: the <b>Legendary Beasts</b> (Raikou, Entei, Suicune)
               only spawn around the Burned Tower — use Pokénav to track them.
+            </li>
+            <li>
+              Entei, Suicune, Raikou Spawn Level: <b>Lvl 60</b>
             </li>
             <li>
               Locate the <b>Bell Tower</b> (found in Forest biomes) and use the
@@ -540,6 +569,9 @@ function HowToGetPokemonPageInner() {
       content: (
         <div className="space-y-6">
           <ul className="list-disc list-inside space-y-1">
+            <li>
+              Spawn Level: <b>Lvl 30</b>
+            </li>
             <li>
               Must be in <b>Johto Series</b> with <b>level cap 100+</b> (defeat
               the whole Johto League).
@@ -573,6 +605,9 @@ function HowToGetPokemonPageInner() {
       content: (
         <div className="space-y-6">
           <ul className="list-disc list-inside space-y-1">
+            <li>
+              Spawn Level: <b>Lvl 60</b>
+            </li>
             <li>
               Structure only generates when <b>Hoenn</b> is activated.
             </li>
@@ -610,6 +645,9 @@ function HowToGetPokemonPageInner() {
         <div className="space-y-6">
           <ul className="list-disc list-inside space-y-1">
             <li>
+              Calyrex Spawn Level: <b>Lvl 50–70</b>
+            </li>
+            <li>
               No series required — these structures can be found immediately in
               the world.
             </li>
@@ -624,10 +662,12 @@ function HowToGetPokemonPageInner() {
               Find their respective <b>carrots</b> and throw it into:
               <ul className="list-disc list-inside ml-6">
                 <li>
-                  The <b>Coffin</b> for <b>Spectrier</b>.
+                  The <b>Coffin</b> for <b>Spectrier</b> — Spawn Level:{" "}
+                  <b>Lvl 60</b>.
                 </li>
                 <li>
-                  The <b>Trough</b> for <b>Glastrier</b>.
+                  The <b>Trough</b> for <b>Glastrier</b> — Spawn Level:{" "}
+                  <b>Lvl 60</b>.
                 </li>
               </ul>
             </li>
@@ -721,13 +761,16 @@ function HowToGetPokemonPageInner() {
         <div className="space-y-6">
           <ul className="list-disc list-inside space-y-1">
             <li>
-              <b>Kyurem</b>: Ice Spikes biome, <b>raining</b>.
+              <b>Kyurem</b>: Ice Spikes biome, <b>raining</b>. Spawn Level:{" "}
+              <b>Lvl 66–78</b>.
             </li>
             <li>
               <b>Reshiram</b>: Mountain-tagged biomes, <b>clear</b> weather.
+              Spawn Level: <b>Lvl 70–84</b>.
             </li>
             <li>
-              <b>Zekrom</b>: Mountain-tagged biomes, <b>thundering</b>.
+              <b>Zekrom</b>: Mountain-tagged biomes, <b>thundering</b>. Spawn
+              Level: <b>Lvl 70–84</b>.
             </li>
             <li>
               Craft <b>DNA Splicer</b> to fuse Reshiram/Zekrom with Kyurem.
@@ -764,13 +807,16 @@ function HowToGetPokemonPageInner() {
               this is the only place they can spawn.
             </li>
             <li>
-              <b>Galarian Articuno</b>: <b>Nighttime</b>.
+              <b>Galarian Articuno</b>: <b>Nighttime</b>. Spawn Level:{" "}
+              <b>Lvl 60</b>.
             </li>
             <li>
-              <b>Galarian Zapdos</b>: <b>Thundering</b>.
+              <b>Galarian Zapdos</b>: <b>Thundering</b>. Spawn Level:{" "}
+              <b>Lvl 60</b>.
             </li>
             <li>
-              <b>Galarian Moltres</b>: <b>Daytime</b>.
+              <b>Galarian Moltres</b>: <b>Daytime</b>. Spawn Level:{" "}
+              <b>Lvl 60</b>.
             </li>
           </ul>
           <p className="text-xs opacity-50 italic">
@@ -789,13 +835,16 @@ function HowToGetPokemonPageInner() {
           <ul className="list-disc list-inside space-y-1">
             <li>
               <b>Dialga</b>: Stony Peaks, Jagged Peaks, Frozen Peaks, Snowy
-              Slopes — <b>nighttime</b> and <b>clear weather</b>.
+              Slopes — <b>nighttime</b> and <b>clear weather</b>. Spawn Level:{" "}
+              <b>Lvl 70</b>.
             </li>
             <li>
               <b>Palkia</b>: Same locations — <b>daytime</b> and <b>raining</b>.
+              Spawn Level: <b>Lvl 70</b>.
             </li>
             <li>
-              <b>Giratina</b>: <b>Ancient Cities</b> only.
+              <b>Giratina</b>: <b>Ancient Cities</b> only. Spawn Level:{" "}
+              <b>Lvl 75–95</b>.
             </li>
           </ul>
 
@@ -846,6 +895,9 @@ function HowToGetPokemonPageInner() {
           <ul className="list-disc list-inside space-y-1">
             <li>
               <b>Azelf, Mesprit, Uxie</b>: Spawn at <b>Beaches</b>.
+            </li>
+            <li>
+              Spawn Level: <b>Lvl 40–65</b>
             </li>
           </ul>
           <RiverGuardiansImageSlider />
@@ -907,6 +959,12 @@ function HowToGetPokemonPageInner() {
             <li>
               To assemble Zygarde parts, you need a <b>Zygarde Cube</b> and a{" "}
               <b>Reassembly Unit</b>.
+            </li>
+            <li>
+              You can also find a <b>Zygarde</b> naturally in{" "}
+              <b>Dripstone Caves</b>. Its <b>10% Form</b> spawns at{" "}
+              <b>Lvl 10–50</b>, and its <b>50% Form</b>
+              can spawn at <b>Lvl 50–80</b>.
             </li>
           </ul>
 
@@ -1010,6 +1068,9 @@ function HowToGetPokemonPageInner() {
         <div className="space-y-6">
           <ul className="list-disc list-inside space-y-1">
             <li>
+              Spawn Level: <b>Lvl 40–60</b>
+            </li>
+            <li>
               <b>Kubfu</b> spawns in <b>Cherry Groves</b>.
             </li>
             <li>
@@ -1043,7 +1104,13 @@ function HowToGetPokemonPageInner() {
               <b>Zacian</b> and <b>Zamazenta</b> spawn in <b>Forest Biomes</b>.
             </li>
             <li>
+              Zacian, Zamazenta Spawn Level: <b>Lvl 65–80</b>
+            </li>
+            <li>
               <b>Eternatus</b> spawns in the <b>End dimension</b>.
+            </li>
+            <li>
+              Eternatus Spawn Level: <b>Lvl 70–90</b>
             </li>
             <li>
               To Crown <b>Zamazenta</b>:
@@ -1108,6 +1175,9 @@ function HowToGetPokemonPageInner() {
               Must be in <b>Hoenn Series</b>.
             </li>
             <li>
+              Spawn Level: <b>Lvl 50–60</b>
+            </li>
+            <li>
               Structure generates in <b>Snowy Badlands</b>.
             </li>
             <li>
@@ -1128,6 +1198,9 @@ function HowToGetPokemonPageInner() {
           <ul className="list-disc list-inside space-y-1">
             <li>
               Must be in <b>Hoenn Series</b>.
+            </li>
+            <li>
+              Spawn Level: <b>Lvl 50–60</b>
             </li>
             <li>
               Structure generates in <b>Lush Desert</b>.
@@ -1153,6 +1226,9 @@ function HowToGetPokemonPageInner() {
               Must be in <b>Hoenn Series</b>.
             </li>
             <li>
+              Spawn Level: <b>Lvl 50–60</b>
+            </li>
+            <li>
               Structure generates in <b>Alpine Highlands</b>.
             </li>
             <li>
@@ -1175,6 +1251,9 @@ function HowToGetPokemonPageInner() {
           <ul className="list-disc list-inside space-y-1">
             <li>No series required.</li>
             <li>
+              Spawn Level: <b>Lvl 50–70</b>
+            </li>
+            <li>
               Structure generates in underground <b>Caves</b>.
             </li>
             <li>
@@ -1194,6 +1273,9 @@ function HowToGetPokemonPageInner() {
           <ul className="list-disc list-inside space-y-1">
             <li>No series required.</li>
             <li>
+              Spawn Level: <b>Lvl 50–70</b>
+            </li>
+            <li>
               Structure generates in <b>Desert Biomes</b>.
             </li>
             <li>
@@ -1212,6 +1294,9 @@ function HowToGetPokemonPageInner() {
           </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>No series required.</li>
+            <li>
+              Spawn Level: <b>Lvl 70–80</b>
+            </li>
             <li>
               Structure generates in <b>Snowy Taiga Biomes</b>.
             </li>
@@ -1254,6 +1339,9 @@ function HowToGetPokemonPageInner() {
               <b>Sapphire Dew</b> is dropped by beating the{" "}
               <b>Hoenn Champion Rocco</b>.
             </li>
+            <li>
+              Spawn Level: <b>Lvl 55</b>
+            </li>
           </ul>
 
           <h4
@@ -1277,6 +1365,9 @@ function HowToGetPokemonPageInner() {
               <b>Ruby Dew</b> is dropped by beating the{" "}
               <b>Hoenn Champion Rocco</b>.
             </li>
+            <li>
+              Spawn Level: <b>Lvl 55</b>
+            </li>
           </ul>
           <p className="text-xs opacity-50 italic">
             Use <code>/locate structure cobbleverse:secret_garden</code>
@@ -1299,6 +1390,9 @@ function HowToGetPokemonPageInner() {
             Jirachi
           </h4>
           <ul className="list-disc list-inside space-y-1">
+            <li>
+              Spawn Level: <b>Lvl 75</b>
+            </li>
             <li>
               Must be in <b>Hoenn Series</b>.
             </li>
@@ -1339,6 +1433,9 @@ function HowToGetPokemonPageInner() {
               <b>Cresselia</b> spawns in <b>Cherry Groves</b> during{" "}
               <b>nighttime</b>.
             </li>
+            <li>
+              Spawn Level: <b>Lvl 40–65</b>
+            </li>
           </ul>
 
           <h4
@@ -1352,6 +1449,9 @@ function HowToGetPokemonPageInner() {
             <li>
               <b>Darkrai</b> spawns in <b>Dark Forests</b> during{" "}
               <b>nighttime</b>.
+            </li>
+            <li>
+              Spawn Level: <b>Lvl 40–65</b>
             </li>
           </ul>
 
@@ -1369,6 +1469,9 @@ function HowToGetPokemonPageInner() {
             <li>
               <b>Manaphy</b> and <b>Phione</b> spawn in <b>any Ocean biomes</b>.
             </li>
+            <li>
+              Spawn Level: <b>Lvl 50</b>
+            </li>
           </ul>
 
           <SeaGuardiansImage />
@@ -1384,6 +1487,9 @@ function HowToGetPokemonPageInner() {
           <ul className="list-disc list-inside space-y-1">
             <li>
               <b>Heatran</b> spawns in <b>Nether Wastes</b>.
+            </li>
+            <li>
+              Spawn Level: <b>Lvl 50–65</b>
             </li>
           </ul>
 
@@ -1401,6 +1507,9 @@ function HowToGetPokemonPageInner() {
             <li>
               <b>Shaymin</b> spawns in <b>Floral biomes</b> during{" "}
               <b>daytime</b> with <b>clear weather</b>.
+            </li>
+            <li>
+              Spawn Level: <b>Lvl 50–55</b>
             </li>
             <li>
               <span className="text-red-300">Note:</span> <b>Gracidea Flower</b>{" "}
@@ -1423,6 +1532,9 @@ function HowToGetPokemonPageInner() {
               <b>Arceus</b> can be found in the <b>End dimension</b>.
             </li>
             <li>
+              Spawn Level: <b>Lvl 70</b>
+            </li>
+            <li>
               <b>Arceus Plates</b> can only be obtained through{" "}
               <b>Ominous Trial Vaults</b> in <b>Trial Chambers</b>.
             </li>
@@ -1434,8 +1546,8 @@ function HowToGetPokemonPageInner() {
               <b>5%</b> drop by a <b>Klefki</b>.
             </li>
             <li>
-              You can also change <b>Arceus’ type</b> using <b>Z-Crystals</b>,
-              but this does <u>not</u> change the damage type of Arceus’
+              You can also change <b>Arceus' type</b> using <b>Z-Crystals</b>,
+              but this does <u>not</u> change the damage type of Arceus'
               signature move <b>Judgment</b>. Only <b>Arceus Plates</b> alter
               the damage type of Judgment.
             </li>
@@ -1459,6 +1571,9 @@ function HowToGetPokemonPageInner() {
                 Isles, Warped Mesa
               </b>{" "}
               biomes.
+            </li>
+            <li>
+              Spawn Level: <b>Lvl 50</b>
             </li>
             <li>
               It has a <b>3x spawn multiplier</b> in the{" "}
@@ -1501,6 +1616,9 @@ function HowToGetPokemonPageInner() {
             <li>
               <b>Cobalion</b> spawns in <b>Windswept Forest</b> biome.
             </li>
+            <li>
+              Spawn Level: <b>Lvl 50–70</b>
+            </li>
           </ul>
 
           <h4
@@ -1512,6 +1630,9 @@ function HowToGetPokemonPageInner() {
           <ul className="list-disc list-inside space-y-1">
             <li>
               <b>Terrakion</b> spawns in <b>Savanna</b> biomes.
+            </li>
+            <li>
+              Spawn Level: <b>Lvl 50–70</b>
             </li>
           </ul>
 
@@ -1525,6 +1646,9 @@ function HowToGetPokemonPageInner() {
             <li>
               <b>Virizion</b> spawns in <b>all Forest</b> biomes.
             </li>
+            <li>
+              Spawn Level: <b>Lvl 50–70</b>
+            </li>
           </ul>
 
           <h4
@@ -1537,6 +1661,9 @@ function HowToGetPokemonPageInner() {
             <li>
               <b>Keldeo</b> spawns in <b>Sakura Grove</b> and{" "}
               <b>Sakura Valley</b>.
+            </li>
+            <li>
+              Keldeo Ordinary Form: <b>Lvl 60</b>; Resolute Form: <b>Lvl 80</b>
             </li>
           </ul>
 
@@ -1561,6 +1688,9 @@ function HowToGetPokemonPageInner() {
               <b>Tornadus</b> spawns in <b>All Ocean Biomes</b>. <b>3x</b> when{" "}
               <b>Raining</b>.
             </li>
+            <li>
+              Spawn Level: <b>Lvl 50–60</b>
+            </li>
           </ul>
 
           <h4
@@ -1573,6 +1703,9 @@ function HowToGetPokemonPageInner() {
             <li>
               <b>Thundurus</b> spawns in <b>Mountain</b> biomes. <b>3x</b> when{" "}
               <b>Thundering</b>.
+            </li>
+            <li>
+              Spawn Level: <b>Lvl 50–60</b>
             </li>
           </ul>
 
@@ -1587,6 +1720,9 @@ function HowToGetPokemonPageInner() {
               <b>Landorus</b> spawns in <b>Badlands</b> biomes.{" "}
               <b>Clear weather</b>.
             </li>
+            <li>
+              Spawn Level: <b>Lvl 50–60</b>
+            </li>
           </ul>
 
           <h4
@@ -1599,6 +1735,9 @@ function HowToGetPokemonPageInner() {
             <li>
               <b>Enamorus</b> spawns in <b>Mountain</b> biomes. <b>4x</b> when{" "}
               <b>Thundering</b>.
+            </li>
+            <li>
+              Spawn Level: <b>Lvl 50</b>
             </li>
           </ul>
 
@@ -1628,6 +1767,9 @@ function HowToGetPokemonPageInner() {
             <li>
               <b>Meloetta</b> spawns in <b>Sunflower Plains</b>.
             </li>
+            <li>
+              Spawn Level: <b>Lvl 50–55</b>
+            </li>
           </ul>
 
           <h4 className="font-medium">Form Change</h4>
@@ -1651,6 +1793,9 @@ function HowToGetPokemonPageInner() {
           <ul className="list-disc list-inside space-y-1">
             <li>
               <b>Genesect</b> spawns in <b>Dripstone Caves</b>.
+            </li>
+            <li>
+              Spawn Level: <b>Lvl 48–68</b>
             </li>
           </ul>
 
@@ -1745,6 +1890,9 @@ function HowToGetPokemonPageInner() {
             <li>
               <b>Hoopa</b> spawns in the <b>End dimension</b>.
             </li>
+            <li>
+              Spawn Level: <b>Lvl 65–75</b>
+            </li>
           </ul>
 
           <h4 className="font-medium">Unbound Form</h4>
@@ -1775,6 +1923,9 @@ function HowToGetPokemonPageInner() {
               <b> Snowy Slopes</b>, <b> Jagged Peaks</b>, <b> Frozen Peaks</b>,
               and <b> Stony Peaks</b>.
             </li>
+            <li>
+              Spawn Level: <b>Lvl 70</b>
+            </li>
           </ul>
 
           <VolcanionImage />
@@ -1798,6 +1949,9 @@ function HowToGetPokemonPageInner() {
               <b>Tapu Koko</b> spawns in <b>Savanna</b> and <b>Jungle</b>{" "}
               biomes.
             </li>
+            <li>
+              Spawn Level: <b>Lvl 50–70</b>
+            </li>
           </ul>
 
           <h4
@@ -1809,6 +1963,9 @@ function HowToGetPokemonPageInner() {
           <ul className="list-disc list-inside space-y-1">
             <li>
               <b>Tapu Lele</b> spawns in <b>Floral</b> and <b>Beach</b> biomes.
+            </li>
+            <li>
+              Spawn Level: <b>Lvl 50–70</b>
             </li>
           </ul>
 
@@ -1822,6 +1979,9 @@ function HowToGetPokemonPageInner() {
             <li>
               <b>Tapu Bulu</b> spawns in <b>Rivers</b> and <b>Jungle</b> biomes.
             </li>
+            <li>
+              Spawn Level: <b>Lvl 50–70</b>
+            </li>
           </ul>
 
           <h4
@@ -1833,6 +1993,9 @@ function HowToGetPokemonPageInner() {
           <ul className="list-disc list-inside space-y-1">
             <li>
               <b>Tapu Fini</b> spawns in <b>Rivers</b> and <b>Beach</b> biomes.
+            </li>
+            <li>
+              Spawn Level: <b>Lvl 50–70</b>
             </li>
           </ul>
 
@@ -1852,6 +2015,9 @@ function HowToGetPokemonPageInner() {
               .
             </li>
             <li>
+              Spawn Levels — Cosmog: <b>Lvl 28–42</b>, Cosmoem: <b>Lvl 44–52</b>
+            </li>
+            <li>
               <b>Cosmoem</b> evolves at <b>level 53</b>:
               <ul className="list-disc list-inside ml-6">
                 <li>
@@ -1867,10 +2033,19 @@ function HowToGetPokemonPageInner() {
               <b>End</b>.
             </li>
             <li>
+              Spawn Level: <b>Lvl 70</b>
+            </li>
+            <li>
               <b>Lunala</b> spawns in <b>Dark Forests</b> and in the <b>End</b>.
             </li>
             <li>
+              Spawn Level: <b>Lvl 70</b>
+            </li>
+            <li>
               <b>Necrozma</b> spawns in the <b>End</b>.
+            </li>
+            <li>
+              Spawn Level: <b>Lvl 70–75</b>
             </li>
           </ul>
 
@@ -1880,6 +2055,9 @@ function HowToGetPokemonPageInner() {
               Fuse <b>Lunala/Solgaleo</b> with <b>Necrozma</b> by using or
               interacting a<b> N-Solarizer</b>/<b> Lunarizer</b> on{" "}
               <b>Solgaleo/Lunala</b> and on <b>Necrozma</b>.
+            </li>
+            <li>
+              Fused Necrozma in towers: <b>Lvl 80</b>
             </li>
             <li>You can unfuse them using the same item.</li>
             <li>
