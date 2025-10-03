@@ -157,33 +157,92 @@ export async function parseSpeciesAndSpawnFromZip(file) {
         const json = parseJsonWithFallbacks(content, path);
 
         if (json && json.name) {
-          // Validate and sanitize the data
-          const sanitizedJson = {
-            name: (json.name?.toLowerCase() || "").trim(),
-            nationalDex: parseInt(json.nationalPokedexNumber) || null,
-            types: [json.primaryType, json.secondaryType]
-              .filter(Boolean)
-              .map((t) => t.trim()),
-            stats: {
-              hp: parseInt(json.baseStats?.hp) || 0,
-              attack: parseInt(json.baseStats?.attack) || 0,
-              defence: parseInt(json.baseStats?.defence) || 0,
-              special_attack: parseInt(json.baseStats?.special_attack) || 0,
-              special_defence: parseInt(json.baseStats?.special_defence) || 0,
-              speed: parseInt(json.baseStats?.speed) || 0,
-            },
-            evYield: json.evYield || {},
-            moves: Array.isArray(json.moves) ? json.moves : [],
-            sourceFile: file.name,
+          // Helper to build a normalized species entry from a base or form object
+          const buildEntry = (baseName, specObj, fallback) => {
+            const name = (baseName || "").toLowerCase().trim();
+            const primaryType = specObj.primaryType ?? fallback?.primaryType;
+            const secondaryType =
+              specObj.secondaryType ?? fallback?.secondaryType;
+            const baseStats = specObj.baseStats ?? fallback?.baseStats ?? {};
+            const movesArr = Array.isArray(specObj.moves)
+              ? specObj.moves
+              : Array.isArray(fallback?.moves)
+              ? fallback.moves
+              : [];
+
+            return {
+              name,
+              nationalDex: parseInt(json.nationalPokedexNumber) || null,
+              types: [primaryType, secondaryType]
+                .filter(Boolean)
+                .map((t) => t.trim()),
+              stats: {
+                hp: parseInt(baseStats?.hp) || 0,
+                attack: parseInt(baseStats?.attack) || 0,
+                defence: parseInt(baseStats?.defence) || 0,
+                special_attack: parseInt(baseStats?.special_attack) || 0,
+                special_defence: parseInt(baseStats?.special_defence) || 0,
+                speed: parseInt(baseStats?.speed) || 0,
+              },
+              evYield: json.evYield || {},
+              moves: movesArr,
+              sourceFile: file.name,
+            };
           };
 
-          // Only add if we have at least a name
-          if (sanitizedJson.name) {
-            results.push(sanitizedJson);
+          // Base species entry
+          const baseName = (json.name || "").toLowerCase().trim();
+          const baseEntry = buildEntry(baseName, json);
+          if (baseEntry.name) {
+            results.push(baseEntry);
             successCount++;
           } else {
             skippedCount++;
-            console.warn(`⚠️ Skipping ${path} - invalid name`);
+            console.warn(`⚠️ Skipping ${path} - invalid base species name`);
+          }
+
+          // Regional forms (e.g., Alolan, Galarian)
+          if (Array.isArray(json.forms)) {
+            for (const form of json.forms) {
+              try {
+                // Determine adjective (alolan/galarian/others) if available
+                const lowerAspects = (form.aspects || []).map((a) =>
+                  (a || "").toLowerCase()
+                );
+                const lowerLabels = (form.labels || []).map((l) =>
+                  (l || "").toLowerCase()
+                );
+                let adjective = (form.name || "").toLowerCase();
+
+                if (
+                  lowerAspects.includes("alolan") ||
+                  lowerLabels.some((l) => l.includes("alolan"))
+                ) {
+                  adjective = "alolan";
+                } else if (
+                  lowerAspects.includes("galarian") ||
+                  lowerLabels.some((l) => l.includes("galarian"))
+                ) {
+                  adjective = "galarian";
+                }
+
+                const formDisplayBase = `${adjective} ${baseName}`.trim();
+                const formEntry = buildEntry(formDisplayBase, form, json);
+
+                if (formEntry.name) {
+                  results.push(formEntry);
+                  successCount++;
+                } else {
+                  skippedCount++;
+                  console.warn(
+                    `⚠️ Skipping form for ${path} - invalid form name`
+                  );
+                }
+              } catch (formErr) {
+                errorCount++;
+                console.warn(`⚠️ Failed to process form for ${path}`, formErr);
+              }
+            }
           }
         } else {
           errorCount++;

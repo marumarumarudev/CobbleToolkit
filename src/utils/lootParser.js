@@ -146,21 +146,78 @@ export async function parseLootFromZip(file) {
         if (data && (data.name || data.target)) {
           const displayName =
             data.name || (data.target ? data.target.split(":").pop() : null);
-          const drops = (data?.drops?.entries || []).map((entry) => ({
+          const baseDrops = (data?.drops?.entries || []).map((entry) => ({
             item: entry.item || "unknown_item",
             quantity: entry.quantityRange || 1,
             chance: entry.percentage ?? 100,
           }));
 
-          if (drops.length > 0) {
+          // Helper to push a loot entry
+          const pushEntry = (pokemonName, drops) => {
             results.push({
-              name: displayName || "unknown_pokemon",
+              name: pokemonName || "unknown_pokemon",
               namespace: path.split("/")[1],
               pokedexNumber: data.nationalPokedexNumber ?? null,
               drops,
             });
             successCount++;
-          } else {
+          };
+
+          // Push base species drops if present
+          if (baseDrops.length > 0) {
+            pushEntry(displayName, baseDrops);
+          }
+
+          // Also handle regional forms that define their own drops
+          if (Array.isArray(data.forms)) {
+            const baseName = (displayName || "").toLowerCase().trim();
+            for (const form of data.forms) {
+              try {
+                const formDrops = (form?.drops?.entries || []).map((entry) => ({
+                  item: entry.item || "unknown_item",
+                  quantity: entry.quantityRange || 1,
+                  chance: entry.percentage ?? 100,
+                }));
+                if (formDrops.length === 0) continue; // Only add forms that actually define drops
+
+                const lowerAspects = (form.aspects || []).map((a) =>
+                  (a || "").toLowerCase()
+                );
+                const lowerLabels = (form.labels || []).map((l) =>
+                  (l || "").toLowerCase()
+                );
+                let adjective = (form.name || "").toLowerCase();
+                if (
+                  lowerAspects.includes("alolan") ||
+                  lowerLabels.some((l) => l.includes("alolan"))
+                ) {
+                  adjective = "alolan";
+                } else if (
+                  lowerAspects.includes("galarian") ||
+                  lowerLabels.some((l) => l.includes("galarian"))
+                ) {
+                  adjective = "galarian";
+                }
+                const formName = `${adjective} ${baseName}`.trim();
+
+                pushEntry(formName, formDrops);
+              } catch (formErr) {
+                errorCount++;
+                console.warn(
+                  `⚠️ Failed to process form drops for ${path}`,
+                  formErr
+                );
+              }
+            }
+          }
+
+          if (
+            baseDrops.length === 0 &&
+            (!Array.isArray(data.forms) ||
+              data.forms.every(
+                (f) => !f?.drops?.entries || f.drops.entries.length === 0
+              ))
+          ) {
             errorCount++;
             console.warn(`⚠️ Skipping ${path} - no valid drops found`);
           }
