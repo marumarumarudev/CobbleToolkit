@@ -114,7 +114,7 @@ export default function ItemsGuidePage() {
             Keystone & Blank Megastone (Mega Evolution)
           </h3>
           <FullscreenImage
-            src="./guides/megaroid.png"
+            src="/guides/megaroid.png"
             alt="Keystone & Blank Megastone location"
             credit="doctor"
           />
@@ -130,12 +130,12 @@ export default function ItemsGuidePage() {
           <ImageCarousel
             images={[
               {
-                src: "./guides/sparkling-stone.png",
+                src: "/guides/sparkling-stone.png",
                 alt: "Suspicious sand site",
                 credit: "maru",
               },
               {
-                src: "./guides/archaeological-site.png",
+                src: "/guides/archaeological-site.png",
                 alt: "Sparkling Stone in desert",
                 credit: "Mega Showdown",
               },
@@ -152,7 +152,7 @@ export default function ItemsGuidePage() {
             in <strong>Abandoned Observatories</strong>.
           </p>
           <FullscreenImage
-            src="./guides/observatory.png"
+            src="/guides/observatory.png"
             alt="Blank Z-Crystal in observatory"
             credit="Mega Showdown"
           />
@@ -166,7 +166,7 @@ export default function ItemsGuidePage() {
             diamond pickaxe in a<strong> Wishing Weald</strong>.
           </p>
           <FullscreenImage
-            src="./guides/wishing-weald.png"
+            src="/guides/wishing-weald.png"
             alt="Wishing Star crystal node"
             credit="Mega Showdown"
           />
@@ -183,12 +183,12 @@ export default function ItemsGuidePage() {
           <ImageCarousel
             images={[
               {
-                src: "./guides/tera-orb.png",
+                src: "/guides/tera-orb.png",
                 alt: "Tera Orb",
                 credit: "doctor",
               },
               {
-                src: "./guides/omniring.png",
+                src: "/guides/omniring.png",
                 alt: "Omni Ring",
                 credit: "doctor",
               },
@@ -342,17 +342,17 @@ function ImageCarousel({ images }) {
 function DepartmentStoreSlider() {
   const images = [
     {
-      src: "./guides/department-store-1.png",
+      src: "/guides/department-store-1.png",
       alt: "Department Store",
       credit: "doctor",
     },
     {
-      src: "./guides/department-store-2.png",
+      src: "/guides/department-store-2.png",
       alt: "Department Store",
       credit: "doctor",
     },
     {
-      src: "./guides/department-store-3.png",
+      src: "/guides/department-store-3.png",
       alt: "Department Store",
       credit: "doctor",
     },

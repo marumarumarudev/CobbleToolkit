@@ -103,12 +103,12 @@ export default function HomePage() {
           </a>{" "}
           • Deployed on{" "}
           <a
-            href="https://pages.github.com"
+            href="https://vercel.com/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-400 hover:underline"
           >
-            GitHub Pages
+            Vercel
           </a>
           <p className="mt-2 text-gray-500 text-sm">
             Made this out of laziness, boredom and love. Discord:{" "}
