@@ -2,6 +2,7 @@
   "name": "cobblemon-web",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://username.github.io/cobblemon-web",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
