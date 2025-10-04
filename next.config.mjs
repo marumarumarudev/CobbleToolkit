@@ -2,8 +2,6 @@
 const nextConfig = {
   output: "export",
   trailingSlash: true,
-  basePath: "/cobblemon-web",
-  assetPrefix: "/cobblemon-web",
   images: {
     unoptimized: true,
     remotePatterns: [
