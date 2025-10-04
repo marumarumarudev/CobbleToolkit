@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 
 export default function FeedbackGallery() {
   const screenshots = [
-    { src: "/feedback/feedback1.png", alt: "Feedback 1" },
-    { src: "/feedback/feedback2.png", alt: "Feedback 2" },
-    { src: "/feedback/feedback3.png", alt: "Feedback 3" },
-    { src: "/feedback/feedback4.png", alt: "Feedback 4" },
+    { src: "./feedback/feedback1.png", alt: "Feedback 1" },
+    { src: "./feedback/feedback2.png", alt: "Feedback 2" },
+    { src: "./feedback/feedback3.png", alt: "Feedback 3" },
+    { src: "./feedback/feedback4.png", alt: "Feedback 4" },
   ];
 
   useEffect(() => {
