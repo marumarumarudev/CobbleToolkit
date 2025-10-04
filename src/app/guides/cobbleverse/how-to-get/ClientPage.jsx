@@ -971,7 +971,7 @@ function HowToGetPokemonPageInner() {
           {/* Static banner image */}
           <div className="relative h-48 sm:h-64 md:h-80 w-full overflow-hidden rounded-2xl shadow-lg">
             <Image
-              src="/guides/zygarde.png"
+              src="./guides/zygarde.png"
               alt="Where to get Zygarde"
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
@@ -3422,12 +3422,12 @@ function ImageCarousel({ images }) {
 function MewImageSlider() {
   const images = [
     {
-      src: "/guides/origin-fossil.jpg",
+      src: "./guides/origin-fossil.jpg",
       alt: "Origin Fossil crafting recipe",
       credit: "COBBLEVERSE",
     },
     {
-      src: "/guides/mew-temple.webp",
+      src: "./guides/mew-temple.webp",
       alt: "Mew's Temple in Jungle biome",
       credit: "COBBLEVERSE",
     },
@@ -3438,17 +3438,17 @@ function MewImageSlider() {
 function MewTwoImageSlider() {
   const images = [
     {
-      src: "/guides/atena.png",
+      src: "./guides/atena.png",
       alt: "Team Rocket Admin Atena",
       credit: "doctor",
     },
     {
-      src: "/guides/synthetic-matrix.png",
+      src: "./guides/synthetic-matrix.png",
       alt: "Synthetic Matrix",
       credit: "doctor, Soggy&Wet",
     },
     {
-      src: "/guides/ressurection-mewtwo.png",
+      src: "./guides/ressurection-mewtwo.png",
       alt: "Fossil Resurrection Machine with Ancient DNA and Cloning Catalyst",
       credit: "maru",
     },
@@ -3459,12 +3459,12 @@ function MewTwoImageSlider() {
 function TypeNullSilvallyImageSlider() {
   const images = [
     {
-      src: "/guides/fossilized-helmet.png",
+      src: "./guides/fossilized-helmet.png",
       alt: "Fossilized Helmet",
       credit: "maru",
     },
     {
-      src: "/guides/typenull.png",
+      src: "./guides/typenull.png",
       alt: "Type Null + Silvally",
       credit: "maru",
     },
@@ -3475,12 +3475,12 @@ function TypeNullSilvallyImageSlider() {
 function KyogreImageSlider() {
   const images = [
     {
-      src: "/guides/blue-orb.png",
+      src: "./guides/blue-orb.png",
       alt: "Blue Orb",
       credit: "maru",
     },
     {
-      src: "/guides/water-spout-tm.png",
+      src: "./guides/water-spout-tm.png",
       alt: "Water Spout Barrel",
       credit: "skeleton",
     },
@@ -3491,17 +3491,17 @@ function KyogreImageSlider() {
 function GroudonImageSlider() {
   const images = [
     {
-      src: "/guides/red-orb.png",
+      src: "./guides/red-orb.png",
       alt: "Red Orb",
       credit: "maru",
     },
     {
-      src: "/guides/groudon-secret-1.png",
+      src: "./guides/groudon-secret-1.png",
       alt: "Groudon Secret",
       credit: "skeleton",
     },
     {
-      src: "/guides/groudon-secret-2.png",
+      src: "./guides/groudon-secret-2.png",
       alt: "Groudon Secret",
       credit: "skeleton",
     },
@@ -3512,27 +3512,27 @@ function GroudonImageSlider() {
 function RayquazaImageSlider() {
   const images = [
     {
-      src: "/guides/emerald-emblem.png",
+      src: "./guides/emerald-emblem.png",
       alt: "Emerald Emblem",
       credit: "skeleton",
     },
     {
-      src: "/guides/kyogre-plush.png",
+      src: "./guides/kyogre-plush.png",
       alt: "Kyogre Chamber secret room",
       credit: "skeleton",
     },
     {
-      src: "/guides/skypillar-1.png",
+      src: "./guides/skypillar-1.png",
       alt: "Secret chest",
       credit: "skeleton",
     },
     {
-      src: "/guides/skypillar-2.png",
+      src: "./guides/skypillar-2.png",
       alt: "Secret chest",
       credit: "skeleton",
     },
     {
-      src: "/guides/skypillar-3.png",
+      src: "./guides/skypillar-3.png",
       alt: "Secret chest",
       credit: "skeleton",
     },
@@ -3543,52 +3543,52 @@ function RayquazaImageSlider() {
 function LugiaImageSlider() {
   const images = [
     {
-      src: "/guides/corrupted-shard-1.png",
+      src: "./guides/corrupted-shard-1.png",
       alt: "Corrupted Shards hidden in Radio Tower",
       credit: "doctor, maru",
     },
     {
-      src: "/guides/corrupted-shard-2.png",
+      src: "./guides/corrupted-shard-2.png",
       alt: "Corrupted Shards hidden in Radio Tower",
       credit: "doctor, maru",
     },
     {
-      src: "/guides/corrupted-shard-3.png",
+      src: "./guides/corrupted-shard-3.png",
       alt: "Corrupted Shards hidden in Radio Tower",
       credit: "doctor, maru",
     },
     {
-      src: "/guides/corrupted-shard-4.png",
+      src: "./guides/corrupted-shard-4.png",
       alt: "Corrupted Shards hidden in Radio Tower",
       credit: "doctor, maru",
     },
     {
-      src: "/guides/corrupted-shard-4a.png",
+      src: "./guides/corrupted-shard-4a.png",
       alt: "Corrupted Shards hidden in Radio Tower",
       credit: "doctor, maru, Soggy&Wet",
     },
     {
-      src: "/guides/corrupted-shard-5.png",
+      src: "./guides/corrupted-shard-5.png",
       alt: "Corrupted Shards hidden in Radio Tower",
       credit: "doctor, maru",
     },
     {
-      src: "/guides/corrupted-shard-6.png",
+      src: "./guides/corrupted-shard-6.png",
       alt: "Corrupted Shards hidden in Radio Tower",
       credit: "doctor, maru",
     },
     {
-      src: "/guides/corrupted-shard-7.png",
+      src: "./guides/corrupted-shard-7.png",
       alt: "Corrupted Shards hidden in Radio Tower",
       credit: "doctor, maru",
     },
     {
-      src: "/guides/corrupted-shard-8.png",
+      src: "./guides/corrupted-shard-8.png",
       alt: "Corrupted Shards hidden in Radio Tower",
       credit: "doctor, maru",
     },
     {
-      src: "/guides/whirl-island.png",
+      src: "./guides/whirl-island.png",
       alt: "Whirl Island where Lugia spawns",
       credit: "doctor",
     },
@@ -3599,17 +3599,17 @@ function LugiaImageSlider() {
 function HoohImageSlider() {
   const images = [
     {
-      src: "/guides/burned-tower.png",
+      src: "./guides/burned-tower.png",
       alt: "Burned Tower",
       credit: "COBBLEVERSE",
     },
     {
-      src: "/guides/bell-tower.png",
+      src: "./guides/bell-tower.png",
       alt: "Bell Tower",
       credit: "COBBLEVERSE",
     },
     {
-      src: "/guides/legendary-beasts.png",
+      src: "./guides/legendary-beasts.png",
       alt: "Legendary Beasts",
       credit: "maru",
     },
@@ -3620,27 +3620,27 @@ function HoohImageSlider() {
 function CosplayPikachuImageSlider() {
   const images = [
     {
-      src: "/guides/cosplay-rockstar.png",
+      src: "./guides/cosplay-rockstar.png",
       alt: "Rockstar Pikachu",
       credit: "maru",
     },
     {
-      src: "/guides/cosplay-phd.png",
+      src: "./guides/cosplay-phd.png",
       alt: "PhD Pikachu",
       credit: "maru",
     },
     {
-      src: "/guides/cosplay-libre.png",
+      src: "./guides/cosplay-libre.png",
       alt: "Libre Pikachu",
       credit: "maru",
     },
     {
-      src: "/guides/cosplay-belle.png",
+      src: "./guides/cosplay-belle.png",
       alt: "Belle Pikachu",
       credit: "maru",
     },
     {
-      src: "/guides/cosplay-popstar.png",
+      src: "./guides/cosplay-popstar.png",
       alt: "Popstar Cosplay Pikachu",
       credit: "maru",
     },
@@ -3651,52 +3651,52 @@ function CosplayPikachuImageSlider() {
 function CalyrexImageSlider() {
   const images = [
     {
-      src: "/guides/glastrier.png",
+      src: "./guides/glastrier.png",
       alt: "Glastrier",
       credit: "skeleton",
     },
     {
-      src: "/guides/glastrier-1.png",
+      src: "./guides/glastrier-1.png",
       alt: "Glastrier",
       credit: "doctor",
     },
     {
-      src: "/guides/glastrier-2.png",
+      src: "./guides/glastrier-2.png",
       alt: "Glastrier",
       credit: "doctor",
     },
     {
-      src: "/guides/glastrier-3.png",
+      src: "./guides/glastrier-3.png",
       alt: "Glastrier",
       credit: "doctor",
     },
     {
-      src: "/guides/glastrier-4.png",
+      src: "./guides/glastrier-4.png",
       alt: "Glastrier",
       credit: "doctor",
     },
     {
-      src: "/guides/spectrier.png",
+      src: "./guides/spectrier.png",
       alt: "Spectrier",
       credit: "skeleton",
     },
     {
-      src: "/guides/spectrier-1.png",
+      src: "./guides/spectrier-1.png",
       alt: "Spectrier",
       credit: "doctor",
     },
     {
-      src: "/guides/spectrier-2.png",
+      src: "./guides/spectrier-2.png",
       alt: "Spectrier",
       credit: "doctor",
     },
     {
-      src: "/guides/spectrier-3.png",
+      src: "./guides/spectrier-3.png",
       alt: "Spectrier",
       credit: "doctor",
     },
     {
-      src: "/guides/spectrier-4.png",
+      src: "./guides/spectrier-4.png",
       alt: "Spectrier",
       credit: "doctor",
     },
@@ -3707,22 +3707,22 @@ function CalyrexImageSlider() {
 function DeoxysImageSlider() {
   const images = [
     {
-      src: "/guides/deoxys-island.png",
+      src: "./guides/deoxys-island.png",
       alt: "End island with scattered meteorites",
       credit: "skeleton, doctor",
     },
     {
-      src: "/guides/deoxys-meteorite.png",
+      src: "./guides/deoxys-meteorite.png",
       alt: "Mega Meteorite in the End",
       credit: "skeleton, doctor",
     },
     {
-      src: "/guides/deoxys-item.png",
+      src: "./guides/deoxys-item.png",
       alt: "Hidden altar inside the meteorite",
       credit: "skeleton, doctor",
     },
     {
-      src: "/guides/deoxys-form-meteorite.png",
+      src: "./guides/deoxys-form-meteorite.png",
       alt: "Form-changing meteorite block",
       credit: "skeleton, doctor",
     },
@@ -3733,32 +3733,32 @@ function DeoxysImageSlider() {
 function AshGreninjaImageSlider() {
   const images = [
     {
-      src: "/guides/ash-greninja.png",
+      src: "./guides/ash-greninja.png",
       alt: "Ash Greninja",
       credit: "Mega Showdown",
     },
     {
-      src: "/guides/ash-house-1.png",
+      src: "./guides/ash-house-1.png",
       alt: "Ash House",
       credit: "doctor",
     },
     {
-      src: "/guides/ash.png",
+      src: "./guides/ash.png",
       alt: "Ash",
       credit: "doctor",
     },
     {
-      src: "/guides/ash-mom-1.png",
+      src: "./guides/ash-mom-1.png",
       alt: "Ash Mom",
       credit: "doctor",
     },
     {
-      src: "/guides/ash-mom-2.png",
+      src: "./guides/ash-mom-2.png",
       alt: "Ash Mom",
       credit: "doctor",
     },
     {
-      src: "/guides/ash-mom-3.png",
+      src: "./guides/ash-mom-3.png",
       alt: "Ash Mom",
       credit: "doctor",
     },
@@ -3769,27 +3769,27 @@ function AshGreninjaImageSlider() {
 function AshPikachuImageSlider() {
   const images = [
     {
-      src: "/guides/ash-pikachu.png",
+      src: "./guides/ash-pikachu.png",
       alt: "Ash Pikachu",
       credit: "doctor",
     },
     {
-      src: "/guides/ash-pikachu-1.png",
+      src: "./guides/ash-pikachu-1.png",
       alt: "Ash House",
       credit: "doctor",
     },
     {
-      src: "/guides/ash-mom-1.png",
+      src: "./guides/ash-mom-1.png",
       alt: "Ash Mom",
       credit: "doctor",
     },
     {
-      src: "/guides/ash-mom-2.png",
+      src: "./guides/ash-mom-2.png",
       alt: "Ash Mom",
       credit: "doctor",
     },
     {
-      src: "/guides/ash-mom-3.png",
+      src: "./guides/ash-mom-3.png",
       alt: "Ash Mom",
       credit: "doctor",
     },
@@ -3800,23 +3800,23 @@ function AshPikachuImageSlider() {
 function TaoTrioImageSlider() {
   const images = [
     {
-      src: "/guides/tao-1.png",
+      src: "./guides/tao-1.png",
       alt: "Kyurem in Ice Spikes (raining)",
       credit: "maru",
     },
     {
-      src: "/guides/tao-2.png",
+      src: "./guides/tao-2.png",
       alt: "Reshiram in mountains (clear)",
       credit: "maru",
     },
     {
-      src: "/guides/tao-3.png",
+      src: "./guides/tao-3.png",
       alt: "Zekrom in mountains (thundering)",
       credit: "maru",
     },
-    { src: "/guides/tao-4.png", alt: "DNA Splicer item", credit: "maru" },
+    { src: "./guides/tao-4.png", alt: "DNA Splicer item", credit: "maru" },
     {
-      src: "/guides/tao-5.png",
+      src: "./guides/tao-5.png",
       alt: "Kyurem fusion showcase",
       credit: "maru",
     },
@@ -3827,17 +3827,17 @@ function TaoTrioImageSlider() {
 function LegendaryBirdsImageSlider() {
   const images = [
     {
-      src: "/guides/galar-articuno.png",
+      src: "./guides/galar-articuno.png",
       alt: "Galarian Articuno (night)",
       credit: "maru",
     },
     {
-      src: "/guides/galar-zapdos.png",
+      src: "./guides/galar-zapdos.png",
       alt: "Galarian Zapdos (thundering)",
       credit: "maru",
     },
     {
-      src: "/guides/galar-moltres.png",
+      src: "./guides/galar-moltres.png",
       alt: "Galarian Moltres (day)",
       credit: "maru",
     },
@@ -3847,10 +3847,10 @@ function LegendaryBirdsImageSlider() {
 
 function CreationTrioImageSlider() {
   const images = [
-    { src: "/guides/dialga.png", alt: "Dialga spawn", credit: "maru" },
-    { src: "/guides/palkia.png", alt: "Palkia spawn", credit: "maru" },
+    { src: "./guides/dialga.png", alt: "Dialga spawn", credit: "maru" },
+    { src: "./guides/palkia.png", alt: "Palkia spawn", credit: "maru" },
     {
-      src: "/guides/giratina.png",
+      src: "./guides/giratina.png",
       alt: "Giratina in Ancient City",
       credit: "maru",
     },
@@ -3861,7 +3861,7 @@ function CreationTrioImageSlider() {
 function RiverGuardiansImageSlider() {
   const images = [
     {
-      src: "/guides/river-guardians.png",
+      src: "./guides/river-guardians.png",
       alt: "Azelf, Mesprit, Uxie at Beaches",
       credit: "maru",
     },
@@ -3872,12 +3872,12 @@ function RiverGuardiansImageSlider() {
 function LunarDuoImageSlider() {
   const images = [
     {
-      src: "/guides/cresselia.png",
+      src: "./guides/cresselia.png",
       alt: "Cresselia in Cherry Groves (night)",
       credit: "maru",
     },
     {
-      src: "/guides/darkrai.png",
+      src: "./guides/darkrai.png",
       alt: "Darkrai in Dark Forests (night)",
       credit: "maru",
     },
@@ -3888,7 +3888,7 @@ function LunarDuoImageSlider() {
 function XerneasImage() {
   return (
     <SingleImage
-      src="/guides/xerneas.png"
+      src="./guides/xerneas.png"
       alt="Xerneas in Floral Biomes"
       credit="maru"
     />
@@ -3898,7 +3898,7 @@ function XerneasImage() {
 function YveltalImage() {
   return (
     <SingleImage
-      src="/guides/yveltal.png"
+      src="./guides/yveltal.png"
       alt="Yveltal in Dark Forests"
       credit="maru"
     />
@@ -3908,32 +3908,32 @@ function YveltalImage() {
 function ZygardeImageSlider() {
   const images = [
     {
-      src: "/guides/mossy-oubliette-ruins.png",
+      src: "./guides/mossy-oubliette-ruins.png",
       alt: "Ruins",
       credit: "Cobblemon",
     },
     {
-      src: "/guides/crumbling-arch-ruins.png",
+      src: "./guides/crumbling-arch-ruins.png",
       alt: "Ruins",
       credit: "Cobblemon",
     },
     {
-      src: "/guides/archaeological-site.png",
+      src: "./guides/archaeological-site.png",
       alt: "Dig Site",
       credit: "Mega Showdown",
     },
     {
-      src: "/guides/observatory.png",
+      src: "./guides/observatory.png",
       alt: "Observatory",
       credit: "Mega Showdown",
     },
     {
-      src: "/guides/wishing-weald.png",
+      src: "./guides/wishing-weald.png",
       alt: "Wishing Weald",
       credit: "Mega Showdown",
     },
     {
-      src: "/guides/reassembly-unit.png",
+      src: "./guides/reassembly-unit.png",
       alt: "Reassembly Unit",
       credit: "Mega Showdown",
     },
@@ -3944,17 +3944,17 @@ function ZygardeImageSlider() {
 function KubfuImageSlider() {
   const images = [
     {
-      src: "/guides/kubfu.png",
+      src: "./guides/kubfu.png",
       alt: "Kubfu in Cherry Groves",
       credit: "maru",
     },
     {
-      src: "/guides/urshifu-single-strike.png",
+      src: "./guides/urshifu-single-strike.png",
       alt: "Urshifu Single Strike Form",
       credit: "maru",
     },
     {
-      src: "/guides/urshifu-rapid-strike.png",
+      src: "./guides/urshifu-rapid-strike.png",
       alt: "Urshifu Rapid Strike Form",
       credit: "maru",
     },
@@ -3965,27 +3965,27 @@ function KubfuImageSlider() {
 function CombatTrioImageSlider() {
   const images = [
     {
-      src: "/guides/rusted-shield.png",
+      src: "./guides/rusted-shield.png",
       alt: "Rusted Shield from Sol Henge Ruins or Archaeological Sites",
       credit: "maru",
     },
     {
-      src: "/guides/rusted-sword.png",
+      src: "./guides/rusted-sword.png",
       alt: "Rusted Sword from Luna Henge Ruins or Archaeological Sites",
       credit: "maru",
     },
     {
-      src: "/guides/star-core.png",
+      src: "./guides/star-core.png",
       alt: "Star Core for Eternamax Eternatus",
       credit: "maru",
     },
     {
-      src: "/guides/crowned-dogs.png",
+      src: "./guides/crowned-dogs.png",
       alt: "Crowned Dogs",
       credit: "maru",
     },
     {
-      src: "/guides/eternamax-eternatus.png",
+      src: "./guides/eternamax-eternatus.png",
       alt: "Eternamax Eternatus",
       credit: "maru",
     },
@@ -3996,7 +3996,7 @@ function CombatTrioImageSlider() {
 function SeaGuardiansImage() {
   return (
     <SingleImage
-      src="/guides/sea-guardians.png"
+      src="./guides/sea-guardians.png"
       alt="Sea Guardians"
       credit="maru"
     />
@@ -4173,17 +4173,17 @@ function SingleImage({ src, alt, credit }) {
 function OriginalTitansImageSlider() {
   const images = [
     {
-      src: "/guides/regice.png",
+      src: "./guides/regice.png",
       alt: "Regice Structure in Snowy Badlands",
       credit: "maru",
     },
     {
-      src: "/guides/regirock.png",
+      src: "./guides/regirock.png",
       alt: "Regirock Structure in Lush Dsert",
       credit: "maru",
     },
     {
-      src: "/guides/registeel.png",
+      src: "./guides/registeel.png",
       alt: "Registeel Structure in Alpine Highlands",
       credit: "maru",
     },
@@ -4194,17 +4194,17 @@ function OriginalTitansImageSlider() {
 function EonDuoImageSlider() {
   const images = [
     {
-      src: "/guides/secret-garden.png",
+      src: "./guides/secret-garden.png",
       alt: "Secret Garden Structure in Deep Lukewarm Ocean",
       credit: "maru",
     },
     {
-      src: "/guides/latias-shrine.png",
+      src: "./guides/latias-shrine.png",
       alt: "Latias summoning with Ruby Dew",
       credit: "maru",
     },
     {
-      src: "/guides/latios-shrine.png",
+      src: "./guides/latios-shrine.png",
       alt: "Latios summoning with Sapphire Dew",
       credit: "maru",
     },
@@ -4215,12 +4215,12 @@ function EonDuoImageSlider() {
 function JirachiImageSlider() {
   const images = [
     {
-      src: "/guides/jirachi.png",
+      src: "./guides/jirachi.png",
       alt: "Jirachi Structure in Blooming Plateau",
       credit: "maru",
     },
     {
-      src: "/guides/melodic-tape.png",
+      src: "./guides/melodic-tape.png",
       alt: "Melodic Tape in barrel at top of structure",
       credit: "maru",
     },
@@ -4231,17 +4231,17 @@ function JirachiImageSlider() {
 function CelebiImageSlider() {
   const images = [
     {
-      src: "/guides/celebi-shrine.png",
+      src: "./guides/celebi-shrine.png",
       alt: "Celebi Shrine in Taiga biome",
       credit: "maru",
     },
     {
-      src: "/guides/rival-red.png",
+      src: "./guides/rival-red.png",
       alt: "Rival Red at Celebi Shrine",
       credit: "maru",
     },
     {
-      src: "/guides/celebi-summon.png",
+      src: "./guides/celebi-summon.png",
       alt: "Celebi being summoned at Celebi Shrine",
       credit: "maru",
     },
@@ -4252,7 +4252,7 @@ function CelebiImageSlider() {
 function HeatranImage() {
   return (
     <SingleImage
-      src="/guides/heatran.png"
+      src="./guides/heatran.png"
       alt="Heatran spawns in Nether Wastes"
       credit="maru"
     />
@@ -4262,7 +4262,7 @@ function HeatranImage() {
 function ShayminImage() {
   return (
     <SingleImage
-      src="/guides/shaymin.png"
+      src="./guides/shaymin.png"
       alt="Shaymin in Floral biomes (day, clear)"
       credit="maru"
     />
@@ -4272,12 +4272,12 @@ function ShayminImage() {
 function ArceusImageSlider() {
   const images = [
     {
-      src: "/guides/arceus.png",
+      src: "./guides/arceus.png",
       alt: "Arceus in The End",
       credit: "maru",
     },
     {
-      src: "/guides/ominous-vault.png",
+      src: "./guides/ominous-vault.png",
       alt: "Ominous Trial Vaults",
       credit: "maru",
     },
@@ -4288,7 +4288,7 @@ function ArceusImageSlider() {
 function VictiniImage() {
   return (
     <SingleImage
-      src="/guides/victini.png"
+      src="./guides/victini.png"
       alt="Victini in Mushroom Island"
       credit="maru"
     />
@@ -4298,22 +4298,22 @@ function VictiniImage() {
 function SwordsOfJusticeImageSlider() {
   const images = [
     {
-      src: "/guides/cobalion.png",
+      src: "./guides/cobalion.png",
       alt: "Cobalion in Windswept Forest",
       credit: "maru",
     },
     {
-      src: "/guides/terrakion.png",
+      src: "./guides/terrakion.png",
       alt: "Terrakion in Savanna biomes",
       credit: "maru",
     },
     {
-      src: "/guides/virizion.png",
+      src: "./guides/virizion.png",
       alt: "Virizion in Forest biomes",
       credit: "maru",
     },
     {
-      src: "/guides/keldeo.png",
+      src: "./guides/keldeo.png",
       alt: "Keldeo in Sakura Grove/Valley",
       credit: "maru",
     },
@@ -4324,22 +4324,22 @@ function SwordsOfJusticeImageSlider() {
 function ForcesOfNatureImageSlider() {
   const images = [
     {
-      src: "/guides/tornadus.png",
+      src: "./guides/tornadus.png",
       alt: "Tornadus in Ocean biomes (3x when raining)",
       credit: "maru",
     },
     {
-      src: "/guides/thundurus-enamorus.png",
+      src: "./guides/thundurus-enamorus.png",
       alt: "Thundurus in Mountain biomes (3x when thundering)",
       credit: "maru",
     },
     {
-      src: "/guides/landorus.png",
+      src: "./guides/landorus.png",
       alt: "Landorus in Badlands biomes (clear weather)",
       credit: "maru",
     },
     {
-      src: "/guides/reveal-glass.png",
+      src: "./guides/reveal-glass.png",
       alt: "Reveal Glass from Desert Pyramids (7.69% drop rate)",
       credit: "maru",
     },
@@ -4350,7 +4350,7 @@ function ForcesOfNatureImageSlider() {
 function MeloettaImage() {
   return (
     <SingleImage
-      src="/guides/meloetta.png"
+      src="./guides/meloetta.png"
       alt="Meloetta in Sunflower Plains"
       credit="maru"
     />
@@ -4360,7 +4360,7 @@ function MeloettaImage() {
 function GenesectImage() {
   return (
     <SingleImage
-      src="/guides/genesect.png"
+      src="./guides/genesect.png"
       alt="Genesect in Dripstone Caves"
       credit="maru"
     />
@@ -4370,7 +4370,7 @@ function GenesectImage() {
 function DiancieImage() {
   return (
     <SingleImage
-      src="/guides/diancie.png"
+      src="./guides/diancie.png"
       alt="Diancie near Diamond Ore and Amethyst Blocks in Lush Caves"
       credit="maru"
     />
@@ -4380,17 +4380,17 @@ function DiancieImage() {
 function HoopaImageSlider() {
   const images = [
     {
-      src: "/guides/hoopa.png",
+      src: "./guides/hoopa.png",
       alt: "Hoopa in The End",
       credit: "maru",
     },
     {
-      src: "/guides/hoopa-unbound.png",
+      src: "./guides/hoopa-unbound.png",
       alt: "Hoopa in The End",
       credit: "maru",
     },
     {
-      src: "/guides/prison-bottle.png",
+      src: "./guides/prison-bottle.png",
       alt: "Prison Bottle from Desert Wells (11.11% drop)",
       credit: "maru",
     },
@@ -4401,7 +4401,7 @@ function HoopaImageSlider() {
 function VolcanionImage() {
   return (
     <SingleImage
-      src="/guides/volcanion.png"
+      src="./guides/volcanion.png"
       alt="Volcanion biomes: Meadow, Grove, Snowy Slopes, Jagged/Frozen/Stony Peaks"
       credit="maru"
     />
@@ -4411,22 +4411,22 @@ function VolcanionImage() {
 function GuardianDeitiesImageSlider() {
   const images = [
     {
-      src: "/guides/tapu-koko.png",
+      src: "./guides/tapu-koko.png",
       alt: "Tapu Koko in Savanna/Jungle",
       credit: "maru",
     },
     {
-      src: "/guides/tapu-lele.png",
+      src: "./guides/tapu-lele.png",
       alt: "Tapu Lele in Floral/Beach",
       credit: "maru",
     },
     {
-      src: "/guides/tapu-bulu.png",
+      src: "./guides/tapu-bulu.png",
       alt: "Tapu Bulu in Rivers/Jungle",
       credit: "maru",
     },
     {
-      src: "/guides/tapu-fini.png",
+      src: "./guides/tapu-fini.png",
       alt: "Tapu Fini in Rivers/Beach",
       credit: "maru",
     },
@@ -4436,35 +4436,35 @@ function GuardianDeitiesImageSlider() {
 
 function LightTrioImageSlider() {
   const images = [
-    { src: "/guides/cosmog.png", alt: "Cosmog in End", credit: "maru" },
+    { src: "./guides/cosmog.png", alt: "Cosmog in End", credit: "maru" },
     {
-      src: "/guides/solgaleo.png",
+      src: "./guides/solgaleo.png",
       alt: "Solgaleo in Savanna/End",
       credit: "maru",
     },
     {
-      src: "/guides/lunala.png",
+      src: "./guides/lunala.png",
       alt: "Lunala in Dark Forest/End",
       credit: "maru",
     },
     {
-      src: "/guides/dusk-tower.png",
+      src: "./guides/dusk-tower.png",
       alt: "Dusk/Dawn Towers in End",
       credit: "maru",
     },
     {
-      src: "/guides/dawn-tower.png",
+      src: "./guides/dawn-tower.png",
       alt: "Dusk/Dawn Towers in End",
       credit: "maru",
     },
-    { src: "/guides/necrozma.png", alt: "Necrozma in End", credit: "maru" },
+    { src: "./guides/necrozma.png", alt: "Necrozma in End", credit: "maru" },
     {
-      src: "/guides/fused-necrozma.png",
+      src: "./guides/fused-necrozma.png",
       alt: "Necrozma in End",
       credit: "maru",
     },
     {
-      src: "/guides/ultra-necrozma.png",
+      src: "./guides/ultra-necrozma.png",
       alt: "Necrozma in End",
       credit: "maru",
     },
@@ -4475,57 +4475,57 @@ function LightTrioImageSlider() {
 function UltraBeastsImageSlider() {
   const images = [
     {
-      src: "/guides/nihilego.png",
+      src: "./guides/nihilego.png",
       alt: "Nihilego in End Dimension",
       credit: "maru",
     },
     {
-      src: "/guides/poipole.png",
+      src: "./guides/poipole.png",
       alt: "Poipole around Dawn/Dusk Tower",
       credit: "maru",
     },
     {
-      src: "/guides/naganadel.png",
+      src: "./guides/naganadel.png",
       alt: "Naganadel near Purpur Blocks",
       credit: "maru",
     },
     {
-      src: "/guides/pheromosa.png",
+      src: "./guides/pheromosa.png",
       alt: "Pheromosa in End/Terralith biomes",
       credit: "maru",
     },
     {
-      src: "/guides/guzzlord.png",
+      src: "./guides/guzzlord.png",
       alt: "Guzzlord in End Barrens/Deep Dark",
       credit: "maru",
     },
     {
-      src: "/guides/stakataka.png",
+      src: "./guides/stakataka.png",
       alt: "Stakataka in Deep Dark",
       credit: "maru",
     },
     {
-      src: "/guides/buzzwole.png",
+      src: "./guides/buzzwole.png",
       alt: "Buzzwole in Swamp Biomes",
       credit: "maru",
     },
     {
-      src: "/guides/xurkitree.png",
+      src: "./guides/xurkitree.png",
       alt: "Xurkitree in Mangrove Swamps",
       credit: "maru",
     },
     {
-      src: "/guides/celesteela.png",
+      src: "./guides/celesteela.png",
       alt: "Celesteela in Desert biomes",
       credit: "maru",
     },
     {
-      src: "/guides/kartana.png",
+      src: "./guides/kartana.png",
       alt: "Kartana in Bamboo Jungles",
       credit: "maru",
     },
     {
-      src: "/guides/blacephalon.png",
+      src: "./guides/blacephalon.png",
       alt: "Blacephalon in Dark Forests",
       credit: "maru",
     },
@@ -4536,22 +4536,22 @@ function UltraBeastsImageSlider() {
 function Gen7MythicalsImageSlider() {
   const images = [
     {
-      src: "/guides/zeraora.png",
+      src: "./guides/zeraora.png",
       alt: "Zeraora in Badlands/Forest biomes",
       credit: "maru",
     },
     {
-      src: "/guides/magearna.png",
+      src: "./guides/magearna.png",
       alt: "Magearna in Taiga biomes",
       credit: "maru",
     },
     {
-      src: "/guides/marshadow.png",
+      src: "./guides/marshadow.png",
       alt: "Marshadow in Deep Dark",
       credit: "maru",
     },
     {
-      src: "/guides/meltan.png",
+      src: "./guides/meltan.png",
       alt: "Meltan near Iron Blocks/Beach",
       credit: "maru",
     },
@@ -4562,22 +4562,22 @@ function Gen7MythicalsImageSlider() {
 function TreasuresOfRuinImageSlider() {
   const images = [
     {
-      src: "/guides/wo-chien.png",
+      src: "./guides/wo-chien.png",
       alt: "Wo-Chien in Mangrove Swamps",
       credit: "maru",
     },
     {
-      src: "/guides/chien-pao.png",
+      src: "./guides/chien-pao.png",
       alt: "Chien-Pao snowy biomes",
       credit: "maru",
     },
     {
-      src: "/guides/ting-lu.png",
+      src: "./guides/ting-lu.png",
       alt: "Ting-Lu in Dark Forests",
       credit: "maru",
     },
     {
-      src: "/guides/chi-yu.png",
+      src: "./guides/chi-yu.png",
       alt: "Chi-Yu in Basalt Deltas",
       credit: "maru",
     },
@@ -4588,22 +4588,22 @@ function TreasuresOfRuinImageSlider() {
 function OgerponImageSlider() {
   const images = [
     {
-      src: "/guides/ogerpon.png",
+      src: "./guides/ogerpon.png",
       alt: "Ogerpon in Lush Caves/Underground Jungle",
       credit: "maru",
     },
     {
-      src: "/guides/frozen-gimmi.png",
+      src: "./guides/frozen-gimmi.png",
       alt: "Ogerpon Masks & towers",
       credit: "maru",
     },
     {
-      src: "/guides/lush-gimmi.png",
+      src: "./guides/lush-gimmi.png",
       alt: "Ogerpon Masks & towers",
       credit: "maru",
     },
     {
-      src: "/guides/deserted-gimmi.png",
+      src: "./guides/deserted-gimmi.png",
       alt: "Ogerpon Masks & towers",
       credit: "maru",
     },
@@ -4613,19 +4613,19 @@ function OgerponImageSlider() {
 
 function LoyalThreeImageSlider() {
   const images = [
-    { src: "/guides/okidogi.png", alt: "Okidogi in Savanna", credit: "maru" },
+    { src: "./guides/okidogi.png", alt: "Okidogi in Savanna", credit: "maru" },
     {
-      src: "/guides/munkidori.png",
+      src: "./guides/munkidori.png",
       alt: "Munkidori in Jungle",
       credit: "maru",
     },
     {
-      src: "/guides/fezandipiti.png",
+      src: "./guides/fezandipiti.png",
       alt: "Fezandipiti in snowy biomes",
       credit: "maru",
     },
     {
-      src: "/guides/pecharunt.png",
+      src: "./guides/pecharunt.png",
       alt: "Pecharunt in Dark Forests",
       credit: "maru",
     },
@@ -4636,7 +4636,7 @@ function LoyalThreeImageSlider() {
 function TerapagosImage() {
   return (
     <SingleImage
-      src="/guides/terapagos.png"
+      src="./guides/terapagos.png"
       alt="Terapagos spawn info"
       credit="maru"
     />
@@ -4645,54 +4645,54 @@ function TerapagosImage() {
 
 function ParadoxAncientImageSlider() {
   const images = [
-    { src: "/guides/great-tusk.png", alt: "Great Tusk biomes", credit: "maru" },
+    { src: "./guides/great-tusk.png", alt: "Great Tusk biomes", credit: "maru" },
     {
-      src: "/guides/scream-tail.png",
+      src: "./guides/scream-tail.png",
       alt: "Scream Tail biomes",
       credit: "maru",
     },
     {
-      src: "/guides/brute-bonnet.png",
+      src: "./guides/brute-bonnet.png",
       alt: "Brute Bonnet in Jungles",
       credit: "maru",
     },
     {
-      src: "/guides/flutter-mane.png",
+      src: "./guides/flutter-mane.png",
       alt: "Flutter Mane in Deep Dark/Dark Forests",
       credit: "maru",
     },
     {
-      src: "/guides/slither-wing.png",
+      src: "./guides/slither-wing.png",
       alt: "Slither Wing spawn",
       credit: "maru",
     },
     {
-      src: "/guides/sandy-shocks.png",
+      src: "./guides/sandy-shocks.png",
       alt: "Sandy Shocks biomes",
       credit: "maru",
     },
     {
-      src: "/guides/roaring-moon.png",
+      src: "./guides/roaring-moon.png",
       alt: "Roaring Moon (night) biomes",
       credit: "maru",
     },
     {
-      src: "/guides/paradox-duo.png",
+      src: "./guides/paradox-duo.png",
       alt: "Koraidon in Beach",
       credit: "maru",
     },
     {
-      src: "/guides/walking-wake.png",
+      src: "./guides/walking-wake.png",
       alt: "Walking Wake (raining) biomes",
       credit: "maru",
     },
     {
-      src: "/guides/gouging-fire.png",
+      src: "./guides/gouging-fire.png",
       alt: "Gouging Fire in Basalt Deltas",
       credit: "maru",
     },
     {
-      src: "/guides/raging-bolt.png",
+      src: "./guides/raging-bolt.png",
       alt: "Raging Bolt biomes",
       credit: "maru",
     },
@@ -4703,57 +4703,57 @@ function ParadoxAncientImageSlider() {
 function ParadoxFutureImageSlider() {
   const images = [
     {
-      src: "/guides/iron-treads.png",
+      src: "./guides/iron-treads.png",
       alt: "Iron Treads biomes",
       credit: "maru",
     },
     {
-      src: "/guides/iron-bundle.png",
+      src: "./guides/iron-bundle.png",
       alt: "Iron Bundle snowy biomes",
       credit: "maru",
     },
     {
-      src: "/guides/iron-hands.png",
+      src: "./guides/iron-hands.png",
       alt: "Iron Hands in Desert (night)",
       credit: "maru",
     },
     {
-      src: "/guides/iron-jugulis.png",
+      src: "./guides/iron-jugulis.png",
       alt: "Iron Jugulis (night) biomes",
       credit: "maru",
     },
     {
-      src: "/guides/iron-moth.png",
+      src: "./guides/iron-moth.png",
       alt: "Iron Moth in Hills (daytime)",
       credit: "maru",
     },
     {
-      src: "/guides/iron-thorns.png",
+      src: "./guides/iron-thorns.png",
       alt: "Iron Thorns biomes",
       credit: "maru",
     },
     {
-      src: "/guides/iron-valiant.png",
+      src: "./guides/iron-valiant.png",
       alt: "Iron Valiant near lightning rod",
       credit: "maru",
     },
     {
-      src: "/guides/paradox-duo.png",
+      src: "./guides/paradox-duo.png",
       alt: "Miraidon in Beach",
       credit: "maru",
     },
     {
-      src: "/guides/iron-leaves.png",
+      src: "./guides/iron-leaves.png",
       alt: "Iron Leaves in Forests (night)",
       credit: "maru",
     },
     {
-      src: "/guides/iron-boulder.png",
+      src: "./guides/iron-boulder.png",
       alt: "Iron Boulder in Dark Forests (night)",
       credit: "maru",
     },
     {
-      src: "/guides/iron-crown.png",
+      src: "./guides/iron-crown.png",
       alt: "Iron Crown in Lush Caves/Underground Jungle (night)",
       credit: "maru",
     },
