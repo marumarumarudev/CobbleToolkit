@@ -422,6 +422,7 @@ export default function TrainerScanner() {
       gastly: 92,
       haunter: 93,
       gengar: 94,
+      onix: 95,
       drowzee: 96,
       hypno: 97,
       krabby: 98,
