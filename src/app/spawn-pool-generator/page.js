@@ -145,13 +145,14 @@ export default function SpawnPoolGenerator() {
   // custom modal state
   const [modal, setModal] = useState({
     open: false,
-    mode: null, // 'prompt' | 'confirm' | 'batch-merge'
+    mode: null, // 'prompt' | 'confirm' | 'batch-merge' | 'spawn-editor'
     title: "",
     message: "",
     placeholder: "",
     defaultValue: "",
     mergeDetails: null,
     resolve: null,
+    spawnEditor: null, // { fileIndex, spawnIndex } for spawn editing modal
   });
   const promptInputRef = useRef(null);
 

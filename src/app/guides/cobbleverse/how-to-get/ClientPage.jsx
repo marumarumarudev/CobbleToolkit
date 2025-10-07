@@ -1184,6 +1184,9 @@ function HowToGetPokemonPageInner() {
               Player needs <b>Ice Ore</b> (found in Frozen Peaks, Frozen Ocean,
               Ice Spikes) to turn into <b>Cryo Relic</b> to summon Regice.
             </li>
+            <li>
+              <b>Ice Ore Generation:</b> Y <b>65 to 120</b>
+            </li>
           </ul>
           <p className="text-xs opacity-50 italic">
             Use <code>/locate structure cobbleverse:legendary/regice</code>
@@ -1210,6 +1213,9 @@ function HowToGetPokemonPageInner() {
               Eroded Badlands) to turn into <b>Pebble Relic</b> to summon
               Regirock.
             </li>
+            <li>
+              <b>Rock Ore Generation:</b> Y <b>0 to 64</b>
+            </li>
           </ul>
           <p className="text-xs opacity-50 italic">
             Use <code>/locate structure cobbleverse:legendary/regirock</code>
@@ -1235,6 +1241,9 @@ function HowToGetPokemonPageInner() {
               Player needs <b>Steel Ore</b> (found in Deep Dark) to turn into{" "}
               <b>Metal Relic</b> to summon Registeel.
             </li>
+            <li>
+              <b>Steel Ore Generation:</b> Y <b>-60 to -1</b>
+            </li>
           </ul>
           <p className="text-xs opacity-50 italic">
             Use <code>/locate structure cobbleverse:legendary/registeel</code>
@@ -1254,15 +1263,9 @@ function HowToGetPokemonPageInner() {
               Spawn Level: <b>Lvl 50–70</b>
             </li>
             <li>
-              Structure generates in underground <b>Caves</b>.
-            </li>
-            <li>
-              <b>Also spawns naturally</b> in <b>all Cave biomes</b>.
+              <b>Spawns naturally</b> in <b>all Cave biomes</b>.
             </li>
           </ul>
-          <p className="text-xs opacity-50 italic">
-            Use <code>/locate structure legendary:regidrago_cave</code>
-          </p>
 
           <h4
             className="font-bold text-lg bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent"
@@ -1276,15 +1279,9 @@ function HowToGetPokemonPageInner() {
               Spawn Level: <b>Lvl 50–70</b>
             </li>
             <li>
-              Structure generates in <b>Desert Biomes</b>.
-            </li>
-            <li>
-              <b>Also spawns naturally</b> in <b>Desert biomes</b>.
+              <b>Spawns naturally</b> in <b>Desert biomes</b>.
             </li>
           </ul>
-          <p className="text-xs opacity-50 italic">
-            Use <code>/locate structure legendary:regieleki_cave</code>
-          </p>
 
           <h4
             className="font-bold text-lg bg-gradient-to-r from-purple-500 to-indigo-600 bg-clip-text text-transparent"
@@ -1298,17 +1295,9 @@ function HowToGetPokemonPageInner() {
               Spawn Level: <b>Lvl 70–80</b>
             </li>
             <li>
-              Structure generates in <b>Snowy Taiga Biomes</b>.
-            </li>
-            <li>
-              <b>Also spawns naturally</b> in the <b>Snowy Taiga</b> biome.
+              <b>Spawns naturally</b> in the <b>Snowy Taiga</b> biome.
             </li>
           </ul>
-          <p className="text-xs opacity-50 italic">
-            Use <code>/locate structure legendary:snowpoint_temple</code>
-          </p>
-
-          {/* Removed per request: NewTitansImageSlider */}
         </div>
       ),
     },

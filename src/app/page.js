@@ -14,13 +14,16 @@ export default function HomePage() {
     { name: "Guides", path: "/guides" },
     { name: "Feedback Gallery", path: "/feedback-gallery" },
     { name: "FAQ", path: "/faq" },
+    { name: "buh", path: "/buh" },
+    { name: "wuh", path: "/wuh" },
+    { name: "guh", path: "/guh" },
   ];
 
   useEffect(() => {
     document.title = "CobbleToolkit";
   }, []);
 
-  const upcomingTools = ["buh", "wuh", "guh"];
+  const upcomingTools = ["nuhuh"];
 
   return (
     <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-10 sm:px-6 sm:py-12 flex flex-col items-center">
