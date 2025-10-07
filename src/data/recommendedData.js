@@ -289,7 +289,7 @@ export const recommendedResources = {
     items: [
       {
         name: "doctor's Cobbleverse Server",
-        link: "https://blogs.mtdv.me/blog/posts/CtMgV9NjjB",
+        url: "https://blogs.mtdv.me/blog/posts/CtMgV9NjjB",
         note: "Hey guys come join our cobbleverse we currently have 20+ players with weekly and monthly tournaments.",
         author: "doctor",
       },
