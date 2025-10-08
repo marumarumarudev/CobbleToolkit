@@ -61,6 +61,16 @@ export default function SetupCobbleversePage() {
         </p>
       </section>
 
+      <section className="space-y-3">
+        <h2 className="text-2xl font-semibold text-white">
+          Why no COBBLEVERSE Public Server?
+        </h2>
+        <ImageWithFullscreen
+          src="/guides/public-server.png"
+          alt="Why no COBBLEVERSE Public Server?"
+        />
+      </section>
+
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold text-white">
           Transfer from CurseForge to Modrinth
