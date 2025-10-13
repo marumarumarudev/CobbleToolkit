@@ -24,7 +24,7 @@ export default function BreedingGuidePage() {
         <span className="font-medium">requiem</span>.
         <br />
         <span className="text-xs opacity-50 italic">
-          requiem misses azera and maru. 💖
+          requiem misses azera, doctor, and maru 💖
         </span>
       </p>
 
@@ -487,6 +487,17 @@ export default function BreedingGuidePage() {
             className="text-blue-400 underline"
           >
             Cobblemon Breeding (Ludichat)
+          </a>
+        </p>
+        <p>
+          🔗 Breeding compatibility checker:{" "}
+          <a
+            href="https://d-mcneil.github.io/pokemon-breeding-compatibility-checker/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-400 underline"
+          >
+            Pokémon Breeding Compatibility Checker
           </a>
         </p>
         <p>

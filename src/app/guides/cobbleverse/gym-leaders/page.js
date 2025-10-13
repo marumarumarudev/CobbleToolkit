@@ -80,6 +80,16 @@ export default function GymLeadersGuidePage() {
                 Hoenn Gym Leaders
               </a>
             </li>
+            <li>
+              <a
+                href="https://www.lumyverse.com/cobbleverse/sinnoh-gyms-leaders/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 underline"
+              >
+                Sinnoh Gym Leaders
+              </a>
+            </li>
           </ul>
           <ImageWithFullscreen
             src="/guides/item-to-spawn.png"

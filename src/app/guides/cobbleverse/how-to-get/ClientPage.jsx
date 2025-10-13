@@ -80,8 +80,8 @@ function HowToGetPokemonPageInner() {
               </ul>
             </li>
             <li>
-              To battle <b>Atena</b>, you need <b>Level 100</b> level cap
-              (available after <b>Elite 4 Lance</b> or <b>Champion Blue</b>).
+              To battle <b>Atena</b>, you need <b>Level 100</b> level cap. No
+              region series requirement.
             </li>
             <li>
               Find <b>Team Rocket Tower</b> in the Badlands biome.
@@ -102,7 +102,7 @@ function HowToGetPokemonPageInner() {
               Resurrection Machine to obtain Mewtwo.
             </li>
             <li>
-              Hidden inside Radio Tower (Johto Series) is the{" "}
+              Hidden inside Radio Tower (enable <b>Johto datapack</b>) is the{" "}
               <b>Synthetic Matrix</b>, used to craft
               <b> Armored Mewtwo</b>.
             </li>
@@ -277,13 +277,15 @@ function HowToGetPokemonPageInner() {
             <li>
               The <b>Emerald Emblem</b> to craft Rayquaza's spawn item is
               located in the room with the crafters, hidden behind the chest.
+              There's a lever above you to see the barrel.
             </li>
           </ul>
 
           <p className="text-sm">
             You can also find a <b>Lvl 100 Shiny Rayquaza</b> when you enter the
             <b> End</b> for the first time. This replaces the Ender Dragon and
-            can be disabled by deleting the <b>COBBLEVERSE - No Ender Dragon</b>
+            can be disabled by deleting the{" "}
+            <b>COBBLEVERSE - No Ender Dragon </b>
             datapack. The only way to respawn this is via commands:
             <code> /function cobbleverse:spawn_rayquaza</code>
           </p>
@@ -433,14 +435,14 @@ function HowToGetPokemonPageInner() {
     },
     lugia: {
       title: "Lugia",
-      series: "Johto Series",
+      series: "Johto",
       levelCap: "70+",
       content: (
         <div className="space-y-6">
           <ul className="list-disc list-inside space-y-1">
             <li>
-              Must be in <b>Johto Series</b> with level cap 70+ (check trainer
-              card).
+              Requires <b>level cap 70+</b>. Enable the <b>Johto datapack</b> to
+              access the Radio Tower.
             </li>
             <li>
               Spawn Level: <b>Lvl 70</b>
@@ -470,7 +472,7 @@ function HowToGetPokemonPageInner() {
             <li>
               Defeat <b>Admin Apollo</b> to obtain <b>Shadow Heart</b> and a{" "}
               <b>recipe</b> for crafting <b>Shadow Soul Stone</b>. (used to turn
-              Lugia into Shadow Form)
+              Lugia into Shadow Form).
             </li>
           </ul>
 
@@ -523,14 +525,14 @@ function HowToGetPokemonPageInner() {
     },
     hooh: {
       title: "Ho-oh",
-      series: "Johto Series",
+      series: "Johto",
       levelCap: "60+",
       content: (
         <div className="space-y-6">
           <ul className="list-disc list-inside space-y-1">
             <li>
-              Must be in <b>Johto Series</b> with level cap 60+ (check trainer
-              card).
+              Requires <b>level cap 60+</b>. Enable the <b>Johto datapack</b> to
+              access the Burned Tower.
             </li>
             <li>
               Spawn Level: <b>Lvl 70</b>
@@ -544,10 +546,15 @@ function HowToGetPokemonPageInner() {
             </li>
             <li>
               Side note: the <b>Legendary Beasts</b> (Raikou, Entei, Suicune)
-              only spawn around the Burned Tower — use Pokénav to track them.
+              are <b>Ultra-Rare</b> spawns around the Burned Tower — use Pokénav
+              to track them.
             </li>
             <li>
               Entei, Suicune, Raikou Spawn Level: <b>Lvl 60</b>
+            </li>
+            <li>
+              Spawn multipliers: <b>Entei</b> 3× at <b>day</b>, <b>Raikou</b> 3×
+              when <b>thundering</b>, <b>Suicune</b> 3× when <b>raining</b>.
             </li>
             <li>
               Locate the <b>Bell Tower</b> (found in Forest biomes) and use the
@@ -875,8 +882,8 @@ function HowToGetPokemonPageInner() {
               <b>Griseous Core</b> as a held item.
               <ul className="list-disc list-inside ml-6">
                 <li>
-                  <b>Griseous Core</b> can be found by brushing suspicious sands
-                  in <b>Desert Pyramids</b>.
+                  <b>Griseous Core</b> is obtained by defeating
+                  <b> Sinnoh Champion Camilla</b>.
                 </li>
               </ul>
             </li>
@@ -1892,7 +1899,8 @@ function HowToGetPokemonPageInner() {
             </li>
             <li>
               <b>Prison Bottle</b> can be found by brushing suspicious sands in
-              <b> Desert Wells</b> with an <b>11.11%</b> drop chance.
+              <b> Desert Pyramids</b> with a <b>7.6%</b> drop chance, and in
+              <b> Ancient City</b> chests with a <b>4.55%</b> drop chance.
             </li>
           </ul>
 
@@ -2506,6 +2514,7 @@ function HowToGetPokemonPageInner() {
                   thundurus: "forces_of_nature",
                   landorus: "forces_of_nature",
                   enamorus: "forces_of_nature",
+                  "reveal glass": "forces_of_nature",
                   meloetta: "meloetta",
                   genesect: "genesect",
                   diancie: "diancie",
@@ -2521,6 +2530,7 @@ function HowToGetPokemonPageInner() {
                   solgaleo: "light_trio",
                   lunala: "light_trio",
                   necrozma: "light_trio",
+                  "ultra necrozma": "light_trio",
                   nihilego: "ultra_beasts",
                   poipole: "ultra_beasts",
                   naganadel: "ultra_beasts",
@@ -2743,6 +2753,7 @@ function HowToGetPokemonPageInner() {
                     thundurus: "forces_of_nature",
                     landorus: "forces_of_nature",
                     enamorus: "forces_of_nature",
+                    "reveal glass": "forces_of_nature",
                     meloetta: "meloetta",
                     genesect: "genesect",
                     diancie: "diancie",
@@ -2758,6 +2769,7 @@ function HowToGetPokemonPageInner() {
                     solgaleo: "light_trio",
                     lunala: "light_trio",
                     necrozma: "light_trio",
+                    "ultra necrozma": "light_trio",
                     nihilego: "ultra_beasts",
                     poipole: "ultra_beasts",
                     naganadel: "ultra_beasts",
@@ -3002,6 +3014,7 @@ function HowToGetPokemonPageInner() {
                       thundurus: "forces_of_nature",
                       landorus: "forces_of_nature",
                       enamorus: "forces_of_nature",
+                      "reveal glass": "forces_of_nature",
                       meloetta: "meloetta",
                       genesect: "genesect",
                       diancie: "diancie",
@@ -3017,6 +3030,7 @@ function HowToGetPokemonPageInner() {
                       solgaleo: "light_trio",
                       lunala: "light_trio",
                       necrozma: "light_trio",
+                      "ultra necrozma": "light_trio",
                       nihilego: "ultra_beasts",
                       poipole: "ultra_beasts",
                       naganadel: "ultra_beasts",
@@ -4380,7 +4394,7 @@ function HoopaImageSlider() {
     },
     {
       src: "/guides/prison-bottle.png",
-      alt: "Prison Bottle from Desert Wells (11.11% drop)",
+      alt: "Prison Bottle: Desert Pyramids 7.6% (brush), Ancient City 4.55% (chest)",
       credit: "maru",
     },
   ];

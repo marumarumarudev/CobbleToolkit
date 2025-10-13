@@ -66,7 +66,7 @@ A growing suite of open-source, browser-based tools to analyze and inspect **Cob
 
 ## 🚀 Try It Live
 
-**https://cobble-toolkit.vercel.app/**
+**https://cobbletoolkit.pages.dev/**
 
 ## 📦 How to Use
 

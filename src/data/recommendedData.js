@@ -214,6 +214,24 @@ export const recommendedResources = {
         author: "Lenkagari",
         note: "GUI textures inspired by Classic Pokemon games",
       },
+      {
+        name: "Cobblemon Gui Black & White",
+        url: "https://modrinth.com/resourcepack/cobblemon-gui-black-white-edition",
+        author: "Vermout",
+        note: "It is a resource pack that modifies Cobblemon's graphical user interface (GUI) texture to one inspired by Pokemon Black and White Edition.",
+      },
+      {
+        name: "Whimscape",
+        url: "https://modrinth.com/resourcepack/whimscape",
+        author: "kavast",
+        note: "A fresh but familiar 16x16 pixel art look for Minecraft.",
+      },
+      {
+        name: "Whimscape x Cobblemon",
+        url: "https://modrinth.com/resourcepack/whimscape-x-cobblemon",
+        author: "azuleon",
+        note: "An unofficial add-on pack that brings the style of Whimscape to the Cobblemon mod.",
+      },
     ],
   },
   datapacks: {

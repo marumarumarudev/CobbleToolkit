@@ -71,6 +71,11 @@ export default function FarmingGuidePage() {
           items automatically, letting you farm resources (like{" "}
           <strong>Gimmighoul Coins</strong>) over time.
         </p>
+        <p className="text-xs text-gray-400 italic">
+          💡 <strong>Pro tip:</strong> Victini is arguably one of the best
+          Pokémon to put in a pasture block as it drops fire type gems, nether
+          stars, rare candies, ability capsules and patches.
+        </p>
         <p className="text-gray-300">🔗 Use these resources to check drops:</p>
         <ul className="list-disc list-inside pl-4 space-y-1 text-blue-400">
           <li>
@@ -224,34 +229,118 @@ export default function FarmingGuidePage() {
             <code>
               {`{
   "bank": [
-    {"item":"minecraft:emerald","price":750},
-    {"item":"minecraft:emerald_block","price":7000},
-    {"item":"cobblemon:relic_coin","price":50},
-    {"item":"cobblemon:relic_coin_pouch","price":475},
-    {"item":"cobblemon:relic_coin_sack","price":4500},
-    {"item":"cobblemon:potion","price":50},
-    {"item":"cobblemon:super_potion","price":175},
-    {"item":"cobblemon:hyper_potion","price":375},
-    {"item":"cobblemon:max_potion","price":625},
-    {"item":"cobblemon:full_restore","price":750},
-    {"item":"cobblemon:ether","price":300},
-    {"item":"cobblemon:max_ether","price":500},
-    {"item":"cobblemon:elixir","price":750},
-    {"item":"cobblemon:max_elixir","price":1125},
-    {"item":"cobblemon:revive","price":500},
-    {"item":"cobblemon:max_revive","price":1000},
-    {"item":"cobblemon:hp_up","price":2500},
-    {"item":"cobblemon:protein","price":2500},
-    {"item":"cobblemon:iron","price":2500},
-    {"item":"cobblemon:calcium","price":2500},
-    {"item":"cobblemon:zinc","price":2500},
-    {"item":"cobblemon:carbos","price":2500},
-    {"item":"cobblemon:pp_up","price":2500},
-    {"item":"cobblemon:pp_max","price":3500},
-    {"item":"lumymon:glacier_feather","price":5000},
-    {"item":"lumymon:thunder_feather","price":5000},
-    {"item":"lumymon:ember_feather","price":5000},
-    {"item":"lumymon:soul_feather","price":30000}
+    {
+      "item": "minecraft:emerald",
+      "price": 750
+    },
+    {
+      "item": "minecraft:emerald_block",
+      "price": 7000
+    },
+    {
+      "item": "cobblemon:relic_coin",
+      "price": 50
+    },
+    {
+      "item": "cobblemon:relic_coin_pouch",
+      "price": 475
+    },
+    {
+      "item": "cobblemon:relic_coin_sack",
+      "price": 4500
+    },
+    {
+      "item": "cobblemon:potion",
+      "price": 50
+    },
+    {
+      "item": "cobblemon:super_potion",
+      "price": 175
+    },
+    {
+      "item": "cobblemon:hyper_potion",
+      "price": 375
+    },
+    {
+      "item": "cobblemon:max_potion",
+      "price": 625
+    },
+    {
+      "item": "cobblemon:full_restore",
+      "price": 750
+    },
+    {
+      "item": "cobblemon:ether",
+      "price": 300
+    },
+    {
+      "item": "cobblemon:max_ether",
+      "price": 500
+    },
+    {
+      "item": "cobblemon:elixir",
+      "price": 750
+    },
+    {
+      "item": "cobblemon:max_elixir",
+      "price": 1125
+    },
+    {
+      "item": "cobblemon:revive",
+      "price": 500
+    },
+    {
+      "item": "cobblemon:max_revive",
+      "price": 1000
+    },
+    {
+      "item": "cobblemon:hp_up",
+      "price": 2500
+    },
+    {
+      "item": "cobblemon:protein",
+      "price": 2500
+    },
+    {
+      "item": "cobblemon:iron",
+      "price": 2500
+    },
+    {
+      "item": "cobblemon:calcium",
+      "price": 2500
+    },
+    {
+      "item": "cobblemon:zinc",
+      "price": 2500
+    },
+    {
+      "item": "cobblemon:carbos",
+      "price": 2500
+    },
+    {
+      "item": "cobblemon:pp_up",
+      "price": 2500
+    },
+    {
+      "item": "cobblemon:pp_max",
+      "price": 3500
+    },
+    {
+      "item": "lumymon:glacier_feather",
+      "price": 5000
+    },
+    {
+      "item": "lumymon:thunder_feather",
+      "price": 5000
+    },
+    {
+      "item": "lumymon:ember_feather",
+      "price": 5000
+    },
+    {
+      "item": "lumymon:soul_feather",
+      "price": 30000
+    }
   ]
 }`}
             </code>

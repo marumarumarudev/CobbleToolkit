@@ -69,7 +69,7 @@ export default function CobbleverseFAQPage() {
         {
           question: "How to get Hoopa Unbound?",
           answer:
-            "Use a Prison Bottle on Hoopa. Prison Bottles can be found in Desert Wells suspicious sands.",
+            "Use a Prison Bottle on Hoopa. Prison Bottles can be found by brushing suspicious sands in Desert Pyramids (7.6% drop) and in Ancient City chests (4.55% drop).",
           type: "direct",
         },
         {

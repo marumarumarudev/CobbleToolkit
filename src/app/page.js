@@ -106,12 +106,12 @@ export default function HomePage() {
           </a>{" "}
           • Deployed on{" "}
           <a
-            href="https://vercel.com/"
+            href="https://cloudflare.com/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-400 hover:underline"
           >
-            Vercel
+            Cloudflare Pages
           </a>
           <p className="mt-2 text-gray-500 text-sm">
             Made this out of laziness, boredom and love. Discord:{" "}

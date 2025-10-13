@@ -9,10 +9,56 @@ export default function NextRegionGuidePage() {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">How Do I Go to the Next Region?</h1>
-      <p className="text-gray-300">
-        To progress in COBBLEVERSE, you must defeat each region’s Champion and
-        follow the steps below.
-      </p>
+
+      <section className="space-y-3">
+        <h2 className="text-2xl font-semibold">
+          How Regions Work in Cobbleverse
+        </h2>
+        <p className="text-gray-300">
+          In Cobbleverse, a region is not a separate map or a different world.
+          It is more like a stage of progression that adds new content to the
+          same world you have been playing on. Each region represents a new set
+          of datapacks that unlocks different structures, trainers, and
+          legendary encounters related to that region&apos;s theme.
+        </p>
+        <p className="text-gray-300">
+          When you finish a region like Kanto and move on to the next one such
+          as Johto, your world does not reset. You keep everything you have
+          built and collected, including your base, your Pokémon, and your
+          items. What changes is what starts generating when you explore new
+          chunks.
+        </p>
+        <p className="text-gray-300">
+          As you enter a new region, you will begin to see:
+        </p>
+        <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
+          <li>New structures appearing in unexplored areas</li>
+          <li>New gyms, gym leaders, and trainers to battle</li>
+          <li>
+            Legendary structures and other special features from that region
+          </li>
+        </ul>
+        <p className="text-gray-300">
+          You do not receive a new starter or begin in a fresh world. Instead,
+          your current world expands with more things to explore and new
+          challenges to face.
+        </p>
+        <p className="text-gray-300">
+          Think of each region as the next chapter in your Cobbleverse journey.
+          Your adventure keeps growing with every region you complete, all
+          within the same world you started in.
+        </p>
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-2xl font-semibold">
+          How to Progress to the Next Region
+        </h2>
+        <p className="text-gray-300">
+          To progress in COBBLEVERSE, you must defeat each region&apos;s
+          Champion and follow the steps below.
+        </p>
+      </section>
 
       <section className="space-y-3">
         <h2 className="font-semibold">Step 1: Defeat the Champion</h2>
@@ -56,6 +102,14 @@ export default function NextRegionGuidePage() {
             If activating Hoenn, also enable Terralith:
             <br />
             <code>/datapack enable Terralith-DP</code>
+            <br />
+            <span className="text-sm text-blue-400">
+              💡{" "}
+              <a href="/guides/cobbleverse/setup" className="underline">
+                See our setup guide
+              </a>{" "}
+              for recommended server configuration to avoid restarts.
+            </span>
           </li>
         </ul>
       </section>
@@ -110,14 +164,22 @@ export default function NextRegionGuidePage() {
       <section className="space-y-3">
         <h2 className="font-semibold">Step 4: Restarting</h2>
         <p className="text-gray-300">
-          The book will tell you to “restart.” This simply means restarting the{" "}
-          <strong>server</strong> (stop and start again), or in singleplayer,
-          quitting and rejoining your world.
+          The book will tell you to &quot;restart.&quot; This simply means
+          restarting the <strong>server</strong> (stop and start again), or in
+          singleplayer, quitting and rejoining your world.
         </p>
         <p className="text-gray-300">
-          <strong>Important:</strong> You will not lose your world, builds or
-          pokemon. Only your <strong>level cap resets</strong>, so you’ll need
-          to build a new team for the next region. The new structures will
+          <strong>Important:</strong> If the server owner enabled the
+          datapack/region manually via commands (Option B from Step 2), they
+          still need to restart the server for the changes to take effect. You
+          only need to do this restarting process once per datapack/region.
+          Going back to a previous series/region doesn&apos;t require a server
+          restart.
+        </p>
+        <p className="text-gray-300">
+          <strong>Note:</strong> You will not lose your world, builds or
+          pokemon. Only your <strong>level cap resets</strong>, so you&apos;ll
+          need to build a new team for the next region. The new structures will
           generate in new, unloaded chunks.
         </p>
       </section>

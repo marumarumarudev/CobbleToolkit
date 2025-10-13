@@ -63,6 +63,63 @@ export default function SetupCobbleversePage() {
 
       <section className="space-y-3">
         <h2 className="text-2xl font-semibold text-white">
+          Server Setup Recommendations
+        </h2>
+        <p className="text-gray-300">
+          <strong>For server operators/admins:</strong> When setting up your
+          server, go to your datapacks folder, open the &quot;extra&quot; folder
+          and you will see 3 files, Johto, Hoenn, and Terralith datapacks. Move
+          them out of the extra folder and put it in the main datapacks folder
+          and when creating the world, copy the contents of the datapacks folder
+          into world &gt; datapacks folder to make sure it is loaded.
+        </p>
+        <p className="text-gray-300">
+          Why take out these datapacks you might ask, it is so that all of the
+          structures that are region-locked will generate as soon as the server
+          is online and so you don&apos;t have to restart the server when
+          someone is ready to proceed to the next region/series and so you
+          don&apos;t have to travel hundreds of thousands of blocks just to find
+          a new structure later in the game.
+        </p>
+
+        <ImageWithFullscreen
+          src="/guides/datapack-regions.png"
+          alt="Datapacks in file explorer moved out of extra folder"
+        />
+
+        <p className="text-gray-300">
+          You can also achieve this in-game by doing these steps:
+        </p>
+
+        <ImageWithFullscreen
+          src="/guides/datapack-commands.png"
+          alt="Commands for enabling datapacks in-game"
+        />
+
+        <p className="text-gray-300">
+          And don&apos;t forget to set{" "}
+          <b>
+            <code>enable-command-block</code>
+          </b>{" "}
+          to{" "}
+          <b>
+            <code>true</code>
+          </b>{" "}
+          in the{" "}
+          <b>
+            <code>server.properties</code>
+          </b>{" "}
+          file because some structures, mostly gyms, use command blocks.
+        </p>
+
+        <ImageWithFullscreen
+          src="/guides/server-properties.png"
+          alt="Server properties file"
+        />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="text-2xl font-semibold text-white">
           Why no COBBLEVERSE Public Server?
         </h2>
         <ImageWithFullscreen

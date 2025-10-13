@@ -4,11 +4,14 @@ import { useState, useEffect } from "react";
 
 export default function FeedbackGallery() {
   const screenshots = [
-    { src: "/feedback/feedback1.png", alt: "Feedback 1" },
-    { src: "/feedback/feedback2.png", alt: "Feedback 2" },
-    { src: "/feedback/feedback3.png", alt: "Feedback 3" },
-    { src: "/feedback/feedback4.png", alt: "Feedback 4" },
+    { src: "/feedback/feedback1.png", alt: "azera" },
+    { src: "/feedback/feedback2.png", alt: "Cz1owi3kR4k" },
+    { src: "/feedback/feedback3.png", alt: "Clammy" },
+    { src: "/feedback/feedback4.png", alt: "skeleton" },
+    { src: "/feedback/feedback5.png", alt: "Linguini" },
   ];
+
+  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
     const handleEsc = (e) => {
@@ -22,33 +25,35 @@ export default function FeedbackGallery() {
     document.title = "Feedback Gallery | CobbleToolkit";
   }, []);
 
-  const [selected, setSelected] = useState(null);
-
   return (
     <section className="py-12 bg-[#1e1e1e] text-white">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold">💬 Feedback From Others</h2>
         <p className="text-gray-400 mt-2">
-          Here’s what people have said about my projects and contributions.
+          Here&apos;s what people have said about my projects and contributions.
         </p>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-w-6xl mx-auto px-4">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto px-4">
         {screenshots.map((img, idx) => (
-          <div
-            key={idx}
-            className="cursor-pointer overflow-hidden rounded-lg border border-[#333] bg-[#2c2c2c] hover:shadow-lg"
-            onClick={() => setSelected(img)}
-          >
-            <div className="flex items-center justify-center h-[150px] bg-[#1a1a1a] p-2">
-              <Image
-                src={img.src}
-                alt={img.alt}
-                width={800}
-                height={800}
-                className="object-contain max-h-full"
-              />
+          <div key={idx} className="space-y-3 group">
+            <div
+              className="relative w-full rounded-lg border border-gray-600 overflow-hidden bg-gray-800 hover:border-gray-500 transition-colors duration-200 cursor-pointer"
+              onClick={() => setSelected(img)}
+            >
+              <div className="aspect-[4/3] relative">
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  fill
+                  className="object-contain p-4"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                />
+              </div>
             </div>
+            <p className="text-sm text-gray-400 text-center group-hover:text-gray-300 transition-colors duration-200">
+              {img.alt}
+            </p>
           </div>
         ))}
       </div>
@@ -70,9 +75,10 @@ export default function FeedbackGallery() {
           </div>
         </div>
       )}
+
       <p className="text-center text-gray-500 mt-8 text-sm">
-        🙏 Huge thanks to everyone who’s shared their thoughts — your support
-        means a lot!
+        🙏 Huge thanks to everyone who&apos;s shared their thoughts — your
+        support means a lot!
       </p>
     </section>
   );
