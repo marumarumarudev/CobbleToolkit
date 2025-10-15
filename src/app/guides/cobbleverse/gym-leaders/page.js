@@ -1326,13 +1326,383 @@ export default function GymLeadersGuidePage() {
           </Spoiler>
         </div>
 
-        {/* Future Regions Placeholder */}
+        {/* Sinnoh Region */}
         <div className="mb-6">
-          <Spoiler title="Sinnoh will be out on COBBLEVERSE 1.6 soon">
-            <div className="bg-gradient-to-r from-gray-600/20 to-gray-500/20 rounded-lg p-4 border border-gray-500/30">
-              <p className="text-gray-300 text-sm">
-                More regions will be added in future updates
-              </p>
+          <Spoiler title="Sinnoh Region">
+            <div className="space-y-6">
+              <div className="bg-gradient-to-r from-blue-600/20 to-blue-500/20 rounded-lg p-4 border border-blue-500/30">
+                <p className="text-gray-300 text-sm">
+                  The fourth region featuring 8 Gym Leaders, Elite 4, and
+                  Champion. Gym Leader names are in Italian due to copyright
+                  requirements.
+                </p>
+              </div>
+
+              {/* Sinnoh Gym Leaders */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-4 text-blue-400">
+                  Sinnoh Gym Leaders
+                </h3>
+                <div className="grid gap-3">
+                  <Spoiler title="Pedro - Rock Type Gym Leader">
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-300">
+                        Rock Type Specialist
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {["Onix", "Probopass", "Relicanth", "Rampardos"].map(
+                          (pokemon) => (
+                            <div
+                              key={pokemon}
+                              className="bg-gray-600/20 rounded-lg p-3 text-center border border-gray-500/30"
+                            >
+                              <span className="text-white font-medium">
+                                {pokemon}
+                              </span>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </Spoiler>
+
+                  <Spoiler title="Gardenia - Grass Type Gym Leader">
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-300">
+                        Grass Type Specialist
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        {[
+                          "Sunflora",
+                          "Cherrim",
+                          "Breloom",
+                          "Torterra",
+                          "Roserade",
+                        ].map((pokemon) => (
+                          <div
+                            key={pokemon}
+                            className="bg-green-600/20 rounded-lg p-3 text-center border border-green-500/30"
+                          >
+                            <span className="text-white font-medium">
+                              {pokemon}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Spoiler>
+
+                  <Spoiler title="Marzia - Fighting Type Gym Leader">
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-300">
+                        Fighting Type Specialist
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        {[
+                          "Hitmontop",
+                          "Heracross",
+                          "Infernape",
+                          "Medicham",
+                          "Lucario",
+                        ].map((pokemon) => (
+                          <div
+                            key={pokemon}
+                            className="bg-orange-600/20 rounded-lg p-3 text-center border border-orange-500/30"
+                          >
+                            <span className="text-white font-medium">
+                              {pokemon}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Spoiler>
+
+                  <Spoiler title="Omar - Water Type Gym Leader">
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-300">
+                        Water Type Specialist
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
+                        {[
+                          "Politoed",
+                          "Kingdra",
+                          "Ludicolo",
+                          "Huntail",
+                          "Gyarados",
+                          "Floatzel",
+                        ].map((pokemon) => (
+                          <div
+                            key={pokemon}
+                            className="bg-blue-600/20 rounded-lg p-3 text-center border border-blue-500/30"
+                          >
+                            <span className="text-white font-medium">
+                              {pokemon}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Spoiler>
+
+                  <Spoiler title="Fannie - Ghost Type Gym Leader">
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-300">
+                        Ghost Type Specialist
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
+                        {[
+                          "Drifblim",
+                          "Banette",
+                          "Dusknoir",
+                          "Mismagius",
+                          "Froslass",
+                          "Gengar",
+                        ].map((pokemon) => (
+                          <div
+                            key={pokemon}
+                            className="bg-indigo-600/20 rounded-lg p-3 text-center border border-indigo-500/30"
+                          >
+                            <span className="text-white font-medium">
+                              {pokemon}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Spoiler>
+
+                  <Spoiler title="Ferruccio - Steel Type Gym Leader">
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-300">
+                        Steel Type Specialist
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
+                        {[
+                          "Skarmory",
+                          "Steelix",
+                          "Magnezone",
+                          "Empoleon",
+                          "Aggron",
+                          "Bastiodon",
+                        ].map((pokemon) => (
+                          <div
+                            key={pokemon}
+                            className="bg-gray-700/20 rounded-lg p-3 text-center border border-gray-600/30"
+                          >
+                            <span className="text-white font-medium">
+                              {pokemon}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Spoiler>
+
+                  <Spoiler title="Bianca - Ice Type Gym Leader">
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-300">
+                        Ice Type Specialist
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
+                        {[
+                          "Abomasnow",
+                          "Jynx",
+                          "Mamoswine",
+                          "Froslass",
+                          "Glaceon",
+                          "Weavile",
+                        ].map((pokemon) => (
+                          <div
+                            key={pokemon}
+                            className="bg-cyan-600/20 rounded-lg p-3 text-center border border-cyan-500/30"
+                          >
+                            <span className="text-white font-medium">
+                              {pokemon}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Spoiler>
+
+                  <Spoiler title="Corrado - Electric Type Gym Leader">
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-300">
+                        Electric Type Specialist
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
+                        {[
+                          "Pelipper",
+                          "Raichu",
+                          "Luxray",
+                          "Lanturn",
+                          "Jolteon",
+                          "Electivire",
+                        ].map((pokemon) => (
+                          <div
+                            key={pokemon}
+                            className="bg-yellow-600/20 rounded-lg p-3 text-center border border-yellow-500/30"
+                          >
+                            <span className="text-white font-medium">
+                              {pokemon}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Spoiler>
+                </div>
+              </div>
+
+              {/* Sinnoh Elite 4 */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-4 text-purple-400">
+                  Sinnoh Elite 4
+                </h3>
+                <div className="grid gap-3">
+                  <Spoiler title="Aaron - Bug Type Elite 4">
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-300">
+                        Bug Type Specialist
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {[
+                          "Dustox",
+                          "Beautifly",
+                          "Vespiquen",
+                          "Heracross",
+                          "Drapion",
+                          "Yanmega",
+                        ].map((pokemon) => (
+                          <div
+                            key={pokemon}
+                            className="bg-green-600/20 rounded-lg p-3 text-center border border-green-500/30"
+                          >
+                            <span className="text-white font-medium">
+                              {pokemon}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Spoiler>
+
+                  <Spoiler title="Terrie - Ground Type Elite 4">
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-300">
+                        Ground Type Specialist
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {[
+                          "Quagsire",
+                          "Sudowoodo",
+                          "Golem",
+                          "Whiscash",
+                          "Hippowdon",
+                          "Gastrodon",
+                        ].map((pokemon) => (
+                          <div
+                            key={pokemon}
+                            className="bg-amber-600/20 rounded-lg p-3 text-center border border-amber-500/30"
+                          >
+                            <span className="text-white font-medium">
+                              {pokemon}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Spoiler>
+
+                  <Spoiler title="Vulcano - Fire Type Elite 4">
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-300">
+                        Fire Type Specialist
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {[
+                          "Rapidash",
+                          "Steelix",
+                          "Drifblim",
+                          "Lopunny",
+                          "Infernape",
+                          "Magmortar",
+                        ].map((pokemon) => (
+                          <div
+                            key={pokemon}
+                            className="bg-red-600/20 rounded-lg p-3 text-center border border-red-500/30"
+                          >
+                            <span className="text-white font-medium">
+                              {pokemon}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Spoiler>
+
+                  <Spoiler title="Luciano - Psychic Type Elite 4">
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-300">
+                        Psychic Type Specialist
+                      </p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {[
+                          "Mr. Mime",
+                          "Girafarig",
+                          "Bronzong",
+                          "Alakazam",
+                          "Medicham",
+                          "Gallade",
+                        ].map((pokemon) => (
+                          <div
+                            key={pokemon}
+                            className="bg-pink-600/20 rounded-lg p-3 text-center border border-pink-500/30"
+                          >
+                            <span className="text-white font-medium">
+                              {pokemon}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Spoiler>
+                </div>
+              </div>
+
+              {/* Sinnoh Champion */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-4 text-yellow-400">
+                  Sinnoh Champion
+                </h3>
+                <div className="grid gap-3">
+                  <Spoiler title="Camilla - Sinnoh Champion">
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-300">Champion Team</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {[
+                          "Spiritomb",
+                          "Porygon-Z",
+                          "Togekiss",
+                          "Lucario",
+                          "Milotic",
+                          "Garchomp",
+                        ].map((pokemon) => (
+                          <div
+                            key={pokemon}
+                            className="bg-gradient-to-r from-yellow-600/20 to-yellow-500/20 rounded-lg p-3 text-center border border-yellow-500/30"
+                          >
+                            <span className="text-white font-medium">
+                              {pokemon}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Spoiler>
+                </div>
+              </div>
             </div>
           </Spoiler>
         </div>
