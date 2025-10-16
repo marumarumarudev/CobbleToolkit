@@ -68,10 +68,10 @@ export default function SetupCobbleversePage() {
         <p className="text-gray-300">
           <strong>For server operators/admins:</strong> When setting up your
           server, go to your datapacks folder, open the &quot;extra&quot; folder
-          and you will see 3 files, Johto, Hoenn, and Terralith datapacks. Move
-          them out of the extra folder and put it in the main datapacks folder
-          and when creating the world, copy the contents of the datapacks folder
-          into world &gt; datapacks folder to make sure it is loaded.
+          and you will see datapacks. Move them out of the extra folder and put
+          it in the main datapacks folder and when creating the world, copy the
+          contents of the datapacks folder into world &gt; datapacks folder to
+          make sure it is loaded.
         </p>
         <p className="text-gray-300">
           Why take out these datapacks you might ask, it is so that all of the

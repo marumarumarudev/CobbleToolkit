@@ -111,7 +111,7 @@ export default function HomePage() {
             rel="noopener noreferrer"
             className="text-blue-400 hover:underline"
           >
-            Cloudflare Pages
+            Vercel and will move to Cloudflare Pages soon
           </a>
           <p className="mt-2 text-gray-500 text-sm">
             Made this out of laziness, boredom and love. Discord:{" "}

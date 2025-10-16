@@ -9,6 +9,7 @@ export default function FeedbackGallery() {
     { src: "/feedback/feedback3.png", alt: "Clammy" },
     { src: "/feedback/feedback4.png", alt: "skeleton" },
     { src: "/feedback/feedback5.png", alt: "Linguini" },
+    { src: "/feedback/feedback6.png", alt: "ihaveadutchgf" },
   ];
 
   const [selected, setSelected] = useState(null);
