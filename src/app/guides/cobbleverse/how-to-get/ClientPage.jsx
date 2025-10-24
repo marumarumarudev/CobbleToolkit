@@ -14,7 +14,7 @@ function HowToGetPokemonPageInner() {
   const pokemonData = {
     mew_duo: {
       title: "Mew Duo",
-      series: "Kanto Series",
+      series: "Kanto (Default)",
       levelCap: "80+",
       content: (
         <div className="space-y-6">
@@ -25,9 +25,6 @@ function HowToGetPokemonPageInner() {
             Mew
           </h4>
           <ul className="list-disc list-inside space-y-1">
-            <li>
-              Must be in <b>Kanto Series</b>.
-            </li>
             <li>
               Spawn Level: <b>Lvl 75</b>
             </li>
@@ -69,9 +66,6 @@ function HowToGetPokemonPageInner() {
             Mewtwo
           </h4>
           <ul className="list-disc list-inside space-y-1">
-            <li>
-              Must be in <b>Kanto Series</b>.
-            </li>
             <li>
               Obtain <b>Ancient DNA</b>:
               <ul className="list-disc list-inside ml-6">
@@ -170,7 +164,7 @@ function HowToGetPokemonPageInner() {
     },
     weather_trio: {
       title: "Weather Trio",
-      series: "Hoenn Series",
+      series: "Hoenn Datapack",
       levelCap: "Any",
       content: (
         <div className="space-y-6">
@@ -182,7 +176,7 @@ function HowToGetPokemonPageInner() {
           </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
-              Must be in <b>Hoenn Series</b>.
+              Needs to have <b>Hoenn Datapack</b> enabled.
             </li>
             <li>
               Spawn Level: <b>Lvl 60–70</b>
@@ -220,7 +214,7 @@ function HowToGetPokemonPageInner() {
           </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
-              Must be in <b>Hoenn Series</b>.
+              Needs to have <b>Hoenn Datapack</b> enabled.
             </li>
             <li>
               Spawn Level: <b>Lvl 60–70</b>
@@ -266,7 +260,7 @@ function HowToGetPokemonPageInner() {
           </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
-              Must be in <b>Hoenn Series</b>.
+              Needs to have <b>Hoenn Datapack</b> enabled.
             </li>
             <li>
               Spawn Level: <b>Lvl 70</b>
@@ -324,7 +318,7 @@ function HowToGetPokemonPageInner() {
     },
     ash_pokemons: {
       title: "Ash's Pokemons",
-      series: "Kanto Series",
+      series: "Kanto (Default)",
       levelCap: "40+",
       content: (
         <div className="space-y-6">
@@ -337,7 +331,7 @@ function HowToGetPokemonPageInner() {
 
           <ul className="list-disc list-inside space-y-1">
             <li>
-              Must be in <b>Kanto Series</b> with <b>level cap 40+</b>.
+              Requires <b>level cap 40+</b>.
             </li>
             <li>
               Find <b>Ash's House</b> in <b>Plains biomes</b>.
@@ -396,7 +390,7 @@ function HowToGetPokemonPageInner() {
 
           <ul className="list-disc list-inside space-y-1">
             <li>
-              Must be in <b>Kanto Series</b> with <b>level cap 40+</b>.
+              Requires <b>level cap 40+</b>.
             </li>
             <li>
               Obtain <b>Ash's Cap</b> from the drawer in <b>Ash's room</b>.
@@ -435,7 +429,7 @@ function HowToGetPokemonPageInner() {
     },
     lugia: {
       title: "Lugia",
-      series: "Johto",
+      series: "Johto Datapack",
       levelCap: "70+",
       content: (
         <div className="space-y-6">
@@ -525,7 +519,7 @@ function HowToGetPokemonPageInner() {
     },
     hooh: {
       title: "Ho-oh",
-      series: "Johto",
+      series: "Johto Datapack",
       levelCap: "60+",
       content: (
         <div className="space-y-6">
@@ -571,7 +565,7 @@ function HowToGetPokemonPageInner() {
     },
     celebi: {
       title: "Celebi",
-      series: "Johto Series",
+      series: "Johto Datapack",
       levelCap: "100+",
       content: (
         <div className="space-y-6">
@@ -580,8 +574,8 @@ function HowToGetPokemonPageInner() {
               Spawn Level: <b>Lvl 30</b>
             </li>
             <li>
-              Must be in <b>Johto Series</b> with <b>level cap 100+</b> (defeat
-              the whole Johto League).
+              Needs to have <b>Johto Datapack</b> enabled with{" "}
+              <b>level cap 100+</b> (defeat the whole Johto League).
             </li>
             <li>
               <b>Celebi Shrine</b> generates in <b>Taiga biomes</b>.
@@ -607,7 +601,7 @@ function HowToGetPokemonPageInner() {
     },
     deoxys: {
       title: "Deoxys",
-      series: "Hoenn Series",
+      series: "Hoenn Datapack",
       levelCap: "Any",
       content: (
         <div className="space-y-6">
@@ -1179,7 +1173,7 @@ function HowToGetPokemonPageInner() {
           </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
-              Must be in <b>Hoenn Series</b>.
+              Needs to have <b>Hoenn Datapack</b> enabled.
             </li>
             <li>
               Spawn Level: <b>Lvl 50–60</b>
@@ -1207,7 +1201,7 @@ function HowToGetPokemonPageInner() {
           </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
-              Must be in <b>Hoenn Series</b>.
+              Needs to have <b>Hoenn Datapack</b> enabled.
             </li>
             <li>
               Spawn Level: <b>Lvl 50–60</b>
@@ -1236,7 +1230,7 @@ function HowToGetPokemonPageInner() {
           </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
-              Must be in <b>Hoenn Series</b>.
+              Needs to have <b>Hoenn Datapack</b> enabled.
             </li>
             <li>
               Spawn Level: <b>Lvl 50–60</b>
@@ -1310,7 +1304,7 @@ function HowToGetPokemonPageInner() {
     },
     eon_duo: {
       title: "Eon Duo",
-      series: "Hoenn Series",
+      series: "Hoenn Datapack",
       levelCap: "Any",
       content: (
         <div className="space-y-6">
@@ -1322,7 +1316,7 @@ function HowToGetPokemonPageInner() {
           </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
-              Must be in <b>Hoenn Series</b>.
+              Needs to have <b>Hoenn Datapack</b> enabled.
             </li>
             <li>
               Structure generates in <b>Deep Lukewarm Ocean</b> biome (around y
@@ -1348,7 +1342,7 @@ function HowToGetPokemonPageInner() {
           </h4>
           <ul className="list-disc list-inside space-y-1">
             <li>
-              Must be in <b>Hoenn Series</b>.
+              Needs to have <b>Hoenn Datapack</b> enabled.
             </li>
             <li>
               Structure generates in <b>Deep Lukewarm Ocean</b> biome (around y
@@ -1375,7 +1369,7 @@ function HowToGetPokemonPageInner() {
     },
     jirachi: {
       title: "Jirachi",
-      series: "Hoenn Series",
+      series: "Hoenn Datapack",
       levelCap: "Any",
       content: (
         <div className="space-y-6">
@@ -1390,7 +1384,7 @@ function HowToGetPokemonPageInner() {
               Spawn Level: <b>Lvl 75</b>
             </li>
             <li>
-              Must be in <b>Hoenn Series</b>.
+              Needs to have <b>Hoenn Datapack</b> enabled.
             </li>
             <li>
               Structure generates in <b>Blooming Plateau</b>.

@@ -37,7 +37,7 @@ export default function BreedingGuidePage() {
           <strong>Pasture Blocks</strong>. By default, they have a{" "}
           <strong>50% chance every 10 minutes</strong> to produce an egg, but in{" "}
           <strong>Cobbleverse</strong> this interval is{" "}
-          <strong>7 minutes</strong>.
+          <strong>6 minutes</strong>.
         </p>
 
         {/* Pasture Block Setup Images */}
@@ -247,7 +247,7 @@ export default function BreedingGuidePage() {
       <section className="space-y-4">
         <h2 className="text-2xl font-semibold text-white">Shiny Breeding</h2>
         <p className="text-gray-300">
-          Default Cobblemon shiny rate: <strong>1/4096</strong>. In{" "}
+          Default Cobblemon shiny rate: <strong>1/8196</strong>. In{" "}
           <strong>Cobbleverse</strong>: <strong>1/2048</strong>.
         </p>
         <p className="text-gray-300">

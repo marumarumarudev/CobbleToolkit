@@ -25,7 +25,7 @@ export default function GuidesIndexPage() {
       stats: {
         guides: 9,
         categories: 9,
-        lastUpdated: "10/11/25",
+        lastUpdated: "10/24/25",
       },
       features: [
         "Progression Guide",
