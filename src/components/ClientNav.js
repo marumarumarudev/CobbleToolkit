@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -13,6 +13,19 @@ import {
   MessageSquare,
   HelpCircle,
 } from "lucide-react";
+
+// Icon wrapper to prevent hydration issues
+const SafeIcon = ({ Icon, size, ...props }) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || !Icon) return null;
+
+  return <Icon size={size} {...props} />;
+};
 
 export default function ClientNav() {
   const pathname = usePathname();
@@ -57,7 +70,11 @@ export default function ClientNav() {
           className="sm:hidden text-yellow-400 hover:text-yellow-300 transition-colors p-2"
           onClick={() => setIsOpen(!isOpen)}
         >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
+          {isOpen ? (
+            <SafeIcon Icon={X} size={24} />
+          ) : (
+            <SafeIcon Icon={Menu} size={24} />
+          )}
         </button>
 
         {/* Desktop Navigation */}
@@ -68,9 +85,10 @@ export default function ClientNav() {
               onClick={() => setToolsOpen(!toolsOpen)}
               className="flex items-center gap-1 hover:text-yellow-400 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-[#2a2a2a]/50"
             >
-              <Wrench size={16} />
+              <SafeIcon Icon={Wrench} size={16} />
               Tools
-              <ChevronDown
+              <SafeIcon
+                Icon={ChevronDown}
                 size={16}
                 className={`transition-transform duration-200 ${
                   toolsOpen ? "rotate-180" : ""
@@ -112,7 +130,7 @@ export default function ClientNav() {
                     : "text-gray-300 hover:text-yellow-400 hover:bg-[#2a2a2a]/50"
                 }`}
               >
-                <IconComponent size={16} />
+                <SafeIcon Icon={IconComponent} size={16} />
                 {item.name}
               </Link>
             );
@@ -126,7 +144,7 @@ export default function ClientNav() {
           {/* Tools Section */}
           <div className="mb-4">
             <div className="flex items-center gap-2 text-yellow-400 font-semibold mb-2 px-2">
-              <Wrench size={16} />
+              <SafeIcon Icon={Wrench} size={16} />
               Tools
             </div>
             <div className="space-y-1 ml-4">
@@ -162,7 +180,7 @@ export default function ClientNav() {
                   }`}
                   onClick={() => setIsOpen(false)}
                 >
-                  <IconComponent size={16} />
+                  <SafeIcon Icon={IconComponent} size={16} />
                   {item.name}
                 </Link>
               );

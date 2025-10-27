@@ -17,6 +17,15 @@ const geistMono = Geist_Mono({
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+          name="description"
+          content="A collection of browser-based tools for analyzing and understanding Cobblemon datapacks"
+        />
+        <title>CobbleToolkit</title>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#1a1a1a] text-white`}
       >

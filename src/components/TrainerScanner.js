@@ -1905,6 +1905,86 @@ export default function TrainerScanner() {
                             ))}
                           </div>
                         </div>
+
+                        {/* Loot Table */}
+                        {trainer.lootTable && (
+                          <div className="mt-4">
+                            <h4 className="text-sm font-semibold text-gray-300 mb-2">
+                              Rewards
+                            </h4>
+                            <div className="space-y-2">
+                              {trainer.lootTable.pools.map((pool, poolIdx) => (
+                                <div
+                                  key={poolIdx}
+                                  className="bg-[#2c2c2c] p-3 rounded border border-gray-600"
+                                >
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-sm font-medium text-gray-200">
+                                      {poolIdx === 0
+                                        ? "Guaranteed"
+                                        : poolIdx === 1
+                                        ? "Bonus"
+                                        : `Pool ${poolIdx + 1}`}
+                                    </span>
+                                    <span className="text-xs bg-gray-600 px-2 py-0.5 rounded">
+                                      {pool.rolls.min === pool.rolls.max
+                                        ? `${pool.rolls.min} item${
+                                            pool.rolls.min !== 1 ? "s" : ""
+                                          }`
+                                        : `${pool.rolls.min}-${pool.rolls.max} items`}
+                                    </span>
+                                  </div>
+                                  <div className="space-y-1">
+                                    {pool.entries.map((entry, entryIdx) => {
+                                      const itemName =
+                                        entry.type === "item"
+                                          ? entry.name
+                                          : entry.value;
+                                      const isConditional =
+                                        entry.conditions &&
+                                        entry.conditions.length > 0;
+                                      const isLootTable =
+                                        entry.type === "loot_table";
+
+                                      return (
+                                        <div
+                                          key={entryIdx}
+                                          className="flex items-center justify-between text-sm"
+                                        >
+                                          <span className="text-blue-300">
+                                            {itemName
+                                              .split(":")
+                                              .pop()
+                                              .replace(/_/g, " ")
+                                              .replace(/\b\w/g, (l) =>
+                                                l.toUpperCase()
+                                              )}
+                                          </span>
+                                          <div className="flex items-center gap-2 text-xs text-gray-400">
+                                            {isConditional && (
+                                              <span className="text-orange-400">
+                                                First defeat only
+                                              </span>
+                                            )}
+                                            {isLootTable && (
+                                              <span className="text-gray-500">
+                                                Multiple items
+                                              </span>
+                                            )}
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="mt-2 text-xs text-gray-500">
+                              Each pool rolls independently. Conditional items
+                              are only given on first victory.
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

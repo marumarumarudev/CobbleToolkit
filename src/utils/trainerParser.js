@@ -1,5 +1,43 @@
 import JSZip from "jszip";
 
+// Helper function to parse loot table entries
+function parseLootEntry(entry) {
+  if (entry.type === "minecraft:item") {
+    return {
+      type: "item",
+      name: entry.name,
+      conditions: entry.conditions || [],
+    };
+  } else if (entry.type === "minecraft:loot_table") {
+    return {
+      type: "loot_table",
+      value: entry.value,
+      conditions: entry.conditions || [],
+    };
+  }
+  return entry;
+}
+
+// Helper function to parse loot pools
+function parseLootPool(pool) {
+  return {
+    rolls: pool.rolls,
+    entries: pool.entries.map(parseLootEntry),
+  };
+}
+
+// Helper function to parse loot table
+function parseLootTable(lootTableData) {
+  if (!lootTableData || !lootTableData.pools) {
+    return null;
+  }
+
+  return {
+    pools: lootTableData.pools.map(parseLootPool),
+    randomSequence: lootTableData.random_sequence,
+  };
+}
+
 export async function parseTrainersFromZip(file) {
   const zip = await JSZip.loadAsync(file);
   const results = [];
@@ -18,6 +56,89 @@ export async function parseTrainersFromZip(file) {
       if (jsonStr.charCodeAt(0) === 0xfeff) jsonStr = jsonStr.slice(1);
 
       const data = JSON.parse(jsonStr);
+
+      // Extract trainer filename (without extension) for loot table lookup
+      const trainerFilename = path.split("/").pop().replace(".json", "");
+
+      // Extract trainer identity for display purposes
+      const trainerIdentity =
+        data.identity || data.name?.literal || trainerFilename;
+
+      // Convert identity to snake_case for loot table lookup
+      const snakeCaseIdentity = trainerIdentity
+        .toLowerCase()
+        .replace(/\s+/g, "_")
+        .replace(/[^a-z0-9_]/g, "");
+
+      // Look for corresponding loot table in multiple possible locations
+      let lootTable = null;
+      const possibleLootPaths = [
+        // Try trainer filename first (most reliable)
+        `data/rctmod/loot_table/trainers/single/${trainerFilename}.json`,
+        `data/rctmod/loot_table/trainers/groups/${trainerFilename}.json`,
+        `data/rctmod/loot_table/trainers/${trainerFilename}.json`,
+        // Try snake_case identity
+        `data/rctmod/loot_table/trainers/single/${snakeCaseIdentity}.json`,
+        `data/rctmod/loot_table/trainers/groups/${snakeCaseIdentity}.json`,
+        `data/rctmod/loot_table/trainers/${snakeCaseIdentity}.json`,
+        // Also try original identity in case it's already snake_case
+        `data/rctmod/loot_table/trainers/single/${trainerIdentity}.json`,
+        `data/rctmod/loot_table/trainers/groups/${trainerIdentity}.json`,
+        `data/rctmod/loot_table/trainers/${trainerIdentity}.json`,
+      ];
+
+      // First try exact path matches
+      for (const lootTablePath of possibleLootPaths) {
+        if (zip.files[lootTablePath]) {
+          try {
+            const lootTableEntry = zip.files[lootTablePath];
+            if (lootTableEntry && lootTableEntry._data.uncompressedSize > 0) {
+              let lootJsonStr = await lootTableEntry.async("string");
+              if (lootJsonStr.charCodeAt(0) === 0xfeff)
+                lootJsonStr = lootJsonStr.slice(1);
+              const lootData = JSON.parse(lootJsonStr);
+              lootTable = parseLootTable(lootData);
+              break; // Found it, stop looking
+            }
+          } catch (err) {
+            console.warn(
+              `⚠️ Failed to parse loot table for ${trainerIdentity}: ${err.message}`
+            );
+          }
+        }
+      }
+
+      // If no exact match found, search through all loot table files for matching random_sequence
+      if (!lootTable) {
+        const lootTableFiles = Object.keys(zip.files).filter((filePath) =>
+          filePath.match(/^data\/rctmod\/loot_table\/trainers\/.*\.json$/)
+        );
+
+        for (const lootTablePath of lootTableFiles) {
+          try {
+            const lootTableEntry = zip.files[lootTablePath];
+            if (lootTableEntry && lootTableEntry._data.uncompressedSize > 0) {
+              let lootJsonStr = await lootTableEntry.async("string");
+              if (lootJsonStr.charCodeAt(0) === 0xfeff)
+                lootJsonStr = lootJsonStr.slice(1);
+              const lootData = JSON.parse(lootJsonStr);
+
+              // Check if this loot table matches our trainer
+              if (
+                lootData.random_sequence &&
+                (lootData.random_sequence.includes(trainerFilename) ||
+                  lootData.random_sequence.includes(trainerIdentity) ||
+                  lootData.random_sequence.includes(snakeCaseIdentity))
+              ) {
+                lootTable = parseLootTable(lootData);
+                break;
+              }
+            }
+          } catch (err) {
+            // Silently continue to next file
+          }
+        }
+      }
 
       // Extract trainer info
       const trainer = {
@@ -49,6 +170,7 @@ export async function parseTrainersFromZip(file) {
           aspects: pokemon.aspects || [],
           shiny: pokemon.shiny || false,
         })),
+        lootTable: lootTable,
         sourceFile: path,
       };
 
