@@ -32,6 +32,57 @@ export default function UploadArea() {
   const [isFilesExpanded, setIsFilesExpanded] = useState(true);
   const PAGE_SIZE = 25;
 
+  // Biome tags map loaded from BiomeTags.md { "#cobblemon:is_mountain": ["minecraft:...", ...] }
+  const [biomeTagsMap, setBiomeTagsMap] = useState({});
+  const [biomeTagsLoaded, setBiomeTagsLoaded] = useState(false);
+
+  // Floating tooltip state (fixed-position, not clipped by overflow containers)
+  const [hoverTooltip, setHoverTooltip] = useState({
+    visible: false,
+    pinned: false,
+    x: 0,
+    y: 0,
+    content: null, // { title: string, entries: string[] }
+  });
+
+  const showTooltip = (x, y, content) => {
+    setHoverTooltip({ visible: true, pinned: false, x, y, content });
+  };
+
+  const hideTooltip = () => {
+    setHoverTooltip((prev) =>
+      prev.pinned ? prev : { ...prev, visible: false }
+    );
+  };
+
+  // Heuristic resolver for biome tag keys from various inputs (e.g., "mountain" → "#cobblemon:is_mountain")
+  const resolveBiomeTagEntries = (raw) => {
+    if (!raw) return [];
+    const s = String(raw).trim();
+    const candidates = new Set();
+
+    // If already a tag, try as-is and lowercase
+    if (s.startsWith("#")) {
+      candidates.add(s);
+      candidates.add(s.toLowerCase());
+    } else {
+      // Plain labels like "mountain" or "is_mountain"
+      const base = s.toLowerCase().replace(/\s+/g, "_");
+      const withIs = base.startsWith("is_") ? base : `is_${base}`;
+      candidates.add(`#${base}`);
+      candidates.add(`#${withIs}`);
+      candidates.add(`#cobblemon:${base}`);
+      candidates.add(`#cobblemon:${withIs}`);
+      candidates.add(`#minecraft:${base}`);
+      candidates.add(`#minecraft:${withIs}`);
+    }
+
+    for (const key of candidates) {
+      if (biomeTagsMap[key]?.length) return biomeTagsMap[key];
+    }
+    return [];
+  };
+
   const {
     data: fileReports,
     setData: setFileReports,
@@ -50,6 +101,78 @@ export default function UploadArea() {
   useEffect(() => {
     document.title = "Spawn Scanner | CobbleToolkit";
   }, []);
+
+  // Load and parse BiomeTags.md to enable hover tooltips for biome tags
+  useEffect(() => {
+    let isCancelled = false;
+
+    // Remote fetch to GitLab raw is blocked by CORS; rely on local copy served from /public
+
+    const parseBiomeTagsMarkdown = (markdownText) => {
+      /**
+       * Very lightweight parser for our specific MD structure:
+       * - Look for lines like: <summary><b>Tag:</b> #cobblemon:is_mountain</summary>
+       * - Collect following list items beginning with "- " until we hit </details>
+       */
+      const lines = markdownText.split(/\r?\n/);
+      const map = {};
+      let currentTag = null;
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        const tagMatch = line.match(
+          /<summary><b>Tag:<\/b>\s*(#[^<\s]+)\s*<\/summary>/i
+        );
+        if (tagMatch) {
+          currentTag = tagMatch[1];
+          if (!map[currentTag]) map[currentTag] = [];
+          continue;
+        }
+        if (currentTag) {
+          if (line.startsWith("- ")) {
+            const entry = line.slice(2).trim();
+            if (entry) map[currentTag].push(entry);
+          } else if (line.includes("</details>")) {
+            currentTag = null;
+          }
+        }
+      }
+      return map;
+    };
+
+    const fetchAndParse = async () => {
+      if (biomeTagsLoaded) return; // prevent duplicate loads
+
+      // Try local copy (must be placed in /public as BiomeTags.md)
+      const candidates = ["/BiomeTags.md"];
+
+      for (const url of candidates) {
+        try {
+          const resp = await fetch(url, { cache: "no-store" });
+          if (!resp.ok) continue;
+          const text = await resp.text();
+          if (isCancelled) return;
+          const parsed = parseBiomeTagsMarkdown(text);
+          setBiomeTagsMap(parsed || {});
+          try {
+            const count = Object.keys(parsed || {}).length;
+            console.info(`[BiomeTags] Loaded ${count} tags from`, url);
+          } catch {}
+          setBiomeTagsLoaded(true);
+          return;
+        } catch {
+          // ignore and try next candidate
+        }
+      }
+
+      // If all attempts fail, mark as loaded to avoid repeated fetches
+      if (!isCancelled) setBiomeTagsLoaded(true);
+    };
+
+    fetchAndParse();
+    return () => {
+      isCancelled = true;
+    };
+  }, [biomeTagsLoaded]);
 
   useEffect(() => {
     saveSortPreferences({ sort });
@@ -618,7 +741,16 @@ export default function UploadArea() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#1e1e1e] text-white px-4 py-8 flex flex-col items-center">
+    <div
+      className="min-h-screen bg-[#1e1e1e] text-white px-4 py-8 flex flex-col items-center"
+      onClick={() =>
+        setHoverTooltip((prev) =>
+          prev.pinned
+            ? { visible: false, pinned: false, x: 0, y: 0, content: null }
+            : prev
+        )
+      }
+    >
       <header className="text-center mb-10">
         <h1 className="text-3xl md:text-4xl font-bold mb-2">
           Cobblemon Spawn Pool Scanner
@@ -995,15 +1127,138 @@ export default function UploadArea() {
                               </div>
                             ) : isArray ? (
                               <div className="flex flex-wrap gap-1">
-                                {value.map((item, i) => (
-                                  <span
-                                    key={i}
-                                    className="px-2 py-1 bg-gray-700/50 rounded text-xs"
-                                  >
-                                    {item}
-                                  </span>
-                                ))}
+                                {value.map((item, i) => {
+                                  const itemStr = String(item);
+                                  const entries =
+                                    resolveBiomeTagEntries(itemStr);
+                                  const content = { title: itemStr, entries };
+                                  const isTagVisual =
+                                    itemStr.startsWith("#") ||
+                                    /^[a-zA-Z_\s]+$/.test(itemStr);
+                                  return (
+                                    <span
+                                      key={i}
+                                      onMouseEnter={(e) => {
+                                        if (hoverTooltip.pinned) return;
+                                        const rect =
+                                          e.currentTarget.getBoundingClientRect();
+                                        const x = Math.min(
+                                          rect.left,
+                                          window.innerWidth - 20
+                                        );
+                                        const y = Math.min(
+                                          rect.bottom + 8,
+                                          window.innerHeight - 20
+                                        );
+                                        showTooltip(x, y, content);
+                                      }}
+                                      onMouseLeave={hideTooltip}
+                                      onClick={(e) => {
+                                        const rect =
+                                          e.currentTarget.getBoundingClientRect();
+                                        const x = Math.min(
+                                          rect.left,
+                                          window.innerWidth - 20
+                                        );
+                                        const y = Math.min(
+                                          rect.bottom + 8,
+                                          window.innerHeight - 20
+                                        );
+                                        setHoverTooltip({
+                                          visible: true,
+                                          pinned: true,
+                                          x,
+                                          y,
+                                          content,
+                                        });
+                                        e.stopPropagation();
+                                      }}
+                                      className={`${
+                                        isTagVisual
+                                          ? "px-2 py-1 rounded text-xs bg-blue-700/40 border border-blue-600/40"
+                                          : "px-2 py-1 rounded text-xs bg-gray-700/50"
+                                      } cursor-pointer hover:underline`}
+                                      aria-label={content}
+                                      role="note"
+                                    >
+                                      {itemStr}
+                                    </span>
+                                  );
+                                })}
                               </div>
+                            ) : key === "biomes" || key === "antiBiomes" ? (
+                              (() => {
+                                const tokens = String(value || "")
+                                  .split(/[\|,]/)
+                                  .map((t) => t.trim())
+                                  .filter(Boolean);
+                                if (tokens.length === 0) {
+                                  return (
+                                    <span className="text-gray-500 text-xs"></span>
+                                  );
+                                }
+                                return (
+                                  <div className="flex flex-wrap gap-1">
+                                    {tokens.map((tok, i) => {
+                                      const entries =
+                                        resolveBiomeTagEntries(tok);
+                                      const content = { title: tok, entries };
+                                      const isTagVisual =
+                                        tok.startsWith("#") ||
+                                        /^[a-zA-Z_\s]+$/.test(tok);
+                                      return (
+                                        <span
+                                          key={i}
+                                          onMouseEnter={(e) => {
+                                            if (hoverTooltip.pinned) return;
+                                            const rect =
+                                              e.currentTarget.getBoundingClientRect();
+                                            const x = Math.min(
+                                              rect.left,
+                                              window.innerWidth - 20
+                                            );
+                                            const y = Math.min(
+                                              rect.bottom + 8,
+                                              window.innerHeight - 20
+                                            );
+                                            showTooltip(x, y, content);
+                                          }}
+                                          onMouseLeave={hideTooltip}
+                                          onClick={(e) => {
+                                            const rect =
+                                              e.currentTarget.getBoundingClientRect();
+                                            const x = Math.min(
+                                              rect.left,
+                                              window.innerWidth - 20
+                                            );
+                                            const y = Math.min(
+                                              rect.bottom + 8,
+                                              window.innerHeight - 20
+                                            );
+                                            setHoverTooltip({
+                                              visible: true,
+                                              pinned: true,
+                                              x,
+                                              y,
+                                              content,
+                                            });
+                                            e.stopPropagation();
+                                          }}
+                                          className={`${
+                                            isTagVisual
+                                              ? "px-2 py-1 rounded text-xs bg-blue-700/40 border border-blue-600/40"
+                                              : "px-2 py-1 rounded text-xs bg-gray-700/50"
+                                          } cursor-pointer hover:underline`}
+                                          aria-label={content}
+                                          role="note"
+                                        >
+                                          {tok}
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
+                                );
+                              })()
                             ) : key === "sourceFile" ? (
                               <span className="text-xs text-gray-400 font-mono">
                                 {value}
@@ -1063,6 +1318,50 @@ export default function UploadArea() {
           <p className="text-gray-500">
             Try adjusting your search terms or filters
           </p>
+        </div>
+      )}
+
+      {/* Global floating tooltip (fixed; avoids overflow clipping) */}
+      {hoverTooltip.visible && (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: "fixed",
+            left: hoverTooltip.x,
+            top: hoverTooltip.y,
+            transform: "translate3d(0,0,0)",
+          }}
+          className="z-[1000] max-w-[28rem] text-[12px] text-white bg-[#0b0b0c]/95 backdrop-blur-sm border border-gray-700/60 rounded-lg shadow-2xl"
+        >
+          <div className="flex items-center justify-between gap-3 px-3 py-2 border-b border-gray-700/60">
+            <div className="font-semibold truncate">
+              {hoverTooltip.content?.title || "Biome tag"}
+            </div>
+          </div>
+          <div className="max-h-64 overflow-y-auto px-3 py-2">
+            {Array.isArray(hoverTooltip.content?.entries) &&
+            hoverTooltip.content.entries.length > 0 ? (
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1 pr-1">
+                {hoverTooltip.content.entries.map((e, idx) => (
+                  <li
+                    key={idx}
+                    className="text-gray-200/95 text-[12px] leading-5"
+                  >
+                    {e}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="text-gray-400 text-[12px]">
+                No entries found for this tag
+              </div>
+            )}
+          </div>
+          {hoverTooltip.pinned ? (
+            <div className="px-3 py-2 text-[11px] text-gray-400 border-t border-gray-700/60">
+              Click anywhere outside to close
+            </div>
+          ) : null}
         </div>
       )}
     </div>
