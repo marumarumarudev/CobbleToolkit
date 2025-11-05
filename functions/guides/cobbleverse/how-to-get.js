@@ -28,267 +28,225 @@ export async function onRequest({ request, next }) {
     mew_duo: {
       title: "How to Get Mew & Mewtwo | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Mew and Mewtwo in Cobblemon. Learn how to craft the Origin Fossil and obtain Mewtwo through the Rocket Tower.",
-      image: "/guides/origin-fossil.jpg",
+        "Complete guide on how to obtain Mew and Mewtwo in COBBLEVERSE. Learn how to craft the Origin Fossil and obtain Mewtwo through the Rocket Tower.",
     },
     weather_trio: {
       title:
         "How to Get Weather Trio (Groudon, Kyogre, Rayquaza) | CobbleToolkit",
       description:
-        "Guide on how to catch Groudon, Kyogre, and Rayquaza in Cobblemon. Learn about their spawn locations, requirements, and methods.",
-      image: "/guides/map-crafting.jpg",
+        "Guide on how to catch Groudon, Kyogre, and Rayquaza in COBBLEVERSE. Learn about their spawn locations, requirements, and methods.",
     },
     ash_pokemons: {
       title: "How to Get Ash's Pokemon (Greninja, Pikachu) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Ash's Greninja and Pikachu in Cobblemon. Find Ash's house and complete the quest.",
-      image: "/guides/ash.png",
+        "Complete guide on how to obtain Ash's Greninja and Pikachu in COBBLEVERSE. Find Ash's house and complete the quest.",
     },
     lugia: {
       title: "How to Get Lugia | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Lugia in Cobblemon. Learn about the Whirl Islands, Silver Wing, and summoning requirements.",
-      image: "/guides/whirl-island.png",
+        "Complete guide on how to obtain Lugia in COBBLEVERSE. Learn about the Whirl Island, Silver Wing, and summoning requirements.",
     },
     hooh: {
       title: "How to Get Ho-oh | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Ho-oh in Cobblemon. Learn about the Bell Tower, Rainbow Wing, and summoning requirements.",
-      image: "/guides/bell-tower.png",
+        "Complete guide on how to obtain Ho-oh in COBBLEVERSE. Learn about the Bell Tower, Rainbow Wing, and summoning requirements.",
     },
     celebi: {
       title: "How to Get Celebi | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Celebi in Cobblemon. Learn about the Celebi Shrine and summoning requirements.",
-      image: "/guides/celebi-shrine.png",
+        "Complete guide on how to obtain Celebi in COBBLEVERSE. Learn about the Celebi Shrine and summoning requirements.",
     },
     deoxys: {
       title: "How to Get Deoxys | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Deoxys in Cobblemon. Learn about Meteorite Island and form changing.",
-      image: "/guides/deoxys-island.png",
+        "Complete guide on how to obtain Deoxys in COBBLEVERSE. Learn about Meteorite Island and form changing.",
     },
     calyrex: {
       title: "How to Get Calyrex | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Calyrex in Cobblemon. Learn about Glastrier and Spectrier fusion methods.",
-      image: "/guides/glastrier.png",
+        "Complete guide on how to obtain Calyrex in COBBLEVERSE. Learn about Glastrier and Spectrier fusion methods.",
     },
     cosplay_pikachu: {
       title: "How to Get Cosplay Pikachu | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Cosplay Pikachu forms in Cobblemon. Learn about the different cosplay styles.",
-      image: "/guides/cosplay-popstar.png",
+        "Complete guide on how to obtain Cosplay Pikachu forms in COBBLEVERSE. Learn about the different cosplay styles.",
     },
     tao_trio: {
       title: "How to Get Tao Trio (Reshiram, Zekrom, Kyurem) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Reshiram, Zekrom, and Kyurem in Cobblemon. Learn about fusion and separation methods.",
-      image: "/guides/tao-1.png",
+        "Complete guide on how to obtain Reshiram, Zekrom, and Kyurem in COBBLEVERSE. Learn about fusion and separation methods.",
     },
     legendary_birds_trio: {
       title:
         "How to Get Legendary Birds (Articuno, Zapdos, Moltres) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Articuno, Zapdos, and Moltres in Cobblemon. Includes Galarian forms.",
-      image: "/guides/galar-zapdos.png",
+        "Complete guide on how to obtain Articuno, Zapdos, and Moltres in COBBLEVERSE. Includes Galarian forms.",
     },
     creation_trio: {
       title:
         "How to Get Creation Trio (Dialga, Palkia, Giratina) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Dialga, Palkia, and Giratina in Cobblemon. Learn about Spear Pillar and Distortion World.",
-      image: "/guides/dialga.png",
+        "Complete guide on how to obtain Dialga, Palkia, and Giratina in COBBLEVERSE.",
     },
     river_guardians: {
       title:
         "How to Get River Guardians (Azelf, Uxie, Mesprit) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Azelf, Uxie, and Mesprit in Cobblemon. Learn about the lake locations.",
-      image: "/guides/river-guardians.png",
+        "Complete guide on how to obtain Azelf, Uxie, and Mesprit in COBBLEVERSE.",
     },
     aura_trio: {
       title: "How to Get Aura Trio (Xerneas, Yveltal, Zygarde) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Xerneas, Yveltal, and Zygarde in Cobblemon. Learn about Zygarde cells and forms.",
-      image: "/guides/zygarde.png",
+        "Complete guide on how to obtain Xerneas, Yveltal, and Zygarde in COBBLEVERSE. Learn about Zygarde cells and forms.",
     },
     kubfu: {
       title: "How to Get Kubfu & Urshifu | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Kubfu and evolve it into Urshifu in Cobblemon. Learn about the Tower of Darkness and Waters.",
-      image: "/guides/kubfu.png",
+        "Complete guide on how to obtain Kubfu and evolve it into Urshifu in COBBLEVERSE.",
     },
     combat_trio: {
       title:
         "How to Get Combat Trio (Cobalion, Terrakion, Virizion) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Cobalion, Terrakion, and Virizion in Cobblemon.",
-      image: "/guides/cobalion.png",
+        "Complete guide on how to obtain Cobalion, Terrakion, and Virizion in COBBLEVERSE.",
     },
     legendary_titans: {
       title:
         "How to Get Legendary Titans (Regirock, Regice, Registeel, Regigigas) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Regirock, Regice, Registeel, and Regigigas in Cobblemon. Learn about the Regi temples.",
-      image: "/guides/regirock.png",
+        "Complete guide on how to obtain Regirock, Regice, Registeel, and Regigigas in COBBLEVERSE. Learn about the Regi temples.",
     },
     eon_duo: {
       title: "How to Get Eon Duo (Latias, Latios) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Latias and Latios in Cobblemon. Learn about the Eon Shrines.",
-      image: "/guides/latios-shrine.png",
+        "Complete guide on how to obtain Latias and Latios in COBBLEVERSE. Learn about the Secret Garden.",
     },
     jirachi: {
       title: "How to Get Jirachi | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Jirachi in Cobblemon. Learn about the wishing requirements.",
-      image: "/guides/jirachi.png",
+        "Complete guide on how to obtain Jirachi in COBBLEVERSE.",
     },
     lunar_duo: {
-      title: "How to Get Lunar Duo (Solgaleo, Lunala) | CobbleToolkit",
+      title: "How to Get Lunar Duo (Cresselia, Darkrai) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Solgaleo and Lunala in Cobblemon. Learn about Cosmog evolution.",
-      image: "/guides/lunala.png",
+        "Complete guide on how to obtain Cresselia and Darkrai in COBBLEVERSE.",
     },
     sea_guardians: {
       title:
         "How to Get Sea Guardians (Tapu Koko, Tapu Lele, Tapu Bulu, Tapu Fini) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain the Alolan Guardian Deities in Cobblemon.",
-      image: "/guides/tapu-koko.png",
+        "Complete guide on how to obtain the Alolan Guardian Deities in COBBLEVERSE.",
     },
     heatran: {
       title: "How to Get Heatran | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Heatran in Cobblemon. Learn about the volcano location.",
-      image: "/guides/heatran.png",
+        "Complete guide on how to obtain Heatran in COBBLEVERSE.",
     },
     shaymin: {
       title: "How to Get Shaymin | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Shaymin in Cobblemon. Learn about the Gracidea Flower.",
-      image: "/guides/shaymin.png",
+        "Complete guide on how to obtain Shaymin in COBBLEVERSE.",
     },
     arceus: {
       title: "How to Get Arceus | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Arceus in Cobblemon. Learn about the Azure Flute and Hall of Origin.",
-      image: "/guides/arceus.png",
+        "Complete guide on how to obtain Arceus in COBBLEVERSE.",
     },
     victini: {
       title: "How to Get Victini | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Victini in Cobblemon. Learn about the Liberty Garden.",
-      image: "/guides/victini.png",
+        "Complete guide on how to obtain Victini in COBBLEVERSE.",
     },
     swords_of_justice: {
       title:
         "How to Get Swords of Justice (Cobalion, Terrakion, Virizion, Keldeo) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain the Swords of Justice quartet in Cobblemon.",
-      image: "/guides/keldeo.png",
+        "Complete guide on how to obtain the Swords of Justice quartet in COBBLEVERSE.",
     },
     forces_of_nature: {
       title:
         "How to Get Forces of Nature (Tornadus, Thundurus, Landorus, Enamorus) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Tornadus, Thundurus, Landorus, and Enamorus in Cobblemon. Learn about the Reveal Glass.",
-      image: "/guides/tornadus.png",
+        "Complete guide on how to obtain Tornadus, Thundurus, Landorus, and Enamorus in COBBLEVERSE. Learn about the Reveal Glass.",
     },
     meloetta: {
       title: "How to Get Meloetta | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Meloetta in Cobblemon. Learn about form changing.",
-      image: "/guides/meloetta.png",
+        "Complete guide on how to obtain Meloetta in COBBLEVERSE. Learn about form changing.",
     },
     genesect: {
       title: "How to Get Genesect | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Genesect in Cobblemon. Learn about the Drive items.",
-      image: "/guides/genesect.png",
+        "Complete guide on how to obtain Genesect in COBBLEVERSE. Learn about the Drive items.",
     },
     type_null_silvally: {
       title: "How to Get Type: Null & Silvally | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Type: Null and evolve it into Silvally in Cobblemon.",
-      image: "/guides/typenull.png",
+        "Complete guide on how to obtain Type: Null and evolve it into Silvally in COBBLEVERSE.",
     },
     diancie: {
       title: "How to Get Diancie | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Diancie in Cobblemon. Learn about the Diamond Ore.",
-      image: "/guides/diancie.png",
+        "Complete guide on how to obtain Diancie in COBBLEVERSE.",
     },
     hoopa: {
       title: "How to Get Hoopa | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Hoopa in Cobblemon. Learn about the Prison Bottle and Unbound form.",
-      image: "/guides/hoopa.png",
+        "Complete guide on how to obtain Hoopa in COBBLEVERSE. Learn about the Prison Bottle and Unbound form.",
     },
     volcanion: {
       title: "How to Get Volcanion | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Volcanion in Cobblemon. Learn about the volcano location.",
-      image: "/guides/volcanion.png",
+        "Complete guide on how to obtain Volcanion in COBBLEVERSE.",
     },
     guardian_deities: {
       title:
         "How to Get Guardian Deities (Tapu Koko, Tapu Lele, Tapu Bulu, Tapu Fini) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain the Alolan Guardian Deities in Cobblemon.",
-      image: "/guides/tapu-lele.png",
+        "Complete guide on how to obtain the Alolan Guardian Deities in COBBLEVERSE.",
     },
     light_trio: {
       title:
         "How to Get Light Trio (Cosmog, Cosmoem, Solgaleo/Lunala) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Cosmog, Cosmoem, Solgaleo, and Lunala in Cobblemon.",
-      image: "/guides/cosmog.png",
+        "Complete guide on how to obtain Cosmog, Cosmoem, Solgaleo, Lunala, and Necrozma in COBBLEVERSE.",
     },
     ultra_beasts: {
       title: "How to Get Ultra Beasts | CobbleToolkit",
       description:
-        "Complete guide on how to obtain all Ultra Beasts in Cobblemon. Includes Nihilego, Buzzwole, and more.",
-      image: "/guides/buzzwole.png",
+        "Complete guide on how to obtain all Ultra Beasts in COBBLEVERSE.",
     },
     paradox_ancient: {
       title: "How to Get Paradox: Ancient Pokemon | CobbleToolkit",
       description:
-        "Complete guide on how to obtain ancient Paradox Pokemon like Great Tusk, Roaring Moon, and Slither Wing in Cobblemon.",
-      image: "/guides/great-tusk.png",
+        "Complete guide on how to obtain ancient Paradox Pokemon like Great Tusk, Roaring Moon, and Slither Wing in COBBLEVERSE.",
     },
     paradox_future: {
       title: "How to Get Paradox: Future Pokemon | CobbleToolkit",
       description:
-        "Complete guide on how to obtain future Paradox Pokemon like Iron Bundle, Iron Valiant, and Iron Hands in Cobblemon.",
-      image: "/guides/iron-bundle.png",
+        "Complete guide on how to obtain future Paradox Pokemon like Iron Bundle, Iron Valiant, and Iron Hands in COBBLEVERSE.",
     },
     treasures_of_ruin: {
       title:
         "How to Get Treasures of Ruin (Ting-Lu, Chien-Pao, Wo-Chien, Chi-Yu) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain the Treasures of Ruin quartet in Cobblemon.",
-      image: "/guides/ting-lu.png",
+        "Complete guide on how to obtain the Treasures of Ruin quartet in COBBLEVERSE.",
     },
     ogerpon: {
       title: "How to Get Ogerpon | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Ogerpon in Cobblemon. Learn about the different mask forms.",
-      image: "/guides/ogerpon.png",
+        "Complete guide on how to obtain Ogerpon in COBBLEVERSE. Learn about the different mask forms.",
     },
     loyal_three: {
       title:
         "How to Get Loyal Three (Okidogi, Munkidori, Fezandipiti) | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Okidogi, Munkidori, and Fezandipiti in Cobblemon.",
-      image: "/guides/okidogi.png",
+        "Complete guide on how to obtain Okidogi, Munkidori, and Fezandipiti in COBBLEVERSE.",
     },
     terapagos: {
       title: "How to Get Terapagos | CobbleToolkit",
       description:
-        "Complete guide on how to obtain Terapagos in Cobblemon. Learn about the Terastal phenomenon.",
-      image: "/guides/terapagos.png",
+        "Complete guide on how to obtain Terapagos in COBBLEVERSE.",
     },
   };
 
@@ -300,10 +258,6 @@ export async function onRequest({ request, next }) {
 
   // Get the HTML content
   const html = await response.text();
-
-  // Get the base URL from the request
-  const baseUrl = `${url.protocol}//${url.host}`;
-  const imageUrl = `${baseUrl}${meta.image}`;
 
   // Helper function to escape HTML
   function escapeHtml(text) {
@@ -324,9 +278,6 @@ export async function onRequest({ request, next }) {
     <meta name="description" content="${escapeHtml(meta.description)}" />
     <meta property="og:title" content="${escapeHtml(meta.title)}" />
     <meta property="og:description" content="${escapeHtml(meta.description)}" />
-    <meta property="og:image" content="${escapeHtml(imageUrl)}" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="CobbleToolkit" />
   `;
