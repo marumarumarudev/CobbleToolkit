@@ -13,6 +13,7 @@ import {
   MessageSquare,
   HelpCircle,
 } from "lucide-react";
+import GlobalFileUpload from "./GlobalFileUpload";
 
 // Icon wrapper to prevent hydration issues
 const SafeIcon = ({ Icon, size, ...props }) => {
@@ -79,6 +80,9 @@ export default function ClientNav() {
 
         {/* Desktop Navigation */}
         <div className="hidden sm:flex items-center space-x-6 text-sm font-mono">
+          {/* Global File Upload */}
+          <GlobalFileUpload />
+          
           {/* Tools Dropdown */}
           <div className="relative group">
             <button
@@ -141,6 +145,11 @@ export default function ClientNav() {
       {/* Mobile menu */}
       {isOpen && (
         <div className="sm:hidden mt-4 space-y-2 font-mono text-sm bg-[#1c1c1c] rounded-xl p-4 border border-[#333]">
+          {/* Global File Upload */}
+          <div className="mb-4">
+            <GlobalFileUpload />
+          </div>
+          
           {/* Tools Section */}
           <div className="mb-4">
             <div className="flex items-center gap-2 text-yellow-400 font-semibold mb-2 px-2">

@@ -1,19 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { parseLootFromZip } from "@/utils/lootParser";
 import Spinner from "./Spinner";
 import {
   X,
-  ChevronDown,
   ChevronUp,
+  ChevronDown,
   ChevronsUpDown,
   Search,
   Filter,
 } from "lucide-react";
 import { useStorage, usePreferences } from "@/hooks/useStorage";
 import StorageInfo from "./StorageInfo";
+import { formatPokemonName, matchesSearch } from "@/utils/nameUtils";
+import { useSharedFiles } from "@/contexts/SharedFilesContext";
 
 export default function LootScanner() {
   const {
@@ -24,7 +26,11 @@ export default function LootScanner() {
     loading: storageLoading,
     error: storageError,
   } = useStorage("lootReports", []);
+  const { sharedFiles } = useSharedFiles();
   const [loading, setLoading] = useState(false);
+  const [processedFiles, setProcessedFiles] = useState(new Set());
+  const [processedFilesLoaded, setProcessedFilesLoaded] = useState(false);
+  const SCANNER_NAME = "lootScanner";
   const [globalSearch, setGlobalSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [searchField, setSearchField] = useState("all");
@@ -32,12 +38,6 @@ export default function LootScanner() {
   const [sort, setSort] = useState({ column: "pokemon", direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState({
-    current: 0,
-    total: 0,
-    fileName: "",
-  });
-  const [isFilesExpanded, setIsFilesExpanded] = useState(true);
   const PAGE_SIZE = 50;
 
   useEffect(() => {
@@ -84,10 +84,111 @@ export default function LootScanner() {
     }
   };
 
+  // Load processed files tracking on mount
+  useEffect(() => {
+    const loadProcessedFiles = async () => {
+      try {
+        const { default: getStorage } = await import(
+          "@/utils/indexedDBStorage"
+        );
+        const storage = getStorage();
+        const processed = await storage.getProcessedFiles(SCANNER_NAME);
+        setProcessedFiles(processed);
+        setProcessedFilesLoaded(true);
+      } catch (err) {
+        console.error("Failed to load processed files:", err);
+        setProcessedFilesLoaded(true); // Set to true even on error to prevent blocking
+      }
+    };
+    loadProcessedFiles();
+  }, []);
+
   // Update storage usage whenever fileReports changes
   useEffect(() => {
     updateStorageUsage();
   }, [fileReports]);
+
+  // Process shared files automatically for loot data
+  useEffect(() => {
+    const processSharedFiles = async () => {
+      // Wait for processed files to be loaded before processing
+      if (!processedFilesLoaded || !sharedFiles.length || loading) return;
+
+      // Filter out files already processed by this scanner
+      const unprocessed = sharedFiles.filter(
+        (sf) => sf.file && !processedFiles.has(sf.id)
+      );
+
+      if (!unprocessed.length) return;
+
+      setLoading(true);
+      const newReports = [];
+      const existingFileNames = new Set(fileReports.map((r) => r.name));
+      const { default: getStorage } = await import("@/utils/indexedDBStorage");
+      const storage = getStorage();
+
+      for (const sharedFile of unprocessed) {
+        // Check for duplicates in current data
+        if (existingFileNames.has(sharedFile.name)) {
+          console.log(`⏭️ Skipping duplicate file: ${sharedFile.name}`);
+          // Mark as processed even if duplicate
+          await storage.markFileProcessed(SCANNER_NAME, sharedFile.id);
+          setProcessedFiles((prev) => new Set([...prev, sharedFile.id]));
+          continue;
+        }
+
+        try {
+          const parsed = await parseLootFromZip(sharedFile.file);
+          if (parsed && parsed.length > 0) {
+            newReports.push({
+              id: crypto.randomUUID(),
+              name: sharedFile.name,
+              data: parsed,
+              fromShared: true,
+            });
+            existingFileNames.add(sharedFile.name);
+            console.log(
+              `✅ Processed shared file ${sharedFile.name}: ${parsed.length} loot entries`
+            );
+          }
+        } catch (err) {
+          console.error(
+            `❌ Failed to process shared file ${sharedFile.name}:`,
+            err
+          );
+        }
+        // Mark as processed in persistent storage
+        await storage.markFileProcessed(SCANNER_NAME, sharedFile.id);
+        setProcessedFiles((prev) => new Set([...prev, sharedFile.id]));
+      }
+
+      if (newReports.length > 0) {
+        const updated = [...newReports, ...fileReports];
+        try {
+          await saveReports(updated);
+          setFileReports(updated);
+          toast.success(
+            `✅ Processed ${newReports.length} shared file(s) for loot data`
+          );
+        } catch (err) {
+          console.error("Failed to save loot reports:", err);
+          setFileReports(updated);
+        }
+      }
+
+      setLoading(false);
+    };
+
+    processSharedFiles();
+  }, [
+    sharedFiles,
+    loading,
+    fileReports,
+    saveReports,
+    setFileReports,
+    processedFiles,
+    processedFilesLoaded,
+  ]);
 
   // Auto-cleanup storage when it gets too full
   const autoCleanupStorage = () => {
@@ -112,79 +213,6 @@ export default function LootScanner() {
     }
   };
 
-  const handleFiles = async (files) => {
-    if (loading) return toast.error("Still parsing...");
-    setLoading(true);
-
-    const valid = Array.from(files).filter((f) =>
-      f.name.toLowerCase().match(/\.(zip|jar)$/)
-    );
-    if (!valid.length) {
-      toast.error("Only .zip or .jar files allowed.");
-      setLoading(false);
-      return;
-    }
-
-    setUploadProgress({ current: 0, total: valid.length, fileName: "" });
-
-    const newReports = [];
-    for (let i = 0; i < valid.length; i++) {
-      const file = valid[i];
-      setUploadProgress({
-        current: i + 1,
-        total: valid.length,
-        fileName: file.name,
-      });
-
-      try {
-        const parsed = await parseLootFromZip(file);
-        if (parsed && parsed.length > 0) {
-          newReports.push({
-            id: crypto.randomUUID(),
-            name: file.name,
-            data: parsed,
-          });
-          console.log(
-            `✅ Successfully parsed ${file.name}: ${parsed.length} loot entries`
-          );
-        } else {
-          console.warn(`⚠️ No loot data found in ${file.name}`);
-        }
-      } catch (err) {
-        console.error(`❌ Failed to parse ${file.name}:`, err);
-        toast.error(`Failed to parse ${file.name}`);
-      }
-    }
-
-    // Merge new data with existing data
-    const updated = [...newReports, ...fileReports];
-
-    // Save using IndexedDB
-    try {
-      await saveReports(updated);
-      setFileReports(updated);
-
-      if (newReports.length > 0) {
-        toast.success(`✅ Successfully parsed ${newReports.length} files!`);
-      }
-    } catch (err) {
-      console.error("Failed to save loot reports:", err);
-      toast.error("⚠️ Failed to save data. It will be lost on page refresh.");
-      setFileReports(updated);
-    }
-
-    setLoading(false);
-    setUploadProgress({ current: 0, total: 0, fileName: "" });
-  };
-
-  const handleInputChange = (e) => {
-    const files = Array.from(e.target.files).filter((f) =>
-      f.name.toLowerCase().match(/\.(zip|jar)$/)
-    );
-    if (!files.length) return toast.error("Only .zip or .jar files allowed.");
-    handleFiles(files);
-  };
-
   const lootEntries = fileReports.flatMap((report) =>
     report.data.flatMap((pokemon) =>
       (pokemon.drops || []).map((drop) => ({
@@ -203,11 +231,9 @@ export default function LootScanner() {
     )
   );
 
-  // Enhanced filtering with field-specific search
+  // Enhanced filtering with field-specific search (normalized for underscores/spaces)
   const filtered = lootEntries.filter((entry) => {
     if (!debouncedSearch) return true;
-
-    const searchTerm = debouncedSearch.toLowerCase();
 
     if (searchField === "all") {
       return [
@@ -216,10 +242,10 @@ export default function LootScanner() {
         entry.quantity,
         entry.chance,
         entry.sourceFile,
-      ].some((val) => val && val.toString().toLowerCase().includes(searchTerm));
+      ].some((val) => matchesSearch(debouncedSearch, val));
     } else {
       const value = entry[searchField];
-      return value && value.toString().toLowerCase().includes(searchTerm);
+      return matchesSearch(debouncedSearch, value);
     }
   });
 
@@ -278,34 +304,6 @@ export default function LootScanner() {
     setCurrentPage(1);
   };
 
-  const deleteFile = async (fileId) => {
-    if (window.confirm("Are you sure you want to delete this file?")) {
-      const updatedReports = fileReports.filter(
-        (report) => report.id !== fileId
-      );
-      try {
-        await saveReports(updatedReports);
-        setFileReports(updatedReports);
-        toast.success("File deleted successfully");
-      } catch (err) {
-        console.error("Failed to delete file:", err);
-        toast.error("Failed to delete file");
-      }
-    }
-  };
-
-  const clearAll = async () => {
-    if (window.confirm("Are you sure you want to clear all data?")) {
-      const success = await clearReports();
-      if (success) {
-        setFileReports([]);
-        toast.success("All data cleared successfully");
-      } else {
-        toast.error("Failed to clear data");
-      }
-    }
-  };
-
   const SEARCH_FIELDS = [
     { value: "all", label: "All Fields" },
     { value: "pokemon", label: "Pokémon" },
@@ -330,76 +328,23 @@ export default function LootScanner() {
           Cobblemon Loot Scanner
         </h1>
         <p className="text-gray-300 max-w-2xl mx-auto">
-          Upload Cobblemon datapacks (.zip or .jar) to scan Pokémon loot drops.
+          View Pokémon loot drops from uploaded datapacks.
         </p>
         <p className="text-gray-300 text-sm text-center mt-2">
+          Upload files using the &quot;Upload File&quot; button in the
+          navigation bar.
+        </p>
+        <p className="text-gray-300 text-sm text-center mt-1">
           Drops like <code>cobblemon:raw_fish</code> are shown per Pokémon.
         </p>
       </header>
-
-      {/* Upload Area */}
-      <div
-        className="border-2 border-dashed border-gray-600 rounded p-6 w-full max-w-2xl text-center bg-[#2c2c2c] hover:bg-[#3a3a3a] transition cursor-pointer mb-8"
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => {
-          e.preventDefault();
-          const files = Array.from(e.dataTransfer.files).filter((f) =>
-            f.name.toLowerCase().match(/\.(zip|jar)$/)
-          );
-          if (!files.length) return toast.error("Only .zip or .jar allowed.");
-          handleFiles(files);
-        }}
-        onClick={() => document.getElementById("lootInput").click()}
-      >
-        <p className="text-gray-300 text-lg">📦 Drag and drop files here</p>
-        <p className="text-sm text-gray-500">or click to select files</p>
-        <p className="text-xs text-gray-600 mt-2">
-          ⚠️ Maximum file size: 150MB. Large files may take longer to process.
-        </p>
-        <p className="text-xs text-gray-500 mt-1">
-          💡 Tip: Large files consume more storage. Consider clearing old
-          reports if you encounter issues.
-        </p>
-        <input
-          id="lootInput"
-          type="file"
-          multiple
-          accept=".zip,.jar"
-          onChange={(e) => {
-            handleInputChange(e);
-            e.target.value = "";
-          }}
-          className="hidden"
-        />
-      </div>
 
       {loading && (
         <div className="mb-4 flex flex-col items-center gap-2 text-blue-400">
           <div className="flex items-center gap-2">
             <Spinner />
-            <span>
-              {uploadProgress.total > 1
-                ? `Processing file ${uploadProgress.current} of ${uploadProgress.total}...`
-                : "Parsing file..."}
-            </span>
+            <span>Processing shared files...</span>
           </div>
-          {uploadProgress.fileName && (
-            <div className="text-sm text-gray-400">
-              Current: {uploadProgress.fileName}
-            </div>
-          )}
-          {uploadProgress.total > 1 && (
-            <div className="w-64 bg-gray-700 rounded-full h-2">
-              <div
-                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                style={{
-                  width: `${
-                    (uploadProgress.current / uploadProgress.total) * 100
-                  }%`,
-                }}
-              ></div>
-            </div>
-          )}
         </div>
       )}
 
@@ -407,73 +352,30 @@ export default function LootScanner() {
         <>
           {/* Storage Info */}
           <div className="w-full max-w-4xl mb-6 px-4">
-            <StorageInfo />
-          </div>
-
-          {/* File List Section */}
-          <div className="w-full max-w-4xl mb-4 px-4">
-            <div className="bg-[#2a2a2a] rounded-lg border border-gray-700/50 p-3">
-              <div className="flex items-center justify-between mb-3">
-                <button
-                  onClick={() => setIsFilesExpanded(!isFilesExpanded)}
-                  className="flex items-center gap-2 text-base font-semibold text-white hover:text-gray-300 transition-colors duration-200"
-                >
-                  {isFilesExpanded ? (
-                    <ChevronDown size={16} />
-                  ) : (
-                    <ChevronUp size={16} />
-                  )}
-                  📁 Uploaded Files ({fileReports.length})
-                </button>
-                {isFilesExpanded && (
-                  <button
-                    className="flex items-center gap-1 px-3 py-1.5 bg-red-600 rounded hover:bg-red-700 transition text-sm"
-                    onClick={clearAll}
-                  >
-                    <X size={14} /> Clear All
-                  </button>
-                )}
-              </div>
-
-              {isFilesExpanded && (
-                <div className="space-y-1.5">
-                  {fileReports.map((report) => (
-                    <div
-                      key={report.id}
-                      className="flex items-center justify-between bg-[#3a3a3a] rounded-md p-2 border border-gray-600/50"
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="text-lg">
-                          {report.error ? "❌" : "✅"}
-                        </div>
-                        <div>
-                          <div className="text-white font-medium text-xs">
-                            {report.name}
-                          </div>
-                          <div className="text-xs text-gray-400">
-                            {report.error ? (
-                              <span className="text-red-400">
-                                Error: {report.error}
-                              </span>
-                            ) : (
-                              <span className="text-green-400">
-                                {report.data?.length || 0} loot entries
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => deleteFile(report.id)}
-                        className="flex items-center gap-1 px-2 py-1 bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 rounded transition-colors duration-200 text-xs"
-                      >
-                        <X size={12} />
-                        Delete
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+            <div className="flex items-center justify-center gap-4">
+              <StorageInfo />
+              <button
+                onClick={async () => {
+                  if (
+                    window.confirm(
+                      "Are you sure you want to clear all loot data? This cannot be undone."
+                    )
+                  ) {
+                    const success = await clearReports();
+                    if (success) {
+                      // Don't clear processed files tracking - this prevents automatic reprocessing
+                      // If user wants to reprocess, they can clear tracking separately
+                      setFileReports([]);
+                      toast.success("All loot data cleared successfully");
+                    } else {
+                      toast.error("Failed to clear data");
+                    }
+                  }
+                }}
+                className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 rounded text-xs transition-colors duration-200 border border-red-600/30"
+              >
+                Clear All Data
+              </button>
             </div>
           </div>
 
@@ -569,7 +471,7 @@ export default function LootScanner() {
                   <>
                     <span className="text-gray-600">|</span>
                     <span className="text-blue-400">
-                      Matches: &quot;{debouncedSearch}&quot;
+                      Matches: &ldquo;{debouncedSearch}&rdquo;
                     </span>
                   </>
                 )}
@@ -648,7 +550,7 @@ export default function LootScanner() {
                         >
                           <td className="p-3">
                             <span className="text-gray-300 font-medium">
-                              {entry.pokemon}
+                              {formatPokemonName(entry.pokemon)}
                             </span>
                           </td>
                           <td className="p-3">

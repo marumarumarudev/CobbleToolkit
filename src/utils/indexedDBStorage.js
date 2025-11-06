@@ -1,19 +1,11 @@
-/**
- * IndexedDB Storage Utility for Cobblemon Tools
- * Replaces localStorage with much larger capacity and better performance
- */
-
 class CobblemonStorage {
   constructor() {
     this.dbName = "CobblemonData";
-    this.version = 1;
+    this.version = 4; // Incremented to add processedFilesTracking store
     this.db = null;
     this.isInitialized = false;
   }
 
-  /**
-   * Initialize the IndexedDB database
-   */
   async init() {
     if (this.isInitialized) return Promise.resolve();
 
@@ -36,7 +28,6 @@ class CobblemonStorage {
         const db = event.target.result;
         console.log("Creating IndexedDB object stores...");
 
-        // Create object stores for each tool
         const stores = [
           "spawnReports",
           "speciesData",
@@ -44,12 +35,14 @@ class CobblemonStorage {
           "lootReports",
           "spawnPoolData",
           "userPreferences",
+          "sharedFiles",
+          "processedFilesTracking",
         ];
 
         stores.forEach((storeName) => {
           if (!db.objectStoreNames.contains(storeName)) {
             const store = db.createObjectStore(storeName, { keyPath: "id" });
-            // Create indexes for better querying
+
             store.createIndex("timestamp", "timestamp", { unique: false });
             store.createIndex("toolType", "toolType", { unique: false });
           }
@@ -63,6 +56,12 @@ class CobblemonStorage {
    */
   async saveData(storeName, data, metadata = {}) {
     await this.ensureInitialized();
+
+    // Ensure the store exists (safety check)
+    if (!this.db.objectStoreNames.contains(storeName)) {
+      console.error(`Store ${storeName} does not exist`);
+      return Promise.reject(new Error(`Store ${storeName} does not exist`));
+    }
 
     return new Promise((resolve, reject) => {
       const transaction = this.db.transaction([storeName], "readwrite");
@@ -95,6 +94,12 @@ class CobblemonStorage {
    */
   async loadData(storeName) {
     await this.ensureInitialized();
+
+    // Ensure the store exists (safety check)
+    if (!this.db.objectStoreNames.contains(storeName)) {
+      console.warn(`Store ${storeName} does not exist, returning empty array`);
+      return [];
+    }
 
     return new Promise((resolve, reject) => {
       const transaction = this.db.transaction([storeName], "readonly");
@@ -168,6 +173,12 @@ class CobblemonStorage {
   async clearStore(storeName) {
     await this.ensureInitialized();
 
+    // Ensure the store exists (safety check)
+    if (!this.db.objectStoreNames.contains(storeName)) {
+      console.warn(`Store ${storeName} does not exist, nothing to clear`);
+      return Promise.resolve(true);
+    }
+
     return new Promise((resolve, reject) => {
       const transaction = this.db.transaction([storeName], "readwrite");
       const store = transaction.objectStore(storeName);
@@ -175,6 +186,108 @@ class CobblemonStorage {
 
       request.onsuccess = () => {
         console.log(`Cleared ${storeName} store`);
+        resolve(true);
+      };
+
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Track which files have been processed by which scanner
+   */
+  async markFileProcessed(scannerName, fileId) {
+    await this.ensureInitialized();
+
+    if (!this.db.objectStoreNames.contains("processedFilesTracking")) {
+      return Promise.resolve();
+    }
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db.transaction(
+        ["processedFilesTracking"],
+        "readwrite"
+      );
+      const store = transaction.objectStore("processedFilesTracking");
+
+      // Load existing tracking for this scanner
+      const getRequest = store.get(scannerName);
+
+      getRequest.onsuccess = () => {
+        const existing = getRequest.result;
+        const processedFiles = existing
+          ? new Set(existing.processedFiles || [])
+          : new Set();
+
+        processedFiles.add(fileId);
+
+        const dataToSave = {
+          id: scannerName,
+          scannerName,
+          processedFiles: Array.from(processedFiles),
+          lastUpdated: Date.now(),
+        };
+
+        const putRequest = store.put(dataToSave);
+        putRequest.onsuccess = () => resolve();
+        putRequest.onerror = () => reject(putRequest.error);
+      };
+
+      getRequest.onerror = () => reject(getRequest.error);
+    });
+  }
+
+  /**
+   * Get list of processed file IDs for a scanner
+   */
+  async getProcessedFiles(scannerName) {
+    await this.ensureInitialized();
+
+    if (!this.db.objectStoreNames.contains("processedFilesTracking")) {
+      return Promise.resolve(new Set());
+    }
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db.transaction(
+        ["processedFilesTracking"],
+        "readonly"
+      );
+      const store = transaction.objectStore("processedFilesTracking");
+      const request = store.get(scannerName);
+
+      request.onsuccess = () => {
+        const result = request.result;
+        resolve(
+          result && result.processedFiles
+            ? new Set(result.processedFiles)
+            : new Set()
+        );
+      };
+
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Clear processed files tracking for a scanner (when clearing its data)
+   */
+  async clearProcessedFiles(scannerName) {
+    await this.ensureInitialized();
+
+    if (!this.db.objectStoreNames.contains("processedFilesTracking")) {
+      return Promise.resolve(true);
+    }
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db.transaction(
+        ["processedFilesTracking"],
+        "readwrite"
+      );
+      const store = transaction.objectStore("processedFilesTracking");
+      const request = store.delete(scannerName);
+
+      request.onsuccess = () => {
+        console.log(`Cleared processed files tracking for ${scannerName}`);
         resolve(true);
       };
 

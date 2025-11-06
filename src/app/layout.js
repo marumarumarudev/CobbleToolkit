@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import ClientNav from "@/components/ClientNav";
 import GlobalErrorFilters from "@/components/GlobalErrorFilters";
+import { SharedFilesProvider } from "@/contexts/SharedFilesContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,11 +39,13 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#1a1a1a] text-white`}
       >
-        <GlobalErrorFilters />
-        {/* Navbar */}
-        <ClientNav />
+        <SharedFilesProvider>
+          <GlobalErrorFilters />
+          {/* Navbar */}
+          <ClientNav />
 
-        {children}
+          {children}
+        </SharedFilesProvider>
 
         {/* Toaster notifications */}
         <Toaster

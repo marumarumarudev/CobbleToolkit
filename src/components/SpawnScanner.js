@@ -14,6 +14,8 @@ import {
 import Spinner from "./Spinner";
 import { useStorage, usePreferences } from "@/hooks/useStorage";
 import StorageInfo from "./StorageInfo";
+import { formatPokemonName, matchesSearch } from "@/utils/nameUtils";
+import { useSharedFiles } from "@/contexts/SharedFilesContext";
 
 export default function UploadArea() {
   const [loading, setLoading] = useState(false);
@@ -23,13 +25,7 @@ export default function UploadArea() {
   const [contextFilter, setContextFilter] = useState("all");
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [sort, setSort] = useState({ column: "bucket", direction: "asc" });
-  const [uploadProgress, setUploadProgress] = useState({
-    current: 0,
-    total: 0,
-    fileName: "",
-  });
   const [currentPage, setCurrentPage] = useState(1);
-  const [isFilesExpanded, setIsFilesExpanded] = useState(true);
   const PAGE_SIZE = 25;
 
   // Biome tags map loaded from BiomeTags.md { "#cobblemon:is_mountain": ["minecraft:...", ...] }
@@ -91,6 +87,10 @@ export default function UploadArea() {
     loading: storageLoading,
     error: storageError,
   } = useStorage("spawnReports", []);
+  const { sharedFiles } = useSharedFiles();
+  const [processedFiles, setProcessedFiles] = useState(new Set());
+  const [processedFilesLoaded, setProcessedFilesLoaded] = useState(false);
+  const SCANNER_NAME = "spawnScanner";
 
   const { preferences: sortPreferences, savePreferences: saveSortPreferences } =
     usePreferences("spawnScanner", {
@@ -177,6 +177,107 @@ export default function UploadArea() {
   useEffect(() => {
     saveSortPreferences({ sort });
   }, [sort, saveSortPreferences]);
+
+  // Load processed files tracking on mount
+  useEffect(() => {
+    const loadProcessedFiles = async () => {
+      try {
+        const { default: getStorage } = await import(
+          "@/utils/indexedDBStorage"
+        );
+        const storage = getStorage();
+        const processed = await storage.getProcessedFiles(SCANNER_NAME);
+        setProcessedFiles(processed);
+        setProcessedFilesLoaded(true);
+      } catch (err) {
+        console.error("Failed to load processed files:", err);
+        setProcessedFilesLoaded(true); // Set to true even on error to prevent blocking
+      }
+    };
+    loadProcessedFiles();
+  }, []);
+
+  // Process shared files automatically for spawn data
+  useEffect(() => {
+    const processSharedFiles = async () => {
+      // Wait for processed files to be loaded before processing
+      if (!processedFilesLoaded || !sharedFiles.length || loading) return;
+
+      // Filter out files already processed by this scanner
+      const unprocessed = sharedFiles.filter(
+        (sf) => sf.file && !processedFiles.has(sf.id)
+      );
+
+      if (!unprocessed.length) return;
+
+      setLoading(true);
+      const parsedReports = [];
+      const existingFileNames = new Set(fileReports.map((r) => r.name));
+      const { default: getStorage } = await import("@/utils/indexedDBStorage");
+      const storage = getStorage();
+
+      for (const sharedFile of unprocessed) {
+        // Check for duplicates in current data
+        if (existingFileNames.has(sharedFile.name)) {
+          console.log(`⏭️ Skipping duplicate file: ${sharedFile.name}`);
+          // Mark as processed even if duplicate
+          await storage.markFileProcessed(SCANNER_NAME, sharedFile.id);
+          setProcessedFiles((prev) => new Set([...prev, sharedFile.id]));
+          continue;
+        }
+
+        try {
+          const parsed = await parseCobblemonZip(sharedFile.file);
+          if (parsed && parsed.length > 0) {
+            parsedReports.push({
+              id: crypto.randomUUID(),
+              name: sharedFile.name,
+              data: parsed,
+              fromShared: true,
+            });
+            existingFileNames.add(sharedFile.name);
+            console.log(
+              `✅ Processed shared file ${sharedFile.name}: ${parsed.length} spawns`
+            );
+          }
+        } catch (err) {
+          console.error(
+            `❌ Failed to process shared file ${sharedFile.name}:`,
+            err
+          );
+        }
+        // Mark as processed in persistent storage
+        await storage.markFileProcessed(SCANNER_NAME, sharedFile.id);
+        setProcessedFiles((prev) => new Set([...prev, sharedFile.id]));
+      }
+
+      if (parsedReports.length > 0) {
+        const updated = [...parsedReports, ...fileReports];
+        try {
+          await saveReports(updated);
+          setFileReports(updated);
+          toast.success(
+            `✅ Processed ${parsedReports.length} shared file(s) for spawn data`
+          );
+        } catch (err) {
+          console.error("Failed to save spawn reports:", err);
+          setFileReports(updated);
+        }
+      }
+
+      setLoading(false);
+    };
+
+    processSharedFiles();
+  }, [
+    sharedFiles,
+    loading,
+    fileReports,
+    saveReports,
+    setFileReports,
+    processedFiles,
+    processedFilesLoaded,
+  ]);
 
   const prevSearch = useRef("");
 
@@ -441,14 +542,10 @@ export default function UploadArea() {
           : "",
       ]
         .filter(Boolean)
-        .some(
-          (value) =>
-            typeof value === "string" &&
-            value.toLowerCase().includes(debouncedSearch.toLowerCase())
-        );
+        .some((value) => matchesSearch(debouncedSearch, value));
     } else {
       const value = r[searchField];
-      return (
+      const searchValue =
         searchField === "weightMultipliers"
           ? Array.isArray(value)
             ? value
@@ -470,10 +567,8 @@ export default function UploadArea() {
                 })
                 .join(" | ")
             : ""
-          : (value ?? "").toString()
-      )
-        .toLowerCase()
-        .includes(debouncedSearch.toLowerCase());
+          : (value ?? "").toString();
+      return matchesSearch(debouncedSearch, searchValue);
     }
   });
 
@@ -525,137 +620,10 @@ export default function UploadArea() {
     setCurrentPage(1);
   }, [debouncedSearch, contextFilter, searchField]);
 
-  const handleFiles = async (files) => {
-    if (loading) return toast.error("Still parsing...");
-    setLoading(true);
-
-    const valid = Array.from(files).filter((f) =>
-      f.name.toLowerCase().match(/\.(zip|jar)$/)
-    );
-    if (!valid.length) {
-      toast.error("Only .zip or .jar files allowed.");
-      setLoading(false);
-      return;
-    }
-
-    setUploadProgress({ current: 0, total: valid.length, fileName: "" });
-
-    const parsedReports = [];
-
-    for (let i = 0; i < valid.length; i++) {
-      const file = valid[i];
-      setUploadProgress({
-        current: i + 1,
-        total: valid.length,
-        fileName: file.name,
-      });
-
-      try {
-        const parsed = await parseCobblemonZip(file);
-        if (parsed && parsed.length > 0) {
-          parsedReports.push({
-            id: crypto.randomUUID(),
-            name: file.name,
-            data: parsed,
-          });
-          console.log(
-            `✅ Successfully parsed ${file.name}: ${parsed.length} spawns`
-          );
-        } else {
-          console.warn(`⚠️ No spawn data found in ${file.name}`);
-        }
-      } catch (err) {
-        console.error(`❌ Failed to parse ${file.name}:`, err);
-        const message = err.message || "Unknown error";
-
-        if (message.includes("timeout")) {
-          toast.error(
-            `${file.name}: Processing timeout - file may be corrupted or too large.`
-          );
-        } else if (message.includes("memory") || message.includes("quota")) {
-          toast.error(
-            `${file.name}: Memory error - file too large for browser to handle.`
-          );
-        } else {
-          toast.error(`${file.name}: ${message}`);
-        }
-
-        parsedReports.push({
-          id: crypto.randomUUID(),
-          name: file.name,
-          data: [],
-          error: message,
-        });
-      }
-    }
-
-    // Merge new data with existing data
-    const updated = [...parsedReports, ...fileReports];
-
-    // Save using IndexedDB (no size limits!)
-    try {
-      await saveReports(updated);
-      setFileReports(updated);
-
-      if (parsedReports.length > 0) {
-        toast.success(`✅ Successfully parsed ${parsedReports.length} files!`);
-      }
-    } catch (err) {
-      console.error("Failed to save spawn reports:", err);
-      toast.error("⚠️ Failed to save data. It will be lost on page refresh.");
-      // Still update the UI even if save fails
-      setFileReports(updated);
-    }
-
-    setLoading(false);
-    setUploadProgress({ current: 0, total: 0, fileName: "" });
-  };
-
-  const handleInputChange = (e) => {
-    const files = Array.from(e.target.files).filter(
-      (file) =>
-        file.name.toLowerCase().endsWith(".zip") ||
-        file.name.toLowerCase().endsWith(".jar")
-    );
-    if (files.length === 0) {
-      toast.error("Only valid .zip files are supported.");
-      return;
-    }
-    handleFiles(files);
-  };
-
   const clearSearch = () => {
     setSearchTerm("");
     setSearchField("all");
     setCurrentPage(1);
-  };
-
-  const deleteFile = async (fileId) => {
-    if (window.confirm("Are you sure you want to delete this file?")) {
-      const updatedReports = fileReports.filter(
-        (report) => report.id !== fileId
-      );
-      try {
-        await saveReports(updatedReports);
-        setFileReports(updatedReports);
-        toast.success("File deleted successfully");
-      } catch (err) {
-        console.error("Failed to delete file:", err);
-        toast.error("Failed to delete file");
-      }
-    }
-  };
-
-  const clearAll = async () => {
-    if (window.confirm("Are you sure you want to clear all data?")) {
-      const success = await clearReports();
-      if (success) {
-        setFileReports([]);
-        toast.success("All data cleared successfully");
-      } else {
-        toast.error("Failed to clear data");
-      }
-    }
   };
 
   const SEARCH_FIELDS = [
@@ -756,8 +724,11 @@ export default function UploadArea() {
           Cobblemon Spawn Pool Scanner
         </h1>
         <p className="text-gray-300 max-w-2xl mx-auto">
-          Analyze Cobblemon spawn pools (.zip & .jar) to view Pokémon rarities,
-          biomes, structures, and more.
+          View Pokémon spawn pools from uploaded datapacks.
+        </p>
+        <p className="text-gray-300 text-sm text-center mt-2">
+          Upload files using the &quot;Upload File&quot; button in the
+          navigation bar.
         </p>
         <br />
         <p className="text-gray-300 text-sm text-center mt-2">
@@ -774,74 +745,12 @@ export default function UploadArea() {
         </p>
       </header>
 
-      {/* Upload Area */}
-      <div
-        className="border-2 border-dashed border-gray-600 rounded p-6 w-full max-w-2xl text-center bg-[#2c2c2c] hover:bg-[#3a3a3a] transition cursor-pointer mb-8"
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => {
-          e.preventDefault();
-          const files = Array.from(e.dataTransfer.files).filter(
-            (file) => file.name.endsWith(".zip") || file.name.endsWith(".jar")
-          );
-          if (files.length === 0) {
-            toast.error("Only .zip files are supported.");
-            return;
-          }
-          handleFiles(files);
-        }}
-        onClick={() => document.getElementById("fileInput").click()}
-      >
-        <p className="text-gray-300 text-lg">
-          📦 Drag and drop .zip files here
-        </p>
-        <p className="text-sm text-gray-500 mt-1">or click to select files</p>
-        <p className="text-xs text-gray-600 mt-2">
-          ⚠️ Maximum file size: 150MB. Large files may take longer to process.
-        </p>
-        <p className="text-xs text-gray-500 mt-1">
-          💡 Tip: Large files consume more storage. Consider clearing old
-          reports if you encounter issues.
-        </p>
-        <input
-          id="fileInput"
-          type="file"
-          multiple
-          accept=".zip,.jar"
-          onChange={(e) => {
-            handleInputChange(e);
-            e.target.value = "";
-          }}
-          className="hidden"
-        />
-      </div>
-
       {loading && (
         <div className="mb-4 flex flex-col items-center gap-2 text-blue-400">
           <div className="flex items-center gap-2">
             <Spinner />
-            <span>
-              {uploadProgress.total > 1
-                ? `Processing file ${uploadProgress.current} of ${uploadProgress.total}...`
-                : "Parsing file..."}
-            </span>
+            <span>Processing shared files...</span>
           </div>
-          {uploadProgress.fileName && (
-            <div className="text-sm text-gray-400">
-              Current: {uploadProgress.fileName}
-            </div>
-          )}
-          {uploadProgress.total > 1 && (
-            <div className="w-64 bg-gray-700 rounded-full h-2">
-              <div
-                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                style={{
-                  width: `${
-                    (uploadProgress.current / uploadProgress.total) * 100
-                  }%`,
-                }}
-              ></div>
-            </div>
-          )}
         </div>
       )}
 
@@ -849,73 +758,30 @@ export default function UploadArea() {
         <>
           {/* Add StorageInfo component here */}
           <div className="w-full max-w-4xl mb-6 px-4">
-            <StorageInfo />
-          </div>
-
-          {/* File List Section */}
-          <div className="w-full max-w-4xl mb-4 px-4">
-            <div className="bg-[#2a2a2a] rounded-lg border border-gray-700/50 p-3">
-              <div className="flex items-center justify-between mb-3">
-                <button
-                  onClick={() => setIsFilesExpanded(!isFilesExpanded)}
-                  className="flex items-center gap-2 text-base font-semibold text-white hover:text-gray-300 transition-colors duration-200"
-                >
-                  {isFilesExpanded ? (
-                    <ChevronDown size={16} />
-                  ) : (
-                    <ChevronUp size={16} />
-                  )}
-                  📁 Uploaded Files ({fileReports.length})
-                </button>
-                {isFilesExpanded && (
-                  <button
-                    className="flex items-center gap-1 px-3 py-1.5 bg-red-600 rounded hover:bg-red-700 transition text-sm"
-                    onClick={clearAll}
-                  >
-                    <X size={14} /> Clear All
-                  </button>
-                )}
-              </div>
-
-              {isFilesExpanded && (
-                <div className="space-y-1.5">
-                  {fileReports.map((report) => (
-                    <div
-                      key={report.id}
-                      className="flex items-center justify-between bg-[#3a3a3a] rounded-md p-2 border border-gray-600/50"
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="text-lg">
-                          {report.error ? "❌" : "✅"}
-                        </div>
-                        <div>
-                          <div className="text-white font-medium text-xs">
-                            {report.name}
-                          </div>
-                          <div className="text-xs text-gray-400">
-                            {report.error ? (
-                              <span className="text-red-400">
-                                Error: {report.error}
-                              </span>
-                            ) : (
-                              <span className="text-green-400">
-                                {report.data?.length || 0} spawns
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => deleteFile(report.id)}
-                        className="flex items-center gap-1 px-2 py-1 bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 rounded transition-colors duration-200 text-xs"
-                      >
-                        <X size={12} />
-                        Delete
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
+            <div className="flex items-center justify-center gap-4">
+              <StorageInfo />
+              <button
+                onClick={async () => {
+                  if (
+                    window.confirm(
+                      "Are you sure you want to clear all spawn data? This cannot be undone."
+                    )
+                  ) {
+                    const success = await clearReports();
+                    if (success) {
+                      // Don't clear processed files tracking - this prevents automatic reprocessing
+                      // If user wants to reprocess, they can clear tracking separately
+                      setFileReports([]);
+                      toast.success("All spawn data cleared successfully");
+                    } else {
+                      toast.error("Failed to clear data");
+                    }
+                  }
+                }}
+                className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 rounded text-xs transition-colors duration-200 border border-red-600/30"
+              >
+                Clear All Data
+              </button>
             </div>
           </div>
 
@@ -1015,7 +881,7 @@ export default function UploadArea() {
                   <>
                     <span className="text-gray-600">|</span>
                     <span className="text-blue-400">
-                      Matches: &quot;{debouncedSearch}&quot;
+                      Matches: &ldquo;{debouncedSearch}&rdquo;
                     </span>
                   </>
                 )}
@@ -1262,6 +1128,10 @@ export default function UploadArea() {
                             ) : key === "sourceFile" ? (
                               <span className="text-xs text-gray-400 font-mono">
                                 {value}
+                              </span>
+                            ) : key === "pokemon" ? (
+                              <span className="text-gray-300 font-medium">
+                                {formatPokemonName(value)}
                               </span>
                             ) : (
                               <span className="text-gray-300">

@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import toast from "react-hot-toast";
 import Spinner from "./Spinner";
 import { parseSpeciesAndSpawnFromZip } from "@/utils/speciesSpawnParser";
 import { useStorage, usePreferences } from "@/hooks/useStorage";
 import {
   X,
-  ChevronDown,
-  ChevronUp,
   ChevronsUpDown,
+  ChevronUp,
+  ChevronDown,
   Search,
   Filter,
   Zap,
@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import storage from "@/utils/indexedDBStorage";
 import StorageInfo from "./StorageInfo";
+import { useSharedFiles } from "@/contexts/SharedFilesContext";
 
 export default function SpeciesScanner() {
   // Replace localStorage state with storage hooks
@@ -31,6 +32,10 @@ export default function SpeciesScanner() {
     loading: storageLoading,
     error: storageError,
   } = useStorage("speciesData", []);
+  const { sharedFiles } = useSharedFiles();
+  const [processedFiles, setProcessedFiles] = useState(new Set());
+  const [processedFilesLoaded, setProcessedFilesLoaded] = useState(false);
+  const SCANNER_NAME = "speciesScanner";
 
   // Replace localStorage preferences with preferences hook
   const { preferences: sortSettings, savePreferences: saveSortSettings } =
@@ -54,12 +59,6 @@ export default function SpeciesScanner() {
   const [expandedMoves, setExpandedMoves] = useState({});
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [moveSearch, setMoveSearch] = useState({});
-  const [uploadProgress, setUploadProgress] = useState({
-    current: 0,
-    total: 0,
-    fileName: "",
-  });
-  const [isFilesExpanded, setIsFilesExpanded] = useState(true);
 
   const PAGE_SIZE = 25;
 
@@ -100,6 +99,117 @@ export default function SpeciesScanner() {
   useEffect(() => {
     // This function is no longer needed as storageUsage state is removed
   }, [species]);
+
+  // Load processed files tracking on mount
+  useEffect(() => {
+    const loadProcessedFiles = async () => {
+      try {
+        const { default: getStorage } = await import(
+          "@/utils/indexedDBStorage"
+        );
+        const storage = getStorage();
+        const processed = await storage.getProcessedFiles(SCANNER_NAME);
+        setProcessedFiles(processed);
+        setProcessedFilesLoaded(true);
+      } catch (err) {
+        console.error("Failed to load processed files:", err);
+        setProcessedFilesLoaded(true); // Set to true even on error to prevent blocking
+      }
+    };
+    loadProcessedFiles();
+  }, []);
+
+  // Process shared files automatically for species data
+  useEffect(() => {
+    const processSharedFiles = async () => {
+      // Wait for processed files to be loaded before processing
+      if (!processedFilesLoaded || !sharedFiles.length || loading) return;
+
+      // Filter out files already processed by this scanner
+      const unprocessed = sharedFiles.filter(
+        (sf) => sf.file && !processedFiles.has(sf.id)
+      );
+
+      if (!unprocessed.length) return;
+
+      setLoading(true);
+      const allParsed = [];
+      const existingFileNames = new Set(
+        species.map((s) => s.sourceFile).filter(Boolean)
+      );
+      const { default: getStorage } = await import("@/utils/indexedDBStorage");
+      const storage = getStorage();
+
+      for (const sharedFile of unprocessed) {
+        // Check for duplicates in current data
+        if (existingFileNames.has(sharedFile.name)) {
+          console.log(`⏭️ Skipping duplicate file: ${sharedFile.name}`);
+          // Mark as processed even if duplicate
+          await storage.markFileProcessed(SCANNER_NAME, sharedFile.id);
+          setProcessedFiles((prev) => new Set([...prev, sharedFile.id]));
+          continue;
+        }
+
+        try {
+          const parsed = await parseSpeciesAndSpawnFromZip(sharedFile.file);
+          if (parsed && parsed.length > 0) {
+            allParsed.push(...parsed);
+            existingFileNames.add(sharedFile.name);
+            console.log(
+              `✅ Processed shared file ${sharedFile.name}: ${parsed.length} species`
+            );
+          }
+        } catch (err) {
+          console.error(
+            `❌ Failed to process shared file ${sharedFile.name}:`,
+            err
+          );
+        }
+        // Mark as processed in persistent storage
+        await storage.markFileProcessed(SCANNER_NAME, sharedFile.id);
+        setProcessedFiles((prev) => new Set([...prev, sharedFile.id]));
+      }
+
+      if (allParsed.length > 0) {
+        try {
+          const existingSpecies = species.length > 0 ? [...species] : [];
+          const mergedSpecies = [...existingSpecies, ...allParsed];
+
+          // Remove duplicates based on name and source file
+          const finalSpecies = mergedSpecies.filter(
+            (s, index, self) =>
+              index ===
+              self.findIndex(
+                (sp) => sp.name === s.name && sp.sourceFile === s.sourceFile
+              )
+          );
+
+          await saveSpecies(finalSpecies);
+          setSpecies(finalSpecies);
+          setFiltered(finalSpecies);
+          toast.success(
+            `✅ Processed ${allParsed.length} species from shared file(s)`
+          );
+        } catch (err) {
+          console.error("Failed to save species data:", err);
+          toast.error("⚠️ Failed to save data");
+        }
+      }
+
+      setLoading(false);
+    };
+
+    processSharedFiles();
+  }, [
+    sharedFiles,
+    loading,
+    species,
+    saveSpecies,
+    setSpecies,
+    setFiltered,
+    processedFiles,
+    processedFilesLoaded,
+  ]);
 
   useEffect(() => {
     const term = debouncedSearch.toLowerCase();
@@ -198,104 +308,6 @@ export default function SpeciesScanner() {
     setCurrentPage(1);
   }, [debouncedSearch, searchField, sortBy, sortDirection, species]);
 
-  const handleFiles = async (files) => {
-    if (loading) return toast.error("Still parsing...");
-    setLoading(true);
-
-    const valid = Array.from(files).filter((f) =>
-      f.name.toLowerCase().match(/\.(zip|jar)$/)
-    );
-    if (!valid.length) {
-      toast.error("Only .zip or .jar files allowed.");
-      setLoading(false);
-      return;
-    }
-
-    setUploadProgress({ current: 0, total: valid.length, fileName: "" });
-
-    const allParsed = [];
-
-    for (let i = 0; i < valid.length; i++) {
-      const file = valid[i];
-      setUploadProgress({
-        current: i + 1,
-        total: valid.length,
-        fileName: file.name,
-      });
-
-      try {
-        const parsed = await parseSpeciesAndSpawnFromZip(file);
-        if (parsed && parsed.length > 0) {
-          allParsed.push(...parsed);
-          console.log(
-            `✅ Successfully parsed ${file.name}: ${parsed.length} species`
-          );
-        } else {
-          console.warn(`⚠️ No species data found in ${file.name}`);
-        }
-
-        // Small delay to allow garbage collection between files
-        if (i < valid.length - 1) {
-          await new Promise((resolve) => setTimeout(resolve, 50));
-        }
-      } catch (e) {
-        console.error(`❌ Failed to parse ${file.name}:`, e);
-        toast.error(`Failed to parse ${file.name} - check console for details`);
-      }
-    }
-
-    if (allParsed.length > 0) {
-      // Show parsing results
-      toast.success(`✅ Successfully parsed ${allParsed.length} species!`);
-
-      try {
-        // Always merge new data with existing data
-        const existingSpecies = species.length > 0 ? [...species] : [];
-        const mergedSpecies = [...existingSpecies, ...allParsed];
-
-        // Remove duplicates based on name and source file
-        const finalSpecies = mergedSpecies.filter(
-          (species, index, self) =>
-            index ===
-            self.findIndex(
-              (s) =>
-                s.name === species.name && s.sourceFile === species.sourceFile
-            )
-        );
-        const duplicateCount = mergedSpecies.length - finalSpecies.length;
-
-        // Save the merged data (IndexedDB handles large data much better)
-        await saveSpecies(finalSpecies);
-        setSpecies(finalSpecies);
-        setFiltered(finalSpecies);
-
-        const newSpeciesCount = allParsed.length;
-        const totalSpeciesCount = finalSpecies.length;
-
-        if (duplicateCount > 0) {
-          toast.success(
-            `Species data updated! Added ${newSpeciesCount} new species (${duplicateCount} duplicates removed). Total: ${totalSpeciesCount}`
-          );
-        } else {
-          toast.success(
-            `Species data updated! Added ${newSpeciesCount} new species. Total: ${totalSpeciesCount}`
-          );
-        }
-      } catch (err) {
-        console.error("Failed to save species data:", err);
-        toast.error("⚠️ Failed to save data. It will be lost on page refresh.");
-        // Fallback to just the new data if storage fails
-        setSpecies(allParsed);
-        setFiltered(allParsed);
-      }
-    } else {
-      toast.error("No species data found.");
-    }
-
-    setLoading(false);
-    setUploadProgress({ current: 0, total: 0, fileName: "" });
-  };
-
   const paginated = filtered.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
@@ -367,38 +379,6 @@ export default function SpeciesScanner() {
     );
   };
 
-  const deleteFile = async (fileId) => {
-    if (window.confirm("Are you sure you want to delete this file?")) {
-      const updatedSpecies = species.filter(
-        (species) => species.sourceFile !== fileId
-      );
-      try {
-        await saveSpecies(updatedSpecies);
-        setSpecies(updatedSpecies);
-        setFiltered(updatedSpecies);
-        toast.success("File deleted successfully");
-      } catch (err) {
-        console.error("Failed to delete file:", err);
-        toast.error("Failed to delete file");
-      }
-    }
-  };
-
-  const clearAll = async () => {
-    if (window.confirm("Are you sure you want to clear all data?")) {
-      const success = await clearSpecies();
-      if (success) {
-        setSpecies([]);
-        setFiltered([]);
-        setSortBy("dex");
-        setSortDirection("asc");
-        toast.success("Species data cleared");
-      } else {
-        toast.error("Failed to clear data");
-      }
-    }
-  };
-
   const clearSearch = () => {
     setSearch("");
     setSearchField("all");
@@ -441,68 +421,20 @@ export default function SpeciesScanner() {
           Cobblemon Species Scanner
         </h1>
         <p className="text-gray-300 max-w-2xl mx-auto px-4 text-sm md:text-base">
-          Upload a Cobblemon datapack (.zip or .jar) to view Pokémon species,
-          stats, and moves.
+          View Pokémon species, stats, and moves from uploaded datapacks.
+        </p>
+        <p className="text-gray-300 text-sm text-center mt-2">
+          Upload files using the &quot;Upload File&quot; button in the
+          navigation bar.
         </p>
       </header>
-
-      {/* Upload */}
-      <div
-        className="border-2 border-dashed border-gray-600 rounded p-4 md:p-6 w-full max-w-2xl text-center bg-[#2c2c2c] hover:bg-[#3a3a3a] transition cursor-pointer mb-6 md:mb-8 mx-4"
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => {
-          e.preventDefault();
-          handleFiles(e.dataTransfer.files);
-        }}
-        onClick={() => document.getElementById("speciesInput").click()}
-      >
-        <p className="text-gray-300 text-base md:text-lg">
-          📦 Drag and drop file here
-        </p>
-        <p className="text-sm text-gray-500">or click to select</p>
-        <p className="text-xs text-gray-600 mt-2">
-          ⚠️ Maximum file size: 150MB. Large files may take longer to process.
-        </p>
-        <p className="text-xs text-gray-500 mt-1">
-          💡 Tip: Large files consume more storage. Consider clearing old data
-          if you encounter issues.
-        </p>
-        <input
-          id="speciesInput"
-          type="file"
-          accept=".zip,.jar"
-          className="hidden"
-          onChange={(e) => handleFiles(e.target.files)}
-        />
-      </div>
 
       {loading && (
         <div className="mb-4 flex flex-col items-center gap-2 text-blue-400">
           <div className="flex items-center gap-2">
             <Spinner />
-            <span>
-              {uploadProgress.total > 1
-                ? `Processing file ${uploadProgress.current} of ${uploadProgress.total}...`
-                : "Parsing file..."}
-            </span>
+            <span>Processing shared files...</span>
           </div>
-          {uploadProgress.fileName && (
-            <div className="text-sm text-gray-400">
-              Current: {uploadProgress.fileName}
-            </div>
-          )}
-          {uploadProgress.total > 1 && (
-            <div className="w-64 bg-gray-700 rounded-full h-2">
-              <div
-                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                style={{
-                  width: `${
-                    (uploadProgress.current / uploadProgress.total) * 100
-                  }%`,
-                }}
-              ></div>
-            </div>
-          )}
         </div>
       )}
 
@@ -510,82 +442,31 @@ export default function SpeciesScanner() {
         <>
           {/* Add StorageInfo component here */}
           <div className="w-full max-w-4xl mb-6 px-4">
-            <StorageInfo />
-          </div>
-
-          {/* File List Section */}
-          <div className="w-full max-w-4xl mb-4 px-4">
-            <div className="bg-[#2a2a2a] rounded-lg border border-gray-700/50 p-3">
-              <div className="flex items-center justify-between mb-3">
-                <button
-                  onClick={() => setIsFilesExpanded(!isFilesExpanded)}
-                  className="flex items-center gap-2 text-base font-semibold text-white hover:text-gray-300 transition-colors duration-200"
-                >
-                  {isFilesExpanded ? (
-                    <ChevronDown size={16} />
-                  ) : (
-                    <ChevronUp size={16} />
-                  )}
-                  📁 Uploaded Files (
-                  {new Set(species.map((s) => s.sourceFile)).size})
-                </button>
-                {isFilesExpanded && (
-                  <button
-                    className="flex items-center gap-1 px-3 py-1.5 bg-red-600 rounded hover:bg-red-700 transition text-sm"
-                    onClick={clearAll}
-                  >
-                    <X size={14} /> Clear All
-                  </button>
-                )}
-              </div>
-
-              {isFilesExpanded && (
-                <div className="space-y-1.5">
-                  {Array.from(new Set(species.map((s) => s.sourceFile))).map(
-                    (sourceFile) => {
-                      const fileSpecies = species.filter(
-                        (s) => s.sourceFile === sourceFile
-                      );
-                      const hasError = fileSpecies.some((s) => s.error);
-                      return (
-                        <div
-                          key={sourceFile}
-                          className="flex items-center justify-between bg-[#3a3a3a] rounded-md p-2 border border-gray-600/50"
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className="text-lg">
-                              {hasError ? "❌" : "✅"}
-                            </div>
-                            <div>
-                              <div className="text-white font-medium text-xs">
-                                {sourceFile}
-                              </div>
-                              <div className="text-xs text-gray-400">
-                                {hasError ? (
-                                  <span className="text-red-400">
-                                    Error in file
-                                  </span>
-                                ) : (
-                                  <span className="text-green-400">
-                                    {fileSpecies.length} species
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => deleteFile(sourceFile)}
-                            className="flex items-center gap-1 px-2 py-1 bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 rounded transition-colors duration-200 text-xs"
-                          >
-                            <X size={12} />
-                            Delete
-                          </button>
-                        </div>
-                      );
+            <div className="flex items-center justify-center gap-4">
+              <StorageInfo />
+              <button
+                onClick={async () => {
+                  if (
+                    window.confirm(
+                      "Are you sure you want to clear all species data? This cannot be undone."
+                    )
+                  ) {
+                    const success = await clearSpecies();
+                    if (success) {
+                      // Don't clear processed files tracking - this prevents automatic reprocessing
+                      // If user wants to reprocess, they can clear tracking separately
+                      setSpecies([]);
+                      setFiltered([]);
+                      toast.success("All species data cleared successfully");
+                    } else {
+                      toast.error("Failed to clear data");
                     }
-                  )}
-                </div>
-              )}
+                  }
+                }}
+                className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600/30 text-red-400 hover:text-red-300 rounded text-xs transition-colors duration-200 border border-red-600/30"
+              >
+                Clear All Data
+              </button>
             </div>
           </div>
 

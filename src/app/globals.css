@@ -114,8 +114,7 @@ details > summary:hover {
 
 /* Modern focus styles */
 *:focus {
-  outline: 2px solid #fbbf24;
-  outline-offset: 2px;
+  outline: none;
 }
 
 /* Link hover effects */
