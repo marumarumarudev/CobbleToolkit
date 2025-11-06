@@ -14,17 +14,26 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const metadata = {
+  title: "CobbleToolkit",
+  description:
+    "A collection of browser-based tools for analyzing and understanding Cobblemon datapacks",
+  icons: {
+    icon: "/teto.jpg",
+    shortcut: "/teto.jpg",
+    apple: "/teto.jpg",
+  },
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta
-          name="description"
-          content="A collection of browser-based tools for analyzing and understanding Cobblemon datapacks"
-        />
-        <title>CobbleToolkit</title>
+        <link rel="icon" href="/teto.jpg" />
+        <link rel="shortcut icon" href="/teto.jpg" />
+        <link rel="apple-touch-icon" href="/teto.jpg" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#1a1a1a] text-white`}

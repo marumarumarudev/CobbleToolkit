@@ -15,6 +15,7 @@ import {
   HelpCircle,
   Settings,
 } from "lucide-react";
+import { getLastUpdatedDate } from "@/utils/dateUtils";
 
 export default function CobbleverseLayout({ children }) {
   const pathname = usePathname();
@@ -119,7 +120,7 @@ export default function CobbleverseLayout({ children }) {
               </div>
               <div className="flex justify-between">
                 <span>Last Updated:</span>
-                <span className="text-yellow-400">10/24/25</span>
+                <span className="text-yellow-400">{getLastUpdatedDate()}</span>
               </div>
             </div>
           </div>

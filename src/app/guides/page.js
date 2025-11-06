@@ -8,6 +8,7 @@ import {
   TrendingUp,
   Heart,
 } from "lucide-react";
+import { getLastUpdatedDate } from "@/utils/dateUtils";
 
 export const metadata = {
   title: "Guides | CobbleToolkit",
@@ -25,7 +26,7 @@ export default function GuidesIndexPage() {
       stats: {
         guides: 9,
         categories: 9,
-        lastUpdated: "10/24/25",
+        lastUpdated: getLastUpdatedDate(),
       },
       features: [
         "Progression Guide",

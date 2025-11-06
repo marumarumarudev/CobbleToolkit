@@ -111,11 +111,21 @@ export default function HomePage() {
             rel="noopener noreferrer"
             className="text-blue-400 hover:underline"
           >
-            Vercel and will move to Cloudflare Pages soon
+            Cloudflare Pages
           </a>
           <p className="mt-2 text-gray-500 text-sm">
             Made this out of laziness, boredom and love. Discord:{" "}
             <strong>zmoonmaru</strong>.
+          </p>
+          <p className="mt-2">
+            <a
+              href="https://ko-fi.com/zmoonmaru"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:underline inline-flex items-center gap-1"
+            >
+              ☕ Support me on Ko-fi
+            </a>
           </p>
         </footer>
       </div>
