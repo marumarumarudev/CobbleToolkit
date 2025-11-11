@@ -11,8 +11,55 @@ import toast from "react-hot-toast";
 
 const SharedFilesContext = createContext(null);
 
+async function validateFileStructure(file) {
+  try {
+    const JSZip = (await import("jszip")).default;
+    const zip = await JSZip.loadAsync(file, {
+      checkCRC32: false,
+      streamFiles: true,
+    });
+
+    const filePaths = Object.keys(zip.files);
+
+    // Check for spawn_pool_world (Spawn Scanner)
+    const hasSpawnData = filePaths.some((name) =>
+      name.includes("/spawn_pool_world/")
+    );
+
+    // Check for species or species_additions (Loot Scanner)
+    const hasLootData = filePaths.some((rawPath) => {
+      const normalized = rawPath.replace(/\\/g, "/");
+      const dataIndex = normalized.indexOf("data/");
+      if (dataIndex === -1) return false;
+      const rel = normalized.slice(dataIndex);
+      return /^data\/[^/]+\/(species|species_additions)\/.+\.json$/.test(rel);
+    });
+
+    // Check for species folder (Species Scanner)
+    const hasSpeciesData = filePaths.some((path) =>
+      path.match(/^data\/[^/]+\/species\/.+\.json$/)
+    );
+
+    if (!hasSpawnData && !hasLootData && !hasSpeciesData) {
+      return {
+        valid: false,
+        reason:
+          "File does not contain required folders. Needs at least one of: spawn_pool_world, species, or species_additions folders.",
+      };
+    }
+
+    return { valid: true };
+  } catch (err) {
+    console.error("Error validating file structure:", err);
+    return {
+      valid: false,
+      reason: `Failed to validate file: ${err.message}`,
+    };
+  }
+}
+
 export function SharedFilesProvider({ children }) {
-  const [sharedFiles, setSharedFiles] = useState([]); // Array of { id, file, name, size, uploadedAt }
+  const [sharedFiles, setSharedFiles] = useState([]);
 
   // Load shared files metadata from IndexedDB on mount
   useEffect(() => {
@@ -63,6 +110,17 @@ export function SharedFilesProvider({ children }) {
     async (file) => {
       if (!file) return;
 
+      // Validate file structure before adding
+      toast.loading(`Validating "${file.name}"...`, {
+        id: `validate-${file.name}`,
+      });
+      const validation = await validateFileStructure(file);
+
+      if (!validation.valid) {
+        toast.error(validation.reason, { id: `validate-${file.name}` });
+        return;
+      }
+
       const newFile = {
         id: crypto.randomUUID(),
         file,
@@ -73,7 +131,9 @@ export function SharedFilesProvider({ children }) {
 
       const updated = [...sharedFiles, newFile];
       await saveSharedFiles(updated);
-      toast.success(`✅ Added "${file.name}" to shared files`);
+      toast.success(`✅ Added "${file.name}" to shared files`, {
+        id: `validate-${file.name}`,
+      });
     },
     [sharedFiles, saveSharedFiles]
   );
