@@ -83,18 +83,10 @@ export default function BreedingGuidePage() {
         </p>
 
         <p className="text-gray-300">
-          Eggs appear behind the pasture block. Right-click the bottom of the
-          block to collect them. Pasture blocks can also connect to{" "}
-          <strong>storage blocks via hoppers</strong>, making an automated egg
-          farm possible.
-        </p>
-
-        <p className="text-gray-300">
           Egg farms require the chunks to load, but Cobbreeding also allows eggs
           to be produced without the chunks loading through the pasture
           block&apos;s inventory, which holds a maximum of{" "}
-          <strong>5 eggs</strong>. The number of eggs in the pasture block can
-          be seen through <strong>Jade</strong>.
+          <strong>5 eggs</strong>.
         </p>
 
         <div className="my-4">
@@ -109,7 +101,7 @@ export default function BreedingGuidePage() {
             />
           </div>
           <p className="text-sm text-gray-400 text-center mt-2">
-            Pasture block inventory (max 5 eggs)
+            Pasture block inventory
           </p>
         </div>
 
