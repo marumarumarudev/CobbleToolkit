@@ -85,8 +85,7 @@ export default function BreedingGuidePage() {
         <p className="text-gray-300">
           Egg farms require the chunks to load, but Cobbreeding also allows eggs
           to be produced without the chunks loading through the pasture
-          block&apos;s inventory, which holds a maximum of{" "}
-          <strong>5 eggs</strong>.
+          block&apos;s inventory
         </p>
 
         <div className="my-4">
