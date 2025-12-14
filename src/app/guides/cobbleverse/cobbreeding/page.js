@@ -34,10 +34,10 @@ export default function BreedingGuidePage() {
         <p className="text-gray-300">
           Cobbleverse uses the <strong>Cobbreeding</strong> mod. Pokémon
           compatible for breeding must be placed inside{" "}
-          <strong>Pasture Blocks</strong>. By default, they have a{" "}
-          <strong>50% chance every 10 minutes</strong> to produce an egg, but in{" "}
+          <strong>Pasture Blocks</strong>. By default, an egg spawns between{" "}
+          <strong>8000 and 14000 ticks</strong>, but in{" "}
           <strong>Cobbleverse</strong> this interval is{" "}
-          <strong>6 minutes</strong>.
+          <strong>7200 and 21600 ticks (6-18 minutes)</strong>.
         </p>
 
         {/* Pasture Block Setup Images */}
@@ -76,17 +76,32 @@ export default function BreedingGuidePage() {
         </div>
 
         <p className="text-gray-300">
+          After placing the pasture block, an option for breeding is present in
+          the upper-right corner. By default, this is turned off (with an{" "}
+          <strong>X</strong> displayed). Click it to remove the X and start the
+          breeding process.
+        </p>
+
+        <p className="text-gray-300">
           Eggs appear behind the pasture block. Right-click the bottom of the
           block to collect them. Pasture blocks can also connect to{" "}
           <strong>storage blocks via hoppers</strong>, making an automated egg
           farm possible.
         </p>
 
+        <p className="text-gray-300">
+          Egg farms require the chunks to load, but Cobbreeding also allows eggs
+          to be produced without the chunks loading through the pasture
+          block&apos;s inventory, which holds a maximum of{" "}
+          <strong>5 eggs</strong>. The number of eggs in the pasture block can
+          be seen through <strong>Jade</strong>.
+        </p>
+
         <div className="my-4">
           <div className="relative w-full max-w-md mx-auto rounded-lg border border-gray-600 overflow-hidden">
             <Image
-              src="/guides/pasture-block-hopper.png"
-              alt="Pasture block with hopper feeding to chest"
+              src="/guides/pasture-inventory.png"
+              alt="Pasture block inventory showing eggs"
               width={400}
               height={300}
               className="w-full h-auto rounded-lg"
@@ -94,7 +109,7 @@ export default function BreedingGuidePage() {
             />
           </div>
           <p className="text-sm text-gray-400 text-center mt-2">
-            Automated setup with hopper and chest
+            Pasture block inventory (max 5 eggs)
           </p>
         </div>
 
@@ -194,9 +209,8 @@ export default function BreedingGuidePage() {
         </h2>
         <p className="text-gray-300">
           Start with an Eevee with 3 perfect IVs. Give one parent a{" "}
-          <strong>Destiny Knot</strong> and connect your{" "}
-          <span className="font-medium">Pasture Block</span> to a hopper/chest.
-          Eggs will collect in the chest:
+          <strong>Destiny Knot</strong>. Eggs will be produced in the pasture
+          block:
         </p>
         <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
           <li>Discard eggs with 2 IVs or less.</li>
@@ -238,6 +252,21 @@ export default function BreedingGuidePage() {
           </div>
         </div>
 
+        <p className="text-gray-300 text-sm italic">
+          💡 <strong>Note:</strong> The ability to see egg stats in tooltips and
+          the visual indicators (⭐ for shiny, △ for perfect IVs) are provided
+          by the{" "}
+          <a
+            href="https://modrinth.com/mod/more-cobblemon-tweaks"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-400 underline"
+          >
+            MoreCobblemonTweaks
+          </a>{" "}
+          mod. This is a client-side mod that enhances the egg tooltip display.
+        </p>
+
         <p className="text-gray-300">
           Power Bands are only useful early when parents have low/no IVs.
         </p>
@@ -251,53 +280,26 @@ export default function BreedingGuidePage() {
           <strong>Cobbleverse</strong>: <strong>1/2048</strong>.
         </p>
         <p className="text-gray-300">
-          Breeding multiplies these odds. In Cobbleverse, shiny chance is{" "}
-          <strong>16×</strong> by default:
+          Breeding multiplies these odds. In Cobbleverse, by default:
         </p>
         <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
           <li>
-            <strong>Always:</strong> Every breed = 16/2048 chance.
+            <strong>Always:</strong> Every breed. Set to <strong>8.0×</strong>.
           </li>
           <li>
             <strong>Masuda Method:</strong> Parents from different{" "}
-            <strong>original trainers</strong>. <br />
-            <span className="italic text-sm text-gray-400">
-              (⚠️ Not enabled by default — add <code>&quot;masuda&quot;</code>{" "}
-              to <code>shinyMethod</code> in{" "}
-              <code>config/cobbreeding/main.json</code>.)
-            </span>
+            <strong>original trainers</strong>. Set to <strong>2.0×</strong>.
           </li>
           <li>
             <strong>Crystal Method:</strong> Shiny parent(s) increase the odds
-            further. <br />
-            <span className="italic text-sm text-gray-400">
-              (⚠️ Not enabled by default — add <code>&quot;crystal&quot;</code>{" "}
-              to <code>shinyMethod</code> in{" "}
-              <code>config/cobbreeding/main.json</code>.)
-            </span>
+            further. Set to <strong>2.0×</strong> (2 shiny parents increases it
+            to <strong>4.0×</strong>).
           </li>
         </ul>
-        <p className="text-gray-300 italic">
-          Masuda + Shiny parents + Always = near-guaranteed shiny odds with the
-          right setup.
+        <p className="text-gray-300">
+          In Cobbleverse, all eggs have a <strong>64/2048</strong> max chance of
+          being shiny.
         </p>
-
-        {/* Breeding Methods Config Image */}
-        <div className="my-4">
-          <div className="relative w-full max-w-lg mx-auto rounded-lg border border-gray-600 overflow-hidden">
-            <Image
-              src="/guides/breeding-methods.png"
-              alt="Config file showing masuda and crystal methods setup"
-              width={600}
-              height={400}
-              className="w-full h-auto rounded-lg"
-              sizes="(max-width: 768px) 100vw, 600px"
-            />
-          </div>
-          <p className="text-sm text-gray-400 text-center mt-2">
-            Config file with Masuda and Crystal methods enabled
-          </p>
-        </div>
       </section>
 
       {/* Hidden Abilities */}
@@ -429,12 +431,12 @@ export default function BreedingGuidePage() {
         </p>
         <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
           <li>
-            <code>&quot;eggCheckTicks&quot;</code>: Lower this to reduce time
-            between egg checks.
+            <code>&quot;minBreedingTimeInTicks&quot;</code>: Lower this to
+            reduce minimum time in egg production.
           </li>
           <li>
-            <code>&quot;eggCheckChance&quot;</code>: Set to <code>1.0</code> to
-            guarantee an egg each check (default <code>0.5</code> = 50/50).
+            <code>&quot;maxBreedingTimeInTicks&quot;</code>: Lower this to
+            reduce maximum time in egg production.
           </li>
           <li>
             <code>&quot;eggHatchMultiplier&quot;</code>: Set to <code>0.0</code>{" "}

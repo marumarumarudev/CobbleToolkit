@@ -48,6 +48,11 @@ export default function NextRegionGuidePage() {
           Your adventure keeps growing with every region you complete, all
           within the same world you started in.
         </p>
+        <p className="text-gray-300">
+          <strong>Note:</strong> COBBLEVERSE is working on dimension-based
+          regions where each region will be divided into its own dimension. Look
+          forward to this exciting update!
+        </p>
       </section>
 
       <section className="space-y-3">
@@ -68,14 +73,24 @@ export default function NextRegionGuidePage() {
           region.
         </p>
         <p className="text-gray-300">
-          After defeating the Champion, they will give you a{" "}
-          <strong>special book</strong>. Inside, you’ll find a{" "}
-          <span className="italic">[Click here]</span> link.
+          After defeating the Champion, the game automatically runs a{" "}
+          <code>/function</code> command. You will receive:
+        </p>
+        <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
+          <li>
+            The Champion&apos;s unique drop (for example, a shiny, perfect IVs
+            Eevee Egg)
+          </li>
+          <li>A special book with instructions</li>
+        </ul>
+        <p className="text-gray-300">
+          The game also automatically runs a <code>/datapack enable</code>{" "}
+          command that enables the datapack for the next region. This process is
+          now fully automatic—no clicking on embedded links required!
         </p>
         <p className="text-gray-300">
-          Clicking the link will trigger a <code>/function</code> command that
-          unlocks the datapack for the next region. This only needs to be done
-          once.
+          Simply read what is written in the book and follow the instructions
+          provided.
         </p>
       </section>
 
@@ -83,35 +98,30 @@ export default function NextRegionGuidePage() {
         <h2 className="font-semibold">Step 2: Singleplayer vs Servers</h2>
         <p className="text-gray-300">
           <strong>Singleplayer:</strong> You must have <em>cheats enabled</em>{" "}
-          in order for the book to work.
+          in order for the automatic progression system to work.
         </p>
         <p className="text-gray-300">
-          <strong>Servers:</strong> Operators can handle progression in two
-          ways:
+          <strong>Servers:</strong> The progression is now automatic when a
+          player defeats the Champion. However, server operators can still
+          enable datapacks manually if needed:
         </p>
         <ul className="list-disc list-inside pl-4 space-y-1 text-gray-300">
           <li>
-            <strong>Option A:</strong> The host uses the book first (requires
-            them to beat the Champion).
+            <code>/datapack enable COBBLEVERSE-[region]-DP</code>
           </li>
           <li>
-            <strong>Option B:</strong> Enable datapacks manually:
-            <br />
-            <code>/datapack enable COBBLEVERSE-[region]-DP</code>
-            <br />
-            If activating Hoenn, also enable Terralith:
+            If activating Hoenn and Sinnoh, also enable Terralith:
             <br />
             <code>/datapack enable Terralith-DP</code>
-            <br />
-            <span className="text-sm text-blue-400">
-              💡{" "}
-              <a href="/guides/cobbleverse/setup" className="underline">
-                See our setup guide
-              </a>{" "}
-              for recommended server configuration to avoid restarts.
-            </span>
           </li>
         </ul>
+        <p className="text-sm text-blue-400">
+          💡{" "}
+          <a href="/guides/cobbleverse/setup" className="underline">
+            See our setup guide
+          </a>{" "}
+          for recommended server configuration to avoid restarts.
+        </p>
       </section>
 
       <section className="space-y-3">
@@ -170,11 +180,12 @@ export default function NextRegionGuidePage() {
         </p>
         <p className="text-gray-300">
           <strong>Important:</strong> If the server owner enabled the
-          datapack/region manually via commands (Option B from Step 2), they
-          still need to restart the server for the changes to take effect. You
-          only need to do this restarting process once per datapack/region.
-          Going back to a previous series/region doesn&apos;t require a server
-          restart.
+          datapack/region manually via commands, they still need to restart the
+          server for the changes to take effect. When progression happens
+          automatically after defeating the Champion, the restart is still
+          required. You only need to do this restarting process once per
+          datapack/region. Going back to a previous series/region doesn&apos;t
+          require a server restart.
         </p>
         <p className="text-gray-300">
           <strong>Note:</strong> You will not lose your world, builds or
@@ -185,6 +196,9 @@ export default function NextRegionGuidePage() {
       </section>
 
       <div className="p-4 text-gray-300 border-t border-gray-700 space-y-2">
+        <p className="text-sm opacity-75">
+          <em>This guide is written for COBBLEVERSE 1.7.0c</em>
+        </p>
         <p>
           💬 Need more help? Join the{" "}
           <a

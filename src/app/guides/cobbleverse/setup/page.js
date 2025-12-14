@@ -75,17 +75,23 @@ export default function SetupCobbleversePage() {
         </p>
         <p className="text-gray-300">
           Why take out these datapacks you might ask, it is so that all of the
-          structures that are region-locked will generate as soon as the server
-          is online and so you don&apos;t have to restart the server when
-          someone is ready to proceed to the next region/series and so you
-          don&apos;t have to travel hundreds of thousands of blocks just to find
-          a new structure later in the game.
+          structures that are region-locked (Kanto, Johto, Hoenn, Sinnoh) will
+          generate as soon as the server is online and so you don&apos;t have to
+          restart the server when someone is ready to proceed to the next
+          region/series and so you don&apos;t have to travel hundreds of
+          thousands of blocks just to find a new structure later in the game.
         </p>
 
-        <ImageWithFullscreen
-          src="/guides/datapack-regions.png"
-          alt="Datapacks in file explorer moved out of extra folder"
-        />
+        <div className="mt-3 space-y-2">
+          <video
+            src="/guides/datapacks.mkv"
+            controls
+            className="rounded-2xl shadow-lg max-w-full h-auto"
+            aria-label="Datapacks in file explorer moved out of extra folder"
+          >
+            Your browser does not support the video tag.
+          </video>
+        </div>
 
         <p className="text-gray-300">
           You can also achieve this in-game by doing these steps:
