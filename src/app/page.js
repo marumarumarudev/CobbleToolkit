@@ -90,16 +90,16 @@ export default function HomePage() {
             rel="noopener noreferrer"
             className="text-blue-400 hover:underline"
           >
-            maru
+            zmoonmaru
           </a>{" "}
           • Deployed on{" "}
           <a
-            href="https://cloudflare.com/"
+            href="https://github.com/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-400 hover:underline"
           >
-            Cloudflare
+            Github
           </a>
           <p className="mt-2 text-gray-500 text-sm">
             Made this out of laziness, boredom and love. Discord:{" "}
