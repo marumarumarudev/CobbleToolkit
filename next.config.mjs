@@ -2,7 +2,7 @@
 // (https://<user>.github.io/cobbletoolkit/). Leave both empty if this
 // deploys to a user/org root page (https://<user>.github.io/) or a
 // custom domain instead.
-const repoName = "cobbletoolkit";
+const repoName = "CobbleToolkit";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? `/${repoName}`;
 
 /** @type {import('next').NextConfig} */
