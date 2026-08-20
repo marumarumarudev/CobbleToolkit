@@ -1,0 +1,214 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Design tokens — Ultra Ball (black / gold / cool steel line)
+   ========================================================================== */
+@theme {
+  /* Surfaces */
+  --color-bg-base: #0b0c0f;
+  --color-bg-surface: #15171c;
+  --color-bg-surface-2: #1c1f26;
+  --color-bg-surface-hover: #21242c;
+
+  /* Borders — cool + neutral, so gold reads as the only warm note */
+  --color-border: #262a33;
+  --color-border-hover: #383d4a;
+  --color-border-focus: #e6b800;
+
+  /* Text */
+  --color-text-primary: #f2f3f5;
+  --color-text-secondary: #9aa0ad;
+  --color-text-muted: #676d7a;
+
+  /* Accent — Ultra Ball gold */
+  --color-accent: #e6b800;
+  --color-accent-hover: #f5c928;
+  --color-accent-active: #cfa300;
+  --color-accent-soft: #e6b80017;
+  --color-accent-soft-hover: #e6b8002a;
+  --color-accent-ink: #16130a; /* text color used ON solid accent surfaces */
+
+  /* Secondary steel line — Ultra Ball's silver seam, used sparingly */
+  --color-steel: #7d8695;
+  --color-steel-soft: #7d869522;
+
+  /* Status */
+  --color-success: #4ade80;
+  --color-success-soft: #4ade8017;
+  --color-warning: #fbbf24;
+  --color-warning-soft: #fbbf2417;
+  --color-danger: #f87171;
+  --color-danger-soft: #f8717117;
+  --color-info: #38bdf8;
+  --color-info-soft: #38bdf817;
+
+  /* Type */
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "JetBrains Mono", monospace;
+
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.25rem;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  background-image: radial-gradient(
+    circle at 50% -10%,
+    #e6b80009 0%,
+    transparent 55%
+  );
+  background-attachment: fixed;
+}
+
+::selection {
+  background: var(--color-accent-soft-hover);
+  color: var(--color-text-primary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-bg-surface-2);
+  border-radius: 999px;
+  border: 2px solid var(--color-bg-base);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
+}
+
+/* Focus ring — visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Route transitions — short fade + tiny rise, keyed by pathname in
+   PageTransition.jsx. Kept brief on purpose: this should read as "the page
+   is ready" not as a loading animation. */
+.page-transition {
+  animation: page-enter 180ms ease-out;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Seasoning card swap — brief pop when a card's contents change, keyed by
+   seasoning id in PokesnackMaker.jsx. Short and small on purpose: this is
+   a confirmation the swap landed, not a showpiece animation. */
+.seasoning-swap {
+  animation: seasoning-swap-in 160ms ease-out;
+}
+
+@keyframes seasoning-swap-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Element defaults (kept minimal — primitives in components/ui own the rest)
+   ========================================================================== */
+input[type="file"] {
+  display: none;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.625rem 0.75rem;
+  text-align: left;
+}
+
+thead th {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--color-bg-surface-2);
+  position: sticky;
+  top: 0;
+}
+
+tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+tbody tr:hover {
+  background: var(--color-bg-surface-2);
+}
+
+/* Signature — a faint Ultra Ball seam used as an ambient background motif.
+   Applied via .ultraball-seam utility, never literal ball art. */
+.ultraball-seam {
+  position: relative;
+  overflow: hidden;
+}
+.ultraball-seam::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent calc(50% - 1px),
+      var(--color-accent-soft) calc(50% - 1px),
+      var(--color-accent-soft) calc(50% + 1px),
+      transparent calc(50% + 1px),
+      transparent 100%
+    );
+  opacity: 0.6;
+}
