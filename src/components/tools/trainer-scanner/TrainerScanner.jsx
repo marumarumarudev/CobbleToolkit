@@ -266,6 +266,21 @@ const EV_STAT_LABELS = {
   spd: "SpD",
   spe: "Spe",
 };
+// Same six-color EV palette used across the toolkit — chosen for enough
+// separation from each other and the accent gold, at a lightness that
+// still passes contrast against bg-surface-2.
+const EV_STAT_COLORS = {
+  hp: "#f87171",
+  atk: "#fb923c",
+  def: "#facc15",
+  spa: "#60a5fa",
+  spd: "#4ade80",
+  spe: "#f472b6",
+};
+const GENDER_COLORS = {
+  male: "#60a5fa",
+  female: "#f472b6",
+};
 
 function formatCondition(cond) {
   if (!cond || typeof cond !== "object") return String(cond);
@@ -698,7 +713,14 @@ function TeamPanel({ trainer }) {
                       <Badge tone="neutral">Lv {mon.level}</Badge>
                     </div>
                   </div>
-                  <p className="mt-0.5 text-[11px] text-text-muted capitalize">
+                  <p
+                    className="mt-0.5 text-xs font-medium capitalize"
+                    style={{
+                      color:
+                        GENDER_COLORS[mon.gender?.toLowerCase()] ||
+                        "var(--color-text-muted)",
+                    }}
+                  >
                     {mon.gender?.toLowerCase()}
                   </p>
                 </div>
@@ -719,12 +741,13 @@ function TeamPanel({ trainer }) {
 
               {evEntries.length > 0 && (
                 <div>
-                  <p className="mb-1 text-[11px] text-text-muted">EVs</p>
+                  <p className="mb-1 text-xs text-text-muted">EVs</p>
                   <div className="flex flex-wrap gap-1">
                     {evEntries.map(({ stat, value }) => (
                       <span
                         key={stat}
-                        className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-[10px] font-mono text-text-secondary"
+                        className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-[11px] font-mono font-semibold"
+                        style={{ color: EV_STAT_COLORS[stat] }}
                       >
                         {value} {EV_STAT_LABELS[stat]}
                       </span>

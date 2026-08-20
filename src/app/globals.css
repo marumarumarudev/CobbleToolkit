@@ -17,8 +17,8 @@
 
   /* Text */
   --color-text-primary: #f2f3f5;
-  --color-text-secondary: #9aa0ad;
-  --color-text-muted: #676d7a;
+  --color-text-secondary: #b0b6c2;
+  --color-text-muted: #8a90a0;
 
   /* Accent — Ultra Ball gold */
   --color-accent: #e6b800;
@@ -160,7 +160,7 @@ input[type="file"] {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
 }
 
 th,
@@ -173,7 +173,7 @@ td {
 thead th {
   color: var(--color-text-secondary);
   font-weight: 600;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   background: var(--color-bg-surface-2);

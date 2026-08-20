@@ -9,6 +9,7 @@ import {
   Sparkles,
   Info,
   RefreshCw,
+  Youtube,
 } from "lucide-react";
 import { usePokedexSearch } from "@/hooks/usePokedexSearch";
 import { recommendSeasonings, RARITY_BUCKETS, GOALS } from "@/utils/pokesnackMatcher";
@@ -34,6 +35,12 @@ const TYPE_COLORS = {
   Rock: "#B8A038", Ghost: "#705898", Dragon: "#7038F8", Dark: "#705848",
   Steel: "#B8B8D0", Fairy: "#EE99AC",
 };
+
+const SNACK_TUTORIAL_CREATORS = [
+  { name: "Ploop Craft", url: "https://www.youtube.com/@Ploop-Craft" },
+  { name: "GodDigMC", url: "https://www.youtube.com/@GodDigMC" },
+  { name: "PocketCraft", url: "https://www.youtube.com/@pocketcraft3440" },
+];
 
 function resolveIconSources(item) {
   const sources = [];
@@ -91,13 +98,37 @@ const EV_STAT_LABELS = {
   special_defence: "Sp. Def",
   speed: "Spe",
 };
+// Same six-color EV palette used across the toolkit (Trainer Scanner, etc.)
+// so a stat reads the same color everywhere.
+const EV_STAT_COLORS = {
+  hp: "#f87171",
+  attack: "#fb923c",
+  defence: "#facc15",
+  special_attack: "#60a5fa",
+  special_defence: "#4ade80",
+  speed: "#f472b6",
+};
 
-function formatEvYield(evYield) {
+function EvYieldDisplay({ evYield }) {
   const nonZero = (evYield || []).filter((ev) => ev.amount);
-  if (nonZero.length === 0) return "No EV yield";
-  return nonZero
-    .map((ev) => `+${ev.amount} ${EV_STAT_LABELS[ev.stat] || ev.stat}`)
-    .join(", ");
+  if (nonZero.length === 0) {
+    return <span className="text-text-muted">No EV yield</span>;
+  }
+  return (
+    <>
+      {nonZero.map((ev, i) => (
+        <span key={ev.stat}>
+          <span
+            className="font-semibold"
+            style={{ color: EV_STAT_COLORS[ev.stat] || "inherit" }}
+          >
+            +{ev.amount} {EV_STAT_LABELS[ev.stat] || ev.stat}
+          </span>
+          {i < nonZero.length - 1 && <span className="text-text-muted">, </span>}
+        </span>
+      ))}
+    </>
+  );
 }
 
 function TypeBadge({ type }) {
@@ -343,8 +374,8 @@ export default function PokesnackMaker() {
                   {target.types.map((t) => (
                     <TypeBadge key={t} type={t} />
                   ))}
-                  <span className="text-[11px] text-text-muted">
-                    {formatEvYield(target.evYield)}
+                  <span className="text-xs">
+                    <EvYieldDisplay evYield={target.evYield} />
                   </span>
                 </div>
               </div>
@@ -486,6 +517,26 @@ export default function PokesnackMaker() {
               ))}
             </div>
           )}
+
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-text-muted">
+            <span className="flex items-center gap-1">
+              <Youtube size={12} className="shrink-0" />
+              Want a video walkthrough? Check out
+            </span>
+            {SNACK_TUTORIAL_CREATORS.map((creator, i) => (
+              <span key={creator.url} className="flex items-center gap-1">
+                <a
+                  href={creator.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-accent hover:underline"
+                >
+                  {creator.name}
+                </a>
+                {i < SNACK_TUTORIAL_CREATORS.length - 1 && <span>·</span>}
+              </span>
+            ))}
+          </div>
         </div>
       )}
     </div>
