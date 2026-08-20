@@ -38,7 +38,7 @@ I kept needing to answer questions like "what actually drops from this trainer" 
 
 ## 🚀 Live
 
-Hosted on GitHub Pages: **https://zmoonmaru.github.io/CobbleToolkit/**
+Hosted on GitHub Pages: **https://marumarumarudev.github.io/CobbleToolkit/**
 
 ## 📦 Using it
 
