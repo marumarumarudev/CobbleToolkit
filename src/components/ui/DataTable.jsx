@@ -95,7 +95,7 @@ export default function DataTable({
     return (
       <div
         className={[
-          "border border-border rounded-lg overflow-auto max-h-[70vh]",
+          "scroll-visible border border-border rounded-lg overflow-auto max-h-[70vh]",
           className,
         ].join(" ")}
       >
@@ -165,7 +165,7 @@ function VirtualizedBody({
     <div
       ref={scrollRef}
       className={[
-        "border border-border rounded-lg overflow-auto",
+        "scroll-visible border border-border rounded-lg overflow-auto",
         className,
       ].join(" ")}
       style={{ maxHeight }}
@@ -227,9 +227,9 @@ function VirtualizedBody({
                   <div
                     key={col.key}
                     className={[
-                      "flex px-3 py-2 text-xs text-text-primary",
+                      "flex min-w-0 px-3 py-2 text-xs text-text-primary",
                       col.wrap
-                        ? "items-start whitespace-normal break-words"
+                        ? "items-start whitespace-normal wrap-break-word"
                         : "items-center truncate",
                     ].join(" ")}
                   >

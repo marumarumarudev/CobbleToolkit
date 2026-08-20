@@ -64,23 +64,29 @@ export default function GlobalFileUpload() {
 
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop — above the sticky nav so the panel is fully interactive */}
           <div
-            className="fixed inset-0 z-40"
+            className="fixed inset-0 z-60 bg-black/40"
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Dropdown — capped to viewport width so it never clips off-screen
-              on narrow phones, while staying w-80 on wider viewports. */}
-          <div className="absolute right-0 mt-2 w-[min(20rem,calc(100vw-2rem))] bg-bg-surface border border-border rounded-xl shadow-xl z-50 overflow-hidden">
-            <div className="p-4 border-b border-border">
-              <div className="flex items-center justify-between mb-3">
+          {/* Panel is always fixed so it escapes the mobile nav's
+              overflow-y-auto (which previously clipped it to a 1px
+              interactive strip). On small screens it sits as a centered
+              sheet; on md+ it still feels like a dropdown near the top-right. */}
+          <div
+            className="fixed z-70 flex max-h-[min(32rem,calc(100vh-2rem))] w-[min(20rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-xl border border-border bg-bg-surface shadow-xl
+              left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+              md:left-auto md:right-4 md:top-16 md:translate-x-0 md:translate-y-0"
+          >
+            <div className="shrink-0 border-b border-border p-4">
+              <div className="mb-3 flex items-center justify-between">
                 <h3 className="text-sm font-semibold text-accent">
                   Shared Files
                 </h3>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="text-text-muted hover:text-text-primary transition-colors p-1 -m-1"
+                  className="p-1 -m-1 text-text-muted transition-colors hover:text-text-primary"
                 >
                   <X size={16} />
                 </button>
@@ -88,7 +94,7 @@ export default function GlobalFileUpload() {
 
               {/* Upload Area */}
               <div
-                className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors cursor-pointer ${
+                className={`cursor-pointer rounded-lg border-2 border-dashed p-4 text-center transition-colors ${
                   isDragging
                     ? "border-accent bg-accent-soft"
                     : "border-border hover:border-border-hover"
@@ -115,11 +121,11 @@ export default function GlobalFileUpload() {
                 }
               >
                 <Upload size={24} className="mx-auto mb-2 text-text-muted" />
-                <p className="text-xs text-text-secondary mb-1">
+                <p className="mb-1 text-xs text-text-secondary">
                   Drop files here or click to upload
                 </p>
                 <p className="text-xs text-text-muted">.zip or .jar files only</p>
-                <p className="text-xs text-text-muted mt-1">
+                <p className="mt-1 text-xs text-text-muted">
                   This is the one place to add or remove files — removing a
                   file here clears its data from every tool.
                 </p>
@@ -134,23 +140,23 @@ export default function GlobalFileUpload() {
               </div>
             </div>
 
-            {/* File List */}
-            <div className="max-h-64 overflow-y-auto">
+            {/* File List — scrolls inside the panel */}
+            <div className="min-h-0 flex-1 overflow-y-auto">
               {sharedFiles.length === 0 ? (
-                <div className="p-4 text-center text-text-muted text-sm">
+                <div className="p-4 text-center text-sm text-text-muted">
                   No shared files uploaded
                 </div>
               ) : (
-                <div className="p-2 space-y-1">
+                <div className="space-y-1 p-2">
                   {sharedFiles.map((file) => (
                     <div
                       key={file.id}
-                      className="flex items-center justify-between p-2 bg-bg-surface-2 rounded hover:bg-bg-surface-hover transition-colors"
+                      className="flex items-center justify-between rounded bg-bg-surface-2 p-2 transition-colors hover:bg-bg-surface-hover"
                     >
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <File size={14} className="text-text-muted shrink-0" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-text-primary truncate">
+                      <div className="flex min-w-0 flex-1 items-center gap-2">
+                        <File size={14} className="shrink-0 text-text-muted" />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-xs text-text-primary">
                             {file.name}
                           </p>
                           <p className="text-xs text-text-muted">
@@ -160,7 +166,7 @@ export default function GlobalFileUpload() {
                       </div>
                       <button
                         onClick={() => removeSharedFile(file.id)}
-                        className="text-text-muted hover:text-danger transition-colors p-1.5 -m-1"
+                        className="p-1.5 -m-1 text-text-muted transition-colors hover:text-danger"
                         title="Remove file and clear its data from every tool"
                       >
                         <X size={14} />
@@ -173,7 +179,7 @@ export default function GlobalFileUpload() {
 
             {/* Footer */}
             {sharedFiles.length > 0 && (
-              <div className="p-3 border-t border-border">
+              <div className="shrink-0 border-t border-border p-3">
                 <button
                   onClick={async () => {
                     if (
@@ -184,7 +190,7 @@ export default function GlobalFileUpload() {
                       await clearSharedFiles();
                     }
                   }}
-                  className="w-full px-3 py-2.5 bg-danger-soft hover:bg-danger/20 text-danger rounded text-xs transition-colors"
+                  className="w-full rounded bg-danger-soft px-3 py-2.5 text-xs text-danger transition-colors hover:bg-danger/20"
                 >
                   Clear All Files &amp; Data
                 </button>

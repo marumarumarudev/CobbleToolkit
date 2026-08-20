@@ -80,9 +80,10 @@ export default function ClientNav() {
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu — solid bg so page content can't bleed through;
+          overflow-y-auto so long menus scroll; upload lives at the bottom. */}
       {isOpen && (
-        <div className="md:hidden border-t border-border px-4 py-3 flex flex-col gap-1 max-h-[calc(100vh-3.5rem)] overflow-y-auto">
+        <div className="md:hidden flex max-h-[calc(100vh-3.5rem)] flex-col gap-1 overflow-y-auto border-t border-border bg-bg-base px-4 py-3">
           {NAV_ITEMS.map((item) => (
             <Link
               key={item.path}
@@ -99,7 +100,7 @@ export default function ClientNav() {
               {item.name}
             </Link>
           ))}
-          <div className="pt-2 border-t border-border mt-2">
+          <div className="mt-2 border-t border-border pt-2">
             <GlobalFileUpload />
           </div>
         </div>

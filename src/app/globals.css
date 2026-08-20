@@ -95,6 +95,42 @@ body {
   background: var(--color-border-hover);
 }
 
+/* Reusable visible-scrollbar treatment — opt-in via class rather than
+   applied globally, since most scroll areas in the app are small enough
+   that the default (near-invisible, matches bg-surface-2) thumb above is
+   fine. Anything with meaningful horizontal scroll (wide data tables) or
+   where users report missing/invisible scrollbars needs this instead: the
+   default thumb color sits at ~1.1:1 contrast against its own surfaces —
+   functionally invisible until hovered — which is exactly why some
+   users could scroll a table but never see a bar to scroll it with. */
+.scroll-visible {
+  scrollbar-width: thin;
+  scrollbar-color: #565e70 var(--color-bg-surface);
+  /* Reserves gutter space up front instead of the bar overlaying content
+     on first appearance — only applies to the block/vertical axis in
+     current browser support, which is what we want here (no effect on
+     horizontal layout width). */
+  scrollbar-gutter: stable;
+}
+.scroll-visible::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+.scroll-visible::-webkit-scrollbar-track {
+  background: var(--color-bg-surface);
+}
+.scroll-visible::-webkit-scrollbar-thumb {
+  background: #565e70;
+  border-radius: 999px;
+  border: 2px solid var(--color-bg-surface);
+}
+.scroll-visible::-webkit-scrollbar-thumb:hover {
+  background: var(--color-steel);
+}
+.scroll-visible::-webkit-scrollbar-corner {
+  background: var(--color-bg-surface);
+}
+
 /* Focus ring — visible keyboard focus everywhere */
 :focus-visible {
   outline: 2px solid var(--color-accent);

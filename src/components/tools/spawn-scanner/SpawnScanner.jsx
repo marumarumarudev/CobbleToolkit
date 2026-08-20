@@ -155,6 +155,8 @@ const WIDE_COLUMN_KEYS = new Set([
 
 function colWidth(key) {
   if (key === "pokemon") return 190;
+  // Biomes / anti-biomes get more room so tags don't hard-clip as often.
+  if (key === "biomes" || key === "antiBiomes") return 280;
   if (WIDE_COLUMN_KEYS.has(key)) return 240;
   return 130;
 }
@@ -485,49 +487,71 @@ export default function SpawnScanner() {
     [filteredData]
   );
 
-  const renderTagList = (tokens) => (
-    <div className="flex flex-wrap gap-1">
-      {tokens.map((tok, i) => {
-        const entries = resolveBiomeTagEntries(tok);
-        const content = { title: tok, entries };
-        const isTagVisual = tok.startsWith("#") || /^[a-zA-Z_\s]+$/.test(tok);
-        return (
-          <span
-            key={i}
-            onMouseEnter={(e) => {
-              if (hoverTooltip.pinned) return;
-              const rect = e.currentTarget.getBoundingClientRect();
-              showTooltip(
-                Math.min(rect.left, window.innerWidth - 20),
-                Math.min(rect.bottom + 8, window.innerHeight - 20),
-                content
-              );
-            }}
-            onMouseLeave={hideTooltip}
-            onClick={(e) => {
-              e.stopPropagation();
-              const rect = e.currentTarget.getBoundingClientRect();
-              setHoverTooltip({
-                visible: true,
-                pinned: true,
-                x: Math.min(rect.left, window.innerWidth - 20),
-                y: Math.min(rect.bottom + 8, window.innerHeight - 20),
-                content,
-              });
-            }}
-            className={[
-              "cursor-pointer rounded px-1.5 py-0.5 text-[11px] hover:underline",
-              isTagVisual
-                ? "border border-accent/30 bg-accent-soft text-accent"
-                : "bg-bg-surface-2 text-text-secondary",
-            ].join(" ")}
-          >
-            {tok}
-          </span>
-        );
-      })}
-    </div>
-  );
+  // Show all tags directly (no "+N more"). Virtualized rows need a fixed
+  // height, so the chip area gets a generous max-height and the table uses
+  // a matching taller rowHeight so multi-line biome lists fit without
+  // slicing chip borders. Long individual chips still truncate cleanly.
+  const renderTagList = (tokens) => {
+    if (!tokens.length) return null;
+
+    return (
+      <div className="flex max-h-30 min-w-0 flex-wrap content-start gap-1 overflow-hidden">
+        {tokens.map((tok, i) => {
+          const isTagVisual =
+            tok.startsWith("#") || /^[a-zA-Z_\s]+$/.test(tok);
+          const chipClass = [
+            "max-w-full truncate whitespace-nowrap rounded px-1.5 py-0.5 text-[11px] leading-tight",
+            isTagVisual
+              ? "border border-accent/30 bg-accent-soft text-accent"
+              : "bg-bg-surface-2 text-text-secondary",
+          ].join(" ");
+
+          // Only cobblemon-style biome tags have lookup data to show, so
+          // only those get the hover/click tooltip wired up.
+          if (!isTagVisual) {
+            return (
+              <span key={i} className={chipClass} title={tok}>
+                {tok}
+              </span>
+            );
+          }
+
+          const entries = resolveBiomeTagEntries(tok);
+          const content = { title: tok, entries };
+          return (
+            <span
+              key={i}
+              title={tok}
+              onMouseEnter={(e) => {
+                if (hoverTooltip.pinned) return;
+                const rect = e.currentTarget.getBoundingClientRect();
+                showTooltip(
+                  Math.min(rect.left, window.innerWidth - 20),
+                  Math.min(rect.bottom + 8, window.innerHeight - 20),
+                  content
+                );
+              }}
+              onMouseLeave={hideTooltip}
+              onClick={(e) => {
+                e.stopPropagation();
+                const rect = e.currentTarget.getBoundingClientRect();
+                setHoverTooltip({
+                  visible: true,
+                  pinned: true,
+                  x: Math.min(rect.left, window.innerWidth - 20),
+                  y: Math.min(rect.bottom + 8, window.innerHeight - 20),
+                  content,
+                });
+              }}
+              className={`cursor-pointer hover:underline ${chipClass}`}
+            >
+              {tok}
+            </span>
+          );
+        })}
+      </div>
+    );
+  };
 
   const columns = useMemo(
     () =>
@@ -631,7 +655,7 @@ export default function SpawnScanner() {
             return (
               <span
                 title={text.length > 20 ? text : undefined}
-                className="text-text-primary leading-snug line-clamp-2 break-words"
+                className="text-text-primary leading-snug line-clamp-2 wrap-break-word"
               >
                 {text}
               </span>
@@ -834,7 +858,7 @@ export default function SpawnScanner() {
               columns={columns}
               getRowKey={(row) => row._rowId}
               virtualized
-              rowHeight={60}
+              rowHeight={120}
               maxHeight="70vh"
             />
           )}
@@ -857,8 +881,28 @@ export default function SpawnScanner() {
             </div>
           </div>
           <div className="max-h-64 overflow-y-auto px-3 py-2">
-            {Array.isArray(hoverTooltip.content?.entries) &&
-            hoverTooltip.content.entries.length > 0 ? (
+            {Array.isArray(hoverTooltip.content?.tokens) ? (
+              <div className="flex flex-wrap gap-1">
+                {hoverTooltip.content.tokens.map((tok, idx) => {
+                  const isTagVisual =
+                    tok.startsWith("#") || /^[a-zA-Z_\s]+$/.test(tok);
+                  return (
+                    <span
+                      key={idx}
+                      className={[
+                        "rounded px-1.5 py-0.5 text-[11px]",
+                        isTagVisual
+                          ? "border border-accent/30 bg-accent-soft text-accent"
+                          : "bg-bg-surface-2 text-text-secondary",
+                      ].join(" ")}
+                    >
+                      {tok}
+                    </span>
+                  );
+                })}
+              </div>
+            ) : Array.isArray(hoverTooltip.content?.entries) &&
+              hoverTooltip.content.entries.length > 0 ? (
               <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2">
                 {hoverTooltip.content.entries.map((e, idx) => (
                   <li key={idx} className="leading-5 text-text-secondary">
