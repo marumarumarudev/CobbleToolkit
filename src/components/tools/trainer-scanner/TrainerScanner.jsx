@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   Sparkles,
   ImageOff,
+  ChevronRight,
 } from "lucide-react";
 
 import { useStorage } from "@/hooks/useStorage";
@@ -792,27 +793,26 @@ function LootPanel({ trainer }) {
   const { loot } = trainer;
   const [lootSearch, setLootSearch] = useState("");
   const [debouncedLootSearch, setDebouncedLootSearch] = useState("");
+  const [expandedGroups, setExpandedGroups] = useState(() => new Set());
+  // Tracks only the groups that were opened *by search*, as opposed to a
+  // manual header click — so clearing the search can collapse them back
+  // without touching anything the person opened themselves.
+  const [autoExpandedGroups, setAutoExpandedGroups] = useState(
+    () => new Set()
+  );
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedLootSearch(lootSearch), 200);
     return () => clearTimeout(t);
   }, [lootSearch]);
 
-  // Reset the loot search whenever the selected trainer changes, so a
-  // search from a previous trainer doesn't silently hide items here.
+  // Reset the loot search and collapse every group whenever the selected
+  // trainer changes, so state from a previous trainer never leaks in here.
   useEffect(() => {
     setLootSearch("");
+    setExpandedGroups(new Set());
+    setAutoExpandedGroups(new Set());
   }, [trainer.id]);
-
-  if (loot.linkStatus === "none") {
-    return (
-      <EmptyState
-        icon={PackageSearch}
-        title="No loot table matched"
-        description="No trainers/single or trainers/groups loot table filename matches this trainer — it likely doesn't drop loot in this pack."
-      />
-    );
-  }
 
   const items = loot.items.filter((i) => !i.empty);
   const issueCount = loot.issues.length;
@@ -831,6 +831,84 @@ function LootPanel({ trainer }) {
     direct: it.direct,
     sourcePath: it.sourcePath,
   }));
+
+  // Group into "Direct drops" (from the trainer's own root table) plus one
+  // group per distinct nested loot-table path. Built off the (possibly
+  // search-filtered) rows, so a group with zero remaining matches during a
+  // search simply disappears from the list.
+  const groups = buildLootGroups(rows);
+
+  // While a search is active, expand every group that still has matches
+  // (tracking which ones we opened automatically). Once the search is
+  // cleared, collapse back only those auto-opened groups — anything the
+  // person expanded/collapsed by hand keeps whatever state they left it
+  // in. Kept above the "no loot table" early return so hook order never
+  // varies between renders.
+  const groupKeysSignature = groups.map((g) => g.key).join("|");
+  useEffect(() => {
+    if (debouncedLootSearch) {
+      const matchKeys = groups.map((g) => g.key);
+      setExpandedGroups((prev) => {
+        const next = new Set(prev);
+        let changed = false;
+        for (const key of matchKeys) {
+          if (!next.has(key)) {
+            next.add(key);
+            changed = true;
+          }
+        }
+        return changed ? next : prev;
+      });
+      setAutoExpandedGroups((prev) => {
+        const next = new Set(prev);
+        let changed = false;
+        for (const key of matchKeys) {
+          if (!next.has(key)) {
+            next.add(key);
+            changed = true;
+          }
+        }
+        return changed ? next : prev;
+      });
+    } else if (autoExpandedGroups.size > 0) {
+      const toCollapse = autoExpandedGroups;
+      setExpandedGroups((prevExpanded) => {
+        const next = new Set(prevExpanded);
+        for (const key of toCollapse) next.delete(key);
+        return next;
+      });
+      setAutoExpandedGroups(new Set());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedLootSearch, groupKeysSignature]);
+
+  if (loot.linkStatus === "none") {
+    return (
+      <EmptyState
+        icon={PackageSearch}
+        title="No loot table matched"
+        description="No trainers/single or trainers/groups loot table filename matches this trainer — it likely doesn't drop loot in this pack."
+      />
+    );
+  }
+
+  // Manual toggles always take priority — untrack the group from "auto"
+  // so a later search-clear won't yank it closed/open out from under a
+  // person who just clicked it themselves.
+  const toggleGroup = (key) => {
+    setExpandedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+    setAutoExpandedGroups((prev) => {
+      if (!prev.has(key)) return prev;
+      const next = new Set(prev);
+      next.delete(key);
+      return next;
+    });
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -898,16 +976,102 @@ function LootPanel({ trainer }) {
             )}
           </div>
 
-          {rows.length === 0 ? (
+          {groups.length === 0 ? (
             <EmptyState
               icon={Search}
               title="No drops match your search"
               description={`Nothing in this trainer's ${items.length} possible drops matches "${debouncedLootSearch}".`}
             />
           ) : (
-            <LootRowList rows={rows} />
+            <div className="flex flex-col gap-2">
+              {groups.map((group) => (
+                <LootGroupSection
+                  key={group.key}
+                  group={group}
+                  isOpen={expandedGroups.has(group.key)}
+                  onToggle={() => toggleGroup(group.key)}
+                />
+              ))}
+            </div>
           )}
         </>
+      )}
+    </div>
+  );
+}
+
+// Splits rows into a "Direct drops" group plus one group per distinct
+// nested loot-table path (sourcePath minus the trainer root). Direct always
+// sorts first; nested groups sort alphabetically by their leaf label.
+function buildLootGroups(rows) {
+  const direct = [];
+  const nestedByKey = new Map();
+
+  for (const row of rows) {
+    const isDirect = row.direct || row.sourcePath.length <= 1;
+    if (isDirect) {
+      direct.push(row);
+      continue;
+    }
+    const nestedPath = row.sourcePath.slice(1);
+    const key = nestedPath.join(" → ");
+    if (!nestedByKey.has(key)) {
+      const leafId = row.sourcePath[row.sourcePath.length - 1] || key;
+      const label = leafId.includes(":") ? leafId.split(":").pop() : leafId;
+      nestedByKey.set(key, { key, label, subtitle: key, rows: [] });
+    }
+    nestedByKey.get(key).rows.push(row);
+  }
+
+  const groups = [];
+  if (direct.length > 0) {
+    groups.push({
+      key: "__direct__",
+      label: "Direct drops",
+      subtitle: null,
+      rows: direct,
+    });
+  }
+  const nestedGroups = Array.from(nestedByKey.values()).sort((a, b) =>
+    a.label.localeCompare(b.label)
+  );
+  groups.push(...nestedGroups);
+
+  return groups;
+}
+
+function LootGroupSection({ group, isOpen, onToggle }) {
+  return (
+    <div className="rounded-lg border border-border overflow-hidden">
+      <button
+        onClick={onToggle}
+        className="flex w-full items-center gap-2 px-3 py-2.5 text-left hover:bg-bg-surface-2 transition-colors duration-100"
+      >
+        <ChevronRight
+          size={14}
+          className={`shrink-0 text-text-muted transition-transform duration-150 ${
+            isOpen ? "rotate-90" : ""
+          }`}
+        />
+        <span className="min-w-0 flex-1">
+          <span className="block text-xs font-medium text-text-primary truncate">
+            {group.label}
+          </span>
+          {group.subtitle && (
+            <span
+              className="block text-[10px] text-text-muted truncate"
+              title={group.subtitle}
+            >
+              {group.subtitle}
+            </span>
+          )}
+        </span>
+        <Badge tone="neutral">{group.rows.length}</Badge>
+      </button>
+      {isOpen && (
+        <div className="border-t border-border">
+          <LootRowList rows={group.rows} bordered={false} />
+        </div>
       )}
     </div>
   );
@@ -919,7 +1083,7 @@ function LootPanel({ trainer }) {
 // under React 19 and throws during layout.
 const LOOT_ROW_SIZE = 64;
 
-function LootRowList({ rows }) {
+function LootRowList({ rows, bordered = true }) {
   const scrollRef = useRef(null);
   const shouldVirtualize = rows.length > 150;
 
@@ -933,7 +1097,11 @@ function LootRowList({ rows }) {
 
   if (!shouldVirtualize) {
     return (
-      <div className="flex flex-col divide-y divide-border rounded-lg border border-border">
+      <div
+        className={`flex flex-col divide-y divide-border ${
+          bordered ? "rounded-lg border border-border" : ""
+        }`}
+      >
         {rows.map((row) => (
           <LootRow key={row.id} row={row} />
         ))}
@@ -944,7 +1112,9 @@ function LootRowList({ rows }) {
   return (
     <div
       ref={scrollRef}
-      className="rounded-lg border border-border overflow-y-auto"
+      className={`overflow-y-auto ${
+        bordered ? "rounded-lg border border-border" : ""
+      }`}
       style={{ maxHeight: "65vh" }}
     >
       <div
