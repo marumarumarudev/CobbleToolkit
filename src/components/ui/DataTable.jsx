@@ -154,11 +154,19 @@ function VirtualizedBody({
     [columns]
   );
 
+  // Dynamic row heights: estimateSize is only the initial guess; once a row
+  // mounts, measureElement reads its real content height so sparse rows stay
+  // compact and tag-heavy rows grow only as needed.
   const virtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => scrollRef.current,
     estimateSize: () => rowHeight,
     overscan: 12,
+    measureElement:
+      typeof window !== "undefined" &&
+      navigator.userAgent.indexOf("Firefox") === -1
+        ? (el) => el.getBoundingClientRect().height
+        : undefined,
   });
 
   return (
@@ -204,7 +212,7 @@ function VirtualizedBody({
           ))}
         </div>
 
-        {/* Virtualized rows */}
+        {/* Virtualized rows — height comes from measured content, not a fixed px */}
         <div
           style={{
             height: virtualizer.getTotalSize(),
@@ -216,10 +224,11 @@ function VirtualizedBody({
             return (
               <div
                 key={resolveKey(row, virtualRow.index)}
+                data-index={virtualRow.index}
+                ref={virtualizer.measureElement}
                 className="absolute left-0 top-0 w-full grid border-b border-border hover:bg-bg-surface-2 transition-colors duration-100"
                 style={{
                   gridTemplateColumns,
-                  height: virtualRow.size,
                   transform: `translateY(${virtualRow.start}px)`,
                 }}
               >

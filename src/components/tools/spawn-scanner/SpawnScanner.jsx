@@ -155,7 +155,6 @@ const WIDE_COLUMN_KEYS = new Set([
 
 function colWidth(key) {
   if (key === "pokemon") return 190;
-  // Biomes / anti-biomes get more room so tags don't hard-clip as often.
   if (key === "biomes" || key === "antiBiomes") return 280;
   if (WIDE_COLUMN_KEYS.has(key)) return 240;
   return 130;
@@ -487,15 +486,14 @@ export default function SpawnScanner() {
     [filteredData]
   );
 
-  // Show all tags directly (no "+N more"). Virtualized rows need a fixed
-  // height, so the chip area gets a generous max-height and the table uses
-  // a matching taller rowHeight so multi-line biome lists fit without
-  // slicing chip borders. Long individual chips still truncate cleanly.
+  // Show all tags. Row height is dynamic (DataTable measures each row), so
+  // sparse rows stay compact and tag-heavy rows grow only as needed — no
+  // fixed max-height clip and no "+N more" nesting.
   const renderTagList = (tokens) => {
     if (!tokens.length) return null;
 
     return (
-      <div className="flex max-h-30 min-w-0 flex-wrap content-start gap-1 overflow-hidden">
+      <div className="flex min-w-0 flex-wrap content-start gap-1">
         {tokens.map((tok, i) => {
           const isTagVisual =
             tok.startsWith("#") || /^[a-zA-Z_\s]+$/.test(tok);
@@ -506,8 +504,6 @@ export default function SpawnScanner() {
               : "bg-bg-surface-2 text-text-secondary",
           ].join(" ");
 
-          // Only cobblemon-style biome tags have lookup data to show, so
-          // only those get the hover/click tooltip wired up.
           if (!isTagVisual) {
             return (
               <span key={i} className={chipClass} title={tok}>
@@ -858,7 +854,7 @@ export default function SpawnScanner() {
               columns={columns}
               getRowKey={(row) => row._rowId}
               virtualized
-              rowHeight={120}
+              rowHeight={48}
               maxHeight="70vh"
             />
           )}
