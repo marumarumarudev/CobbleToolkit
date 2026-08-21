@@ -300,6 +300,14 @@ function formatRolls(rolls) {
   return rolls.min === rolls.max ? String(rolls.min) : `${rolls.min}–${rolls.max}`;
 }
 
+// Adaptive precision: sub-1% chances (common for deeply nested loot) need a
+// decimal place or two to not all read as "0%"; anything bigger reads fine
+// rounded to one decimal.
+function formatChancePercent(pct) {
+  if (pct == null || Number.isNaN(pct)) return null;
+  return pct < 1 ? `${pct.toFixed(2)}%` : `${pct.toFixed(1)}%`;
+}
+
 function formatSetCount(setCount) {
   if (!setCount) return null;
   return setCount.min === setCount.max
@@ -825,6 +833,9 @@ function LootPanel({ trainer }) {
     id: `${it.item}-${i}`,
     item: it.item,
     weight: it.weight,
+    theoreticalWeight: it.theoreticalWeight,
+    poolTotalWeight: it.poolTotalWeight,
+    chancePercent: it.chancePercent,
     rolls: formatRolls(it.rolls),
     setCount: formatSetCount(it.setCount),
     conditions: it.conditions,
@@ -1145,6 +1156,15 @@ function LootRowList({ rows, bordered = true }) {
 }
 
 function LootRow({ row }) {
+  const chanceLabel = formatChancePercent(row.chancePercent);
+  // Only worth calling out that theoreticalWeight differs from the raw
+  // entry weight when it actually does (i.e. the item came through a
+  // nested/grouped branch) — for a direct, ungrouped entry the two are
+  // identical and showing both would just be noise.
+  const isReweighted =
+    row.theoreticalWeight != null &&
+    Math.abs(row.theoreticalWeight - row.weight) > 0.01;
+
   return (
     <div className="flex flex-col gap-1.5 px-3 py-2.5 hover:bg-bg-surface-2 transition-colors duration-100">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -1152,8 +1172,24 @@ function LootRow({ row }) {
           {row.item}
         </span>
         <span className="ml-auto flex shrink-0 items-center gap-1.5">
+          {chanceLabel && (
+            <span
+              title={
+                isReweighted
+                  ? `Theoretical chance ${chanceLabel} — this entry's weight (${row.weight}) is shared across a nested/grouped table, working out to an effective weight of ~${row.theoreticalWeight.toFixed(2)} out of this pool's ${row.poolTotalWeight} total weight. A simplified model, not a full simulation — see the source for details.`
+                  : `Theoretical chance ${chanceLabel} — weight ${row.weight} out of this pool's ${row.poolTotalWeight} total weight.`
+              }
+              className="rounded bg-accent-soft px-1.5 py-0.5 text-[10px] font-semibold text-accent"
+            >
+              {chanceLabel}
+            </span>
+          )}
           <span
-            title="Weight"
+            title={
+              isReweighted
+                ? `Raw entry weight ${row.weight} (effective weight after nested grouping: ~${row.theoreticalWeight.toFixed(2)})`
+                : "Weight"
+            }
             className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-[10px] text-text-secondary"
           >
             w{row.weight}

@@ -73,17 +73,47 @@ function extractSetCount(functions) {
 }
 
 /**
- * Recursively resolve a loot table id into a flat list of leaf item drops.
+ * Recursively resolve a loot table id into a flat list of leaf item drops,
+ * each annotated with a theoretical weight/chance.
+ *
+ * Weight model (deliberately simplified — see README note below the
+ * function for the full rationale):
+ *   - Within a single pool, an entry's local share = its weight / that
+ *     pool's total weight (empty entries count toward the total, so they
+ *     correctly dilute everyone else's share).
+ *   - A `minecraft:loot_table` entry doesn't stop there — it hands its
+ *     resulting probability mass down into the referenced table. Since a
+ *     loot table's pools *all* fire together (not exclusively, unlike
+ *     entries within one pool), the mass is split evenly across however
+ *     many pools that nested table has before being distributed among
+ *     each pool's own entries the same way as above. This is what makes a
+ *     3-pool "guaranteed bundle" entry with weight 5 split into ~1.67 per
+ *     item instead of counting each item at the full weight of 5.
+ *   - This repeats at whatever depth the nesting goes, multiplying shares
+ *     down the chain, so a leaf several loot tables deep still gets a
+ *     sensible weight.
+ *   - The running `probability` (0-1) is only ever multiplied by local
+ *     shares ≤1, so it's a true probability of that specific leaf being
+ *     the one selected, conditioned on this whole root table firing.
+ *     `theoreticalWeight` rescales that back into the same units as the
+ *     root pool's raw weights (probability × that pool's total weight) so
+ *     it reads naturally next to sibling entries' plain `weight` values,
+ *     and `chancePercent` is just probability × 100.
  *
  * @param {string} id - loot table id to resolve
  * @param {Map} index - id -> parsed loot table JSON
- * @param {Object} ctx - { visited: Set<string> (current ancestor chain),
- *                          sourcePath: string[] (breadcrumb of table ids),
- *                          inheritedConditions: object[] }
+ * @param {Object} ctx
  * @returns {{ items: object[], issues: object[] }}
  */
 function resolveLootTable(id, index, ctx) {
-  const { visited, sourcePath, inheritedConditions, depth = 0 } = ctx;
+  const {
+    visited,
+    sourcePath,
+    inheritedConditions,
+    depth = 0,
+    probability = 1,
+    rootPoolTotalWeight = null,
+  } = ctx;
 
   if (depth > MAX_DEPTH) {
     return {
@@ -118,6 +148,13 @@ function resolveLootTable(id, index, ctx) {
     const poolConditions = pool.conditions || [];
     const entries = Array.isArray(pool.entries) ? pool.entries : [];
 
+
+    const poolTotalWeight =
+      entries.reduce((sum, e) => sum + (e.weight ?? 1), 0) || 1;
+
+
+    const thisPoolRootTotal = depth === 0 ? poolTotalWeight : rootPoolTotalWeight;
+
     for (const entry of entries) {
       const entryConditions = entry.conditions || [];
       const combinedConditions = [
@@ -126,11 +163,20 @@ function resolveLootTable(id, index, ctx) {
         ...entryConditions,
       ];
 
+      const entryWeight = entry.weight ?? 1;
+      const localShare = entryWeight / poolTotalWeight;
+      const entryProbability = probability * localShare;
+      const theoreticalWeight = entryProbability * thisPoolRootTotal;
+      const chancePercent = entryProbability * 100;
+
       if (entry.type === "minecraft:item") {
         items.push({
           item: entry.name,
           empty: false,
-          weight: entry.weight ?? 1,
+          weight: entryWeight,
+          theoreticalWeight,
+          poolTotalWeight: thisPoolRootTotal,
+          chancePercent,
           rolls,
           poolIndex,
           conditions: combinedConditions,
@@ -141,21 +187,25 @@ function resolveLootTable(id, index, ctx) {
         });
       } else if (entry.type === "minecraft:loot_table") {
         if (typeof entry.value === "string") {
+          const nestedTable = index.get(entry.value);
+          const numPoolsNested = nestedTable?.pools?.length || 1;
           const nested = resolveLootTable(entry.value, index, {
             visited: nextVisited,
             sourcePath: nextSourcePath,
             inheritedConditions: combinedConditions,
             depth: depth + 1,
+            probability: entryProbability / numPoolsNested,
+            rootPoolTotalWeight: thisPoolRootTotal,
           });
           items.push(...nested.items);
           issues.push(...nested.issues);
         } else if (entry.value && typeof entry.value === "object") {
-          // Inline loot table object (rare, but valid per schema) — resolve
-          // it directly without an id/index lookup.
+
           const inlineId = `${id}#inline-pool${poolIndex}`;
           const inlinePools = Array.isArray(entry.value.pools)
             ? entry.value.pools
             : [];
+          const numPoolsNested = inlinePools.length || 1;
           const fakeIndex = new Map(index);
           fakeIndex.set(inlineId, { pools: inlinePools });
           const nested = resolveLootTable(inlineId, fakeIndex, {
@@ -163,6 +213,8 @@ function resolveLootTable(id, index, ctx) {
             sourcePath: nextSourcePath,
             inheritedConditions: combinedConditions,
             depth: depth + 1,
+            probability: entryProbability / numPoolsNested,
+            rootPoolTotalWeight: thisPoolRootTotal,
           });
           items.push(...nested.items);
           issues.push(...nested.issues);
@@ -171,7 +223,10 @@ function resolveLootTable(id, index, ctx) {
         items.push({
           item: null,
           empty: true,
-          weight: entry.weight ?? 1,
+          weight: entryWeight,
+          theoreticalWeight,
+          poolTotalWeight: thisPoolRootTotal,
+          chancePercent,
           rolls,
           poolIndex,
           conditions: combinedConditions,
@@ -199,6 +254,8 @@ function resolveTrainerLoot(rootId, index) {
     sourcePath: [],
     inheritedConditions: [],
     depth: 0,
+    probability: 1,
+    rootPoolTotalWeight: null,
   });
   return { status: "resolved", rootTableId: rootId, items, issues };
 }
