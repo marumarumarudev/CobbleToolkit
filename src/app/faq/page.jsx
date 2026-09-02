@@ -1,69 +1,111 @@
-"use client";
+import GiscusComments from "@/components/GiscusComments";
 
-import { HelpCircle } from "lucide-react";
-import { Card, CardBody } from "@/components/ui";
+export const metadata = {
+  title: "FAQ | CobbleToolkit",
+  description: "Common questions and community feedback for CobbleToolkit.",
+};
 
-const FAQS = [
+const faqs = [
   {
-    q: "Are you affiliated with Cobblemon or Cobbled Studios?",
-    a: "No. This toolkit is a fan-made project and is not officially affiliated with Cobbled Studios.",
+    question: "Are you affiliated with Cobblemon or Cobbled Studios?",
+    answer:
+      "No. CobbleToolkit is a fan-made project and is not officially affiliated with Cobbled Studios, Cobblemon, or Cobbleverse.",
   },
   {
-    q: "What file types can I upload?",
-    a: "You can upload .zip or .jar files containing Cobblemon data.",
+    question: "What can this toolkit do?",
+    answer:
+      "Four browser tools for Cobblemon / Cobbleverse datapacks: Spawn Scanner, Species & Loot, RCT Trainer Scanner, and Pokésnack Maker. Everything runs entirely in your tab.",
   },
   {
-    q: "Why is nothing showing up after uploading?",
-    a: "Ensure the datapack contains valid species, spawn, loot, or trainer data that one of the tools reads. Try re-uploading if needed.",
+    question: "What files can I upload?",
+    answer:
+      "`.zip` or `.jar` datapacks. Upload from the navbar or any tool’s dropzone — they share the same file list.",
   },
   {
-    q: "What does EV Yield or BST mean?",
-    a: "EV Yield is the Effort Values gained when defeating a Pokémon. BST stands for Base Stat Total — the sum of all base stats.",
+    question: "Why is nothing showing up after I upload?",
+    answer:
+      "The pack might not contain the folders that tool reads, or you’re on a tool that doesn’t use datapack files (Pokésnack Maker uses the online Pokédex). Try another tool or clear files in the nav and re-upload.",
   },
   {
-    q: "Can I sort or search the data?",
-    a: "Yes. Most tools support searching and sorting — by name, type, biome, and more.",
+    question: "Where is my data stored?",
+    answer:
+      "Nothing is uploaded to any server. Files and parsed results stay in your browser (IndexedDB). Use the navbar clear button if you want them gone.",
   },
   {
-    q: "Where is my data stored?",
-    a: "Everything stays in your browser using IndexedDB. No data is uploaded to any server.",
-  },
-  {
-    q: "Do these tools work offline?",
-    a: "You need to be online to load the website, but after that, most tools work entirely in-browser.",
-  },
-  {
-    q: "Can I suggest a feature or report a bug?",
-    a: "Yes — message on Discord: zmoonmaru. Thanks for using the toolkit.",
+    question: "Can I suggest a feature or report a bug?",
+    answer:
+      "Yes — use the comments section below (powered by GitHub Discussions) or message me on Discord: zmoonmaru.",
   },
 ];
 
-export default function FaqPage() {
+export default function FAQPage() {
   return (
-    <div className="flex flex-col gap-8">
-      <header className="flex flex-col gap-2">
-        <div className="inline-flex items-center gap-2 text-accent">
-          <HelpCircle size={18} />
-          <span className="text-xs font-mono uppercase tracking-wider">FAQ</span>
-        </div>
+    <div className="flex flex-col gap-10">
+      {/* Header */}
+      <header>
         <h1 className="text-2xl font-semibold text-text-primary">
-          Frequently Asked Questions
+          FAQ & Feedback
         </h1>
-        <p className="text-sm text-text-secondary max-w-2xl">
-          Common questions about this toolkit and how it works.
+        <p className="mt-1.5 text-sm text-text-secondary max-w-2xl">
+          Quick answers first. Questions, ideas, and bug reports belong in the
+          comments below — they live in the GitHub Discussions for this project.
         </p>
       </header>
 
-      <div className="flex flex-col gap-3">
-        {FAQS.map((item) => (
-          <Card key={item.q}>
-            <CardBody className="flex flex-col gap-2">
-              <h2 className="text-sm font-semibold text-text-primary">{item.q}</h2>
-              <p className="text-sm text-text-secondary leading-relaxed">{item.a}</p>
-            </CardBody>
-          </Card>
-        ))}
-      </div>
+      {/* Compact FAQ grid */}
+      <section>
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">
+          Common questions
+        </h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {faqs.map((faq) => (
+            <div
+              key={faq.question}
+              className="rounded-lg border border-border bg-bg-surface p-4"
+            >
+              <h3 className="text-sm font-semibold text-accent mb-1.5">
+                {faq.question}
+              </h3>
+              <p className="text-sm text-text-secondary leading-relaxed">
+                {faq.answer}
+              </p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Comments */}
+      <section className="rounded-xl border border-border bg-bg-surface p-5 sm:p-6">
+        <div className="mb-5">
+          <h2 className="text-lg font-semibold text-text-primary">
+            Comments & Discussion
+          </h2>
+          <p className="mt-1 text-sm text-text-secondary">
+            Ask questions, suggest features, or report bugs. Everything here is
+            stored in the project’s GitHub Discussions.
+          </p>
+        </div>
+
+        {/* Welcome text (Giscus does not show the original discussion post) */}
+        <div className="mb-6 rounded-lg border border-border bg-bg-base p-4 text-sm text-text-secondary">
+          <p className="mb-2 font-medium text-text-primary">Welcome</p>
+          <p className="mb-2">
+            This is the general discussion space for CobbleToolkit.
+          </p>
+          <p className="mb-1">Use it for:</p>
+          <ul className="mb-2 list-disc pl-5 space-y-0.5">
+            <li>Questions about any of the tools</li>
+            <li>Feature ideas or suggestions</li>
+            <li>Bug reports</li>
+            <li>Feedback on the site</li>
+          </ul>
+          <p>
+            Be respectful and keep it related to the toolkit.
+          </p>
+        </div>
+
+        <GiscusComments />
+      </section>
     </div>
   );
 }
