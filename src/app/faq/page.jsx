@@ -19,7 +19,7 @@ const faqs = [
   {
     question: "What files can I upload?",
     answer:
-      "`.zip` or `.jar` datapacks. Upload from the navbar or any tool’s dropzone — they share the same file list.",
+      "`.zip` or `.jar` datapacks. Upload from the navbar or any tool’s dropzone — they share the same file list. Cobblemon 1.8.x jars (including herd / alpha spawn data) are supported.",
   },
   {
     question: "Why is nothing showing up after I upload?",
@@ -38,10 +38,11 @@ const faqs = [
   },
 ];
 
+const UPLOAD_TUTORIAL_YOUTUBE_ID = "GRqwv087tgo";
+
 export default function FAQPage() {
   return (
     <div className="flex flex-col gap-10">
-      {/* Header */}
       <header>
         <h1 className="text-2xl font-semibold text-text-primary">
           FAQ & Feedback
@@ -52,7 +53,46 @@ export default function FAQPage() {
         </p>
       </header>
 
-      {/* Compact FAQ grid */}
+      {/* How to upload — video (centered, capped width so it doesn’t float left) */}
+      <section className="mx-auto w-full max-w-3xl">
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">
+          How to upload files in CobbleToolkit
+        </h2>
+        <div className="rounded-lg border border-border bg-bg-surface p-4 sm:p-5">
+          <p className="mb-4 text-sm text-text-secondary leading-relaxed">
+            Use the <strong className="text-text-primary">Upload File</strong>{" "}
+            control in the top bar (or the dropzone on any tool). Accepts{" "}
+            <code className="font-mono text-[11px] text-accent">.zip</code> /{" "}
+            <code className="font-mono text-[11px] text-accent">.jar</code>.
+            Files stay in your browser and are shared across Spawn Scanner,
+            Species &amp; Loot, and RCT Trainer Scanner.
+          </p>
+
+          {UPLOAD_TUTORIAL_YOUTUBE_ID ? (
+            <div className="overflow-hidden rounded-lg border border-border bg-black shadow-sm">
+              <div className="relative w-full aspect-video">
+                <iframe
+                  className="absolute inset-0 h-full w-full"
+                  src={`https://www.youtube-nocookie.com/embed/${UPLOAD_TUTORIAL_YOUTUBE_ID}`}
+                  title="How to upload a datapack in CobbleToolkit"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="flex aspect-video w-full items-center justify-center rounded-lg border border-dashed border-border bg-bg-base px-4 text-center">
+              <p className="text-sm text-text-muted">
+                Video tutorial coming soon — paste a YouTube link and we&apos;ll
+                embed it here.
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+
       <section>
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-text-muted">
           Common questions
@@ -74,7 +114,6 @@ export default function FAQPage() {
         </div>
       </section>
 
-      {/* Comments */}
       <section className="rounded-xl border border-border bg-bg-surface p-5 sm:p-6">
         <div className="mb-5">
           <h2 className="text-lg font-semibold text-text-primary">
@@ -86,7 +125,6 @@ export default function FAQPage() {
           </p>
         </div>
 
-        {/* Welcome text (Giscus does not show the original discussion post) */}
         <div className="mb-6 rounded-lg border border-border bg-bg-base p-4 text-sm text-text-secondary">
           <p className="mb-2 font-medium text-text-primary">Welcome</p>
           <p className="mb-2">
@@ -99,9 +137,7 @@ export default function FAQPage() {
             <li>Bug reports</li>
             <li>Feedback on the site</li>
           </ul>
-          <p>
-            Be respectful and keep it related to the toolkit.
-          </p>
+          <p>Be respectful and keep it related to the toolkit.</p>
         </div>
 
         <GiscusComments />

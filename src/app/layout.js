@@ -37,7 +37,7 @@ export default function RootLayout({ children }) {
           <GlobalErrorFilters />
           <div className="flex min-h-screen flex-col">
             <ClientNav />
-            <main className="max-w-6xl mx-auto w-full flex-1 px-4 py-6 sm:py-8">
+            <main className="mx-auto w-full max-w-[100rem] flex-1 px-4 py-6 sm:px-6 sm:py-8 xl:px-8">
               <PageTransition>{children}</PageTransition>
             </main>
             <Footer />

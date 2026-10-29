@@ -29,7 +29,7 @@ export default function ClientNav() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-bg-base/90 backdrop-blur-md">
-      <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
+      <div className="max-w-[100rem] mx-auto flex items-center justify-between px-4 py-3">
         <Link
           href="/"
           className="flex items-center gap-2 font-mono text-sm font-semibold text-text-primary"

@@ -227,15 +227,62 @@ export async function parseCobblemonZip(file) {
                   return "";
                 };
 
-                // Only add valid entries
-                if (entry.pokemon || entry.species || entry.id) {
+                // Cobblemon 1.8+ herds live under spawn_pool_world/herds/ with
+                // type "pokemon-herd" and a herdablePokemon[] list instead of a
+                // single top-level pokemon. Expand each member into a row so
+                // search/filters still work. Solo entries stay one row.
+                const herdMembers = Array.isArray(entry.herdablePokemon)
+                  ? entry.herdablePokemon
+                  : null;
+                const units = [];
+                if (herdMembers && herdMembers.length) {
+                  for (const member of herdMembers) {
+                    if (!member || typeof member !== "object") continue;
+                    units.push({
+                      pokemon:
+                        member.pokemon ||
+                        member.species ||
+                        entry.pokemon ||
+                        entry.id ||
+                        "Unknown",
+                      level:
+                        member.levelRange ??
+                        entry.levelRange ??
+                        entry.level ??
+                        "",
+                      weight: member.weight ?? entry.weight ?? "",
+                      spawnType: entry.type || "pokemon-herd",
+                      maxHerdSize: entry.maxHerdSize ?? "",
+                      isLeader: member.isLeader ?? "",
+                      isFollower: member.isFollower ?? "",
+                      herdLevelRange: entry.levelRange ?? "",
+                      memberMaxTimes: member.maxTimes ?? "",
+                      levelRangeOffset: member.levelRangeOffset ?? "",
+                      entryWeight: entry.weight ?? "",
+                    });
+                  }
+                } else if (entry.pokemon || entry.species || entry.id) {
+                  units.push({
+                    pokemon: entry.pokemon || entry.species || entry.id || "Unknown",
+                    level: entry.level ?? entry.levelRange ?? "",
+                    weight: entry.weight ?? "",
+                    spawnType: entry.type || "pokemon",
+                    maxHerdSize: entry.maxHerdSize ?? "",
+                    isLeader: "",
+                    isFollower: "",
+                    herdLevelRange: "",
+                    memberMaxTimes: "",
+                    levelRangeOffset: "",
+                    entryWeight: entry.weight ?? "",
+                  });
+                }
+
+                for (const unit of units) {
                   const spawnData = {
-                    pokemon: String(
-                      entry.pokemon || entry.species || entry.id || "Unknown"
-                    ),
+                    pokemon: String(unit.pokemon),
                     bucket: String(entry.bucket || "Unknown"),
-                    level: String(entry.level ?? ""),
-                    weight: String(entry.weight ?? ""),
+                    level: String(unit.level ?? ""),
+                    weight: String(unit.weight ?? ""),
                     // Support both old 'context' and new 'spawnablePositionType' fields
                     spawnablePositionType: String(
                       entry.spawnablePositionType || entry.context || "none"
@@ -243,6 +290,17 @@ export async function parseCobblemonZip(file) {
                     presets: formatArrayValue(entry.presets),
                     // Preserve plural weight multipliers for UI rendering/search
                     weightMultipliers: weightMultipliers,
+
+                    // 1.8 herd / entry metadata
+                    spawnType: String(unit.spawnType || ""),
+                    maxHerdSize: formatSingleValue(unit.maxHerdSize),
+                    isLeader: formatSingleValue(unit.isLeader),
+                    isFollower: formatSingleValue(unit.isFollower),
+                    herdLevelRange: formatSingleValue(unit.herdLevelRange),
+                    memberMaxTimes: formatSingleValue(unit.memberMaxTimes),
+                    levelRangeOffset: formatSingleValue(unit.levelRangeOffset),
+                    herdWeight: formatSingleValue(unit.entryWeight),
+                    spawnId: formatSingleValue(entry.id),
 
                     // Condition fields
                     biomes: formatArrayValue(condition.biomes),
@@ -255,6 +313,8 @@ export async function parseCobblemonZip(file) {
                       condition.neededBaseBlocks
                     ),
                     labels: formatArrayValue(condition.labels),
+                    markers: formatArrayValue(condition.markers),
+                    isPokeSnack: formatSingleValue(condition.isPokeSnack),
 
                     // Boolean condition fields
                     canSeeSky: formatSingleValue(condition.canSeeSky),
@@ -547,9 +607,8 @@ export async function parseCobblemonZip(file) {
                   };
 
                   results.push(spawnData);
-                }
+                }              // ends for (const unit of units)
               } catch (entryErr) {
-                // Skip individual invalid entries without stopping the whole process
                 console.warn(
                   `⚠️ Skipping invalid spawn entry in ${fileName}:`,
                   entryErr
@@ -592,4 +651,4 @@ export async function parseCobblemonZip(file) {
 
   // Race between processing and timeout
   return Promise.race([processingPromise(), timeoutPromise]);
-}
+};

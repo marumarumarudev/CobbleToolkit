@@ -1,7 +1,8 @@
-// Bait Seasoning data for Poké Snacks (Cobblemon 1.7+ cooking system).
+// Bait Seasoning data for Poké Snacks — aligned to Cobblemon 1.8.x
+// spawn_bait_effects (gitlab cable-mc/cobblemon).
 // A Poké Snack has a FIXED base recipe (3 Milk, 2 Honey Bottle, 1 Vivichoke,
 // 3 Hearty Grains) — only the 3 seasoning slots are variable, and their
-// effects stack. Source-checked against wiki.cobblemon.com and cobblewiki.com.
+// effects stack.
 
 export const MC_ITEM_GALLERY_VERSION = "1.21.6";
 export function mcItemGalleryUrl(mcItemId) {
@@ -18,6 +19,11 @@ export const SEASONING_CATEGORY = {
   GENDER: "gender",
   BITE_SPEED: "biteSpeed",
   LEVEL: "level",
+  ALPHA: "alpha",
+  MARK: "mark",
+  SIZE: "size",
+  DROPS: "drops",
+  FRIENDSHIP: "friendship",
   OTHER: "other",
 };
 
@@ -48,14 +54,15 @@ export const TYPE_BERRIES = [
 }));
 
 export const EGG_GROUP_BERRIES = [
-  { id: "rawst-berry",  name: "Rawst Berry",  eggGroups: ["Field"],                  iconSlug: "rawst-berry"  },
-  { id: "pecha-berry",  name: "Pecha Berry",  eggGroups: ["Water 3", "Bug"],         iconSlug: "pecha-berry"  },
-  { id: "cheri-berry",  name: "Cheri Berry",  eggGroups: ["Grass", "Fairy"],         iconSlug: "cheri-berry"  },
-  { id: "chesto-berry", name: "Chesto Berry", eggGroups: ["Human-Like", "Flying"],   iconSlug: "chesto-berry" },
-  { id: "aspear-berry", name: "Aspear Berry", eggGroups: ["Water 1", "Water 2"],     iconSlug: "aspear-berry" },
-  { id: "persim-berry", name: "Persim Berry", eggGroups: ["Mineral", "Amorphous"],   iconSlug: "persim-berry" },
-  { id: "lum-berry",    name: "Lum Berry",    eggGroups: ["Dragon", "Monster"],      iconSlug: "lum-berry"    },
-  { id: "eggant-berry", name: "Eggant Berry", eggGroups: ["Ditto"],                  iconSlug: "eggant-berry" },
+  { id: "rawst-berry",  name: "Rawst Berry",  eggGroups: ["Field"],                iconSlug: "rawst-berry"  },
+  { id: "pecha-berry",  name: "Pecha Berry",  eggGroups: ["Water 3", "Bug"],       iconSlug: "pecha-berry"  },
+  { id: "cheri-berry",  name: "Cheri Berry",  eggGroups: ["Grass", "Fairy"],       iconSlug: "cheri-berry"  },
+  { id: "chesto-berry", name: "Chesto Berry", eggGroups: ["Human-Like", "Flying"], iconSlug: "chesto-berry" },
+  { id: "aspear-berry", name: "Aspear Berry", eggGroups: ["Water 1", "Water 2"],   iconSlug: "aspear-berry" },
+  { id: "persim-berry", name: "Persim Berry", eggGroups: ["Mineral", "Amorphous"], iconSlug: "persim-berry" },
+  { id: "lum-berry",    name: "Lum Berry",    eggGroups: ["Dragon", "Monster"],    iconSlug: "lum-berry"    },
+  // 1.8: Eggant is a real 10x Ditto egg-group bait (spawn_bait_effects/eggant_berry.json)
+  { id: "eggant-berry", name: "Eggant Berry", eggGroups: ["Ditto"],                iconSlug: "eggant-berry" },
 ].map((b) => ({
   ...b,
   category: SEASONING_CATEGORY.EGG_GROUP,
@@ -71,9 +78,10 @@ export const RARITY_SHINY_BERRIES = [
     rarityTiers: 1,
     shinyMultiplier: 2,
     iconSlug: null,
-    mcItemId: null,
+    mcItemId: "golden_apple",
     emoji: "🍎",
-    effect: "Reduces bite time to 0 · +1 rarity tier · 2x shiny chance",
+    // bite_time 0.75 = 75% reduction; shiny_reroll value 1 → 2x total
+    effect: "Reduces bite time by 75% · +1 rarity tier · 2x shiny chance",
   },
   {
     id: "enchanted-golden-apple",
@@ -84,7 +92,8 @@ export const RARITY_SHINY_BERRIES = [
     iconSlug: null,
     mcItemId: "enchanted_golden_apple",
     emoji: "✨🍎",
-    effect: "Reduces bite time to 0 · +10 rarity tiers · 10x shiny chance",
+    // bite_time 1.0 = 100%; shiny_reroll value 9 → 10x total
+    effect: "Reduces bite time by 100% · +10 rarity tiers · 10x shiny chance",
   },
   {
     id: "golden-carrot",
@@ -119,22 +128,7 @@ export const RARITY_SHINY_BERRIES = [
   },
 ];
 
-// ── EV yield berries ──────────────────────────────────────────────────────────
-//
-// IMPORTANT: `stat` must match what usePokedexSearch returns after normalizing
-// PokeAPI stat names. PokeAPI uses "special-attack" / "special-defense"
-// (hyphens, American spelling). normalizeStatName() converts them to
-// underscores + British spelling to match Cobblemon's internal format:
-//   "special-attack"  → "special_attack"
-//   "special-defense" → "special_defence"   ← note British spelling
-//   "defense"         → "defence"
-//
-// The `stat` values here MUST use the post-normalization format (underscores,
-// British spelling) so EV_YIELD_BERRIES.find(b => b.stat === ev.stat) matches.
-//
-// Previous values were "special-attack" / "special-defense" (raw PokeAPI
-// format) which never matched the normalized ev.stat coming from the hook,
-// causing the wrong berry to be recommended for all Sp.Atk/Sp.Def Pokémon.
+// EV yield berries — `stat` must match normalized PokeAPI names used by usePokedexSearch
 export const EV_YIELD_BERRIES = [
   { id: "pomeg-berry",  name: "Pomeg Berry",  stat: "hp",              statLabel: "HP",      iconSlug: "pomeg-berry"  },
   { id: "kelpsy-berry", name: "Kelpsy Berry", stat: "attack",          statLabel: "Attack",  iconSlug: "kelpsy-berry" },
@@ -161,14 +155,14 @@ export const OTHER_BERRIES = [
     name: "Kee Berry",
     category: SEASONING_CATEGORY.GENDER,
     iconSlug: "kee-berry",
-    effect: "+25% chance of a female Pokémon",
+    effect: "25% chance to force female",
   },
   {
     id: "maranga-berry",
     name: "Maranga Berry",
     category: SEASONING_CATEGORY.GENDER,
     iconSlug: "maranga-berry",
-    effect: "+25% chance of a male Pokémon",
+    effect: "25% chance to force male",
   },
   {
     id: "leppa-berry",
@@ -177,13 +171,55 @@ export const OTHER_BERRIES = [
     iconSlug: "leppa-berry",
     effect: "+5 spawn level",
   },
+  // 1.8 CHANGE: Hopo no longer boosts level — alpha_chance 2%
   {
     id: "hopo-berry",
     name: "Hopo Berry",
-    category: SEASONING_CATEGORY.LEVEL,
+    category: SEASONING_CATEGORY.ALPHA,
     iconSlug: "hopo-berry",
-    effect: "+10 spawn level",
+    effect: "2% chance to attract an Alpha Pokémon",
   },
+  // 1.8: mark_chance value 5
+  {
+    id: "micle-berry",
+    name: "Micle Berry",
+    category: SEASONING_CATEGORY.MARK,
+    iconSlug: "micle-berry",
+    effect: "+5 mark chance on the lure",
+  },
+  // 1.8: size +50 / -50
+  {
+    id: "jaboca-berry",
+    name: "Jaboca Berry",
+    category: SEASONING_CATEGORY.SIZE,
+    iconSlug: "jaboca-berry",
+    effect: "Modify size by +50%",
+  },
+  {
+    id: "rowap-berry",
+    name: "Rowap Berry",
+    category: SEASONING_CATEGORY.SIZE,
+    iconSlug: "rowap-berry",
+    effect: "Modify size by −50%",
+  },
+  // 1.8: drops_reroll (was bite/reel in older data)
+  {
+    id: "custap-berry",
+    name: "Custap Berry",
+    category: SEASONING_CATEGORY.DROPS,
+    iconSlug: "custap-berry",
+    effect: "1× drops reroll",
+  },
+  {
+    id: "sweet-heart",
+    name: "Sweet Heart",
+    category: SEASONING_CATEGORY.FRIENDSHIP,
+    iconSlug: null,
+    mcItemId: null,
+    emoji: "💛",
+    effect: "+35 base friendship on lure",
+  },
+  // bite_time values are fractions reduced (0.25 = 25% faster bites)
   {
     id: "sweet-berries",
     name: "Sweet Berries",
@@ -191,35 +227,39 @@ export const OTHER_BERRIES = [
     iconSlug: null,
     mcItemId: "sweet_berries",
     emoji: "🫐",
-    effect: "Reduces bite time to 0",
+    effect: "Reduces bite time by 25%",
+  },
+  {
+    id: "glow-berries",
+    name: "Glow Berries",
+    category: SEASONING_CATEGORY.BITE_SPEED,
+    iconSlug: null,
+    mcItemId: "glow_berries",
+    emoji: "✨",
+    effect: "Reduces bite time by 33%",
   },
   {
     id: "oran-berry",
     name: "Oran Berry",
     category: SEASONING_CATEGORY.BITE_SPEED,
     iconSlug: "oran-berry",
-    effect: "Reduces bite time to 0",
+    effect: "Reduces bite time by 33%",
+  },
+  {
+    id: "apple",
+    name: "Apple",
+    category: SEASONING_CATEGORY.BITE_SPEED,
+    iconSlug: null,
+    mcItemId: "apple",
+    emoji: "🍎",
+    effect: "Reduces bite time by 50%",
   },
   {
     id: "sitrus-berry",
     name: "Sitrus Berry",
     category: SEASONING_CATEGORY.BITE_SPEED,
     iconSlug: "sitrus-berry",
-    effect: "Reduces bite time to 0",
-  },
-  {
-    id: "custap-berry",
-    name: "Custap Berry",
-    category: SEASONING_CATEGORY.BITE_SPEED,
-    iconSlug: "custap-berry",
-    effect: "Reduces bite time to 0 · 70% chance to reel in a Pokémon",
-  },
-  {
-    id: "micle-berry",
-    name: "Micle Berry",
-    category: SEASONING_CATEGORY.BITE_SPEED,
-    iconSlug: "micle-berry",
-    effect: "Reduces bite time to 0 · 100% chance to reel in a Pokémon",
+    effect: "Reduces bite time by 50%",
   },
 ];
 
@@ -234,8 +274,8 @@ export const ALL_SEASONINGS = [
 export const MAX_SEASONING_SLOTS = 3;
 
 export const BASE_RECIPE = [
-  { id: "milk",         name: "Milk (or Moomoo Milk)", mcItemId: "milk_bucket",  emoji: "🥛", slots: [0, 1, 2] },
-  { id: "honey-bottle", name: "Honey Bottle",          mcItemId: "honey_bottle", emoji: "🍯", slots: [3, 5]    },
-  { id: "vivichoke",    name: "Vivichoke",              mcItemId: null,           emoji: "🌱", slots: [4]       },
-  { id: "hearty-grains",name: "Hearty Grains",         mcItemId: null,           emoji: "🌾", slots: [6, 7, 8] },
+  { id: "milk",          name: "Milk (or Moomoo Milk)", mcItemId: "milk_bucket",  emoji: "🥛", slots: [0, 1, 2] },
+  { id: "honey-bottle",  name: "Honey Bottle",         mcItemId: "honey_bottle", emoji: "🍯", slots: [3, 5]    },
+  { id: "vivichoke",     name: "Vivichoke",            mcItemId: null,           emoji: "🌱", slots: [4]       },
+  { id: "hearty-grains", name: "Hearty Grains",        mcItemId: null,           emoji: "🌾", slots: [6, 7, 8] },
 ];

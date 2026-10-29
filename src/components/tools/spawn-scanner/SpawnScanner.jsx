@@ -36,9 +36,10 @@ const RARITY_TONE = {
 const TABLE_COLUMNS = [
   { key: "pokemon", label: "Pokémon" },
   { key: "bucket", label: "Rarity" },
+  { key: "spawnType", label: "Type" },
   { key: "level", label: "Level" },
   { key: "weight", label: "Weight" },
-  { key: "spawnablePositionType", label: "Spawnable Position Type" },
+  { key: "spawnablePositionType", label: "Position" },
   { key: "presets", label: "Presets" },
   { key: "biomes", label: "Biomes" },
   { key: "dimensions", label: "Dimensions" },
@@ -46,6 +47,16 @@ const TABLE_COLUMNS = [
   { key: "neededNearbyBlocks", label: "Nearby Blocks" },
   { key: "neededBaseBlocks", label: "Base Blocks" },
   { key: "labels", label: "Labels" },
+  { key: "markers", label: "Markers" },
+  { key: "isPokeSnack", label: "Poké Snack" },
+  { key: "isLeader", label: "Herd leader" },
+  { key: "isFollower", label: "Herd follower" },
+  { key: "maxHerdSize", label: "Max herd" },
+  { key: "herdLevelRange", label: "Herd levels" },
+  { key: "memberMaxTimes", label: "Herd max times" },
+  { key: "levelRangeOffset", label: "Level offset" },
+  { key: "herdWeight", label: "Herd weight" },
+  { key: "spawnId", label: "Spawn ID" },
   { key: "canSeeSky", label: "Can See Sky" },
   { key: "isRaining", label: "Raining" },
   { key: "isThundering", label: "Thundering" },
@@ -154,10 +165,13 @@ const WIDE_COLUMN_KEYS = new Set([
 ]);
 
 function colWidth(key) {
-  if (key === "pokemon") return 190;
-  if (key === "biomes" || key === "antiBiomes") return 280;
-  if (WIDE_COLUMN_KEYS.has(key)) return 240;
-  return 130;
+  if (key === "pokemon") return 200;
+  if (key === "biomes" || key === "antiBiomes") return 320;
+  if (key === "spawnablePositionType") return 110;
+  if (key === "spawnType") return 120;
+  if (key === "bucket") return 110;
+  if (WIDE_COLUMN_KEYS.has(key)) return 260;
+  return 120;
 }
 
 export default function SpawnScanner() {
