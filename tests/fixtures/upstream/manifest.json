@@ -1,0 +1,42 @@
+{
+  "repository": "https://gitlab.com/cable-mc/cobblemon",
+  "version": "1.8.0",
+  "tag": "1.8.0",
+  "commit": "b33536e8721c9419d664fee15aa9e35cbf1900a8",
+  "tagEvidence": "https://gitlab.com/api/v4/projects/cable-mc%2Fcobblemon/repository/tags/1.8.0",
+  "attribution": "Cobblemon contributors; unmodified official repository files",
+  "files": [
+    {
+      "file": "0001_bulbasaur_herd.json",
+      "archivePath": "data/cobblemon/spawn_pool_world/herds/0001_bulbasaur_herd.json",
+      "sourcePath": "common/src/main/resources/data/cobblemon/spawn_pool_world/herds/0001_bulbasaur_herd.json",
+      "url": "https://gitlab.com/api/v4/projects/cable-mc%2Fcobblemon/repository/files/common%2Fsrc%2Fmain%2Fresources%2Fdata%2Fcobblemon%2Fspawn_pool_world%2Fherds%2F0001_bulbasaur_herd.json/raw?ref=b33536e8721c9419d664fee15aa9e35cbf1900a8",
+      "sha256": "6f87da65b66f60e1053bcc15f6f48e47839ea9b513596b0fa8c1bf376922f684",
+      "gitBlobSha1": "28a5565ce00c83066a590f65f398edd9f09b8f55"
+    },
+    {
+      "file": "0001_bulbasaur.json",
+      "archivePath": "data/cobblemon/spawn_pool_world/0001_bulbasaur.json",
+      "sourcePath": "common/src/main/resources/data/cobblemon/spawn_pool_world/0001_bulbasaur.json",
+      "url": "https://gitlab.com/api/v4/projects/cable-mc%2Fcobblemon/repository/files/common%2Fsrc%2Fmain%2Fresources%2Fdata%2Fcobblemon%2Fspawn_pool_world%2F0001_bulbasaur.json/raw?ref=b33536e8721c9419d664fee15aa9e35cbf1900a8",
+      "sha256": "c5a8980c109440efb5f3655ffb2a1a80acbcbe6831406e51dead593dcb685c79",
+      "gitBlobSha1": "d30cd844dcc44dfcba9c4cabcb52b8d1030a7580"
+    },
+    {
+      "file": "poke_bait.json",
+      "archivePath": "data/cobblemon/spawn_bait_effects/poke_bait.json",
+      "sourcePath": "common/src/main/resources/data/cobblemon/spawn_bait_effects/poke_bait.json",
+      "url": "https://gitlab.com/api/v4/projects/cable-mc%2Fcobblemon/repository/files/common%2Fsrc%2Fmain%2Fresources%2Fdata%2Fcobblemon%2Fspawn_bait_effects%2Fpoke_bait.json/raw?ref=b33536e8721c9419d664fee15aa9e35cbf1900a8",
+      "sha256": "35e25792ef3cded47332c1cc38b74121cf803e8a8815773003fb07452d2c8bdb",
+      "gitBlobSha1": "13d10c8cf478365a545bd3cce792e6763a7add20"
+    },
+    {
+      "file": "sweet_heart.json",
+      "archivePath": "data/cobblemon/spawn_bait_effects/sweet_heart.json",
+      "sourcePath": "common/src/main/resources/data/cobblemon/spawn_bait_effects/sweet_heart.json",
+      "url": "https://gitlab.com/api/v4/projects/cable-mc%2Fcobblemon/repository/files/common%2Fsrc%2Fmain%2Fresources%2Fdata%2Fcobblemon%2Fspawn_bait_effects%2Fsweet_heart.json/raw?ref=b33536e8721c9419d664fee15aa9e35cbf1900a8",
+      "sha256": "e632382b898c5dd66ab0f30938303defc9a083949c962a5e129af93e0d891a30",
+      "gitBlobSha1": "d2f947565c8db8daa9c73339ef5a81f2dae6abc2"
+    }
+  ]
+}

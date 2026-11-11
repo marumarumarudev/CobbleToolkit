@@ -1,3 +1,29 @@
+// Objects merge recursively; arrays and scalar values (including null) replace.
+export function mergeSpeciesJson(base, patch) {
+  if (!patch || typeof patch !== "object" || Array.isArray(patch)) return patch;
+  const result = { ...(base && typeof base === "object" && !Array.isArray(base) ? base : {}) };
+  for (const key of Object.keys(patch)) {
+    Object.defineProperty(result, key, {
+      value: mergeSpeciesJson(result[key], patch[key]),
+      enumerable: true, configurable: true, writable: true,
+    });
+  }
+  return result;
+}
+
+export function mergeSpeciesEntries(base, patch) {
+  if (!base || !patch.isAddition) return patch;
+  const result = { ...base };
+  for (const field of patch.speciesFields || []) {
+    result[field] = ["stats", "evYield", "riding"].includes(field)
+      ? mergeSpeciesJson(base[field], patch[field]) : patch[field];
+  }
+  result.ridingSources = [...(base.ridingSources || []), ...(patch.ridingSources || [])];
+  result.mountDataVersion = patch.mountDataVersion;
+  result.speciesFields = [...new Set([...(base.speciesFields || []), ...(patch.speciesFields || [])])];
+  return result;
+}
+
 /**
  * Joins parsed species entries (speciesSpawnParser) with parsed loot entries
  * (lootParser) by Pokémon name. Both parsers already lowercase/trim `name`,
@@ -23,9 +49,10 @@ export function mergeSpeciesAndLoot(species = [], lootReports = []) {
   }
 
   const speciesByName = new Map();
-  for (const mon of species) {
+  for (const mon of [...species.filter((mon) => !mon?.isAddition), ...species.filter((mon) => mon?.isAddition)]) {
     if (!mon?.name) continue;
-    speciesByName.set(mon.name.toLowerCase().trim(), mon);
+    const key = mon.name.toLowerCase().trim();
+    speciesByName.set(key, mergeSpeciesEntries(speciesByName.get(key), mon));
   }
 
   const allNames = new Set([...speciesByName.keys(), ...lootByName.keys()]);
@@ -42,6 +69,9 @@ export function mergeSpeciesAndLoot(species = [], lootReports = []) {
       moves: spec?.moves ?? [],
       sourceFile: spec?.sourceFile ?? null,
       hasSpeciesData: Boolean(spec),
+      riding: spec?.riding ?? null,
+      ridingSources: spec?.ridingSources ?? [],
+      mountDataVersion: spec?.mountDataVersion ?? null,
       drops,
       hasLootData: drops.length > 0,
     };

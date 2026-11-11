@@ -1,171 +1,140 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-} from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import toast from "react-hot-toast";
 import { validateFileStructure } from "@/utils/fileValidation";
-import {
-  SCANNER_NAMES,
-  TOOL_DATA_STORES,
-  SHARED_FILES_CHANGED_EVENT,
-} from "@/utils/toolDataStores";
+import getStorage from "@/utils/indexedDBStorage";
+import { createScannerCoordinator } from "@/utils/scannerCoordinator";
+import { restoreSharedFiles, storageFailureMessage } from "@/utils/archiveAvailability";
+import { createSharedFilesSync } from "@/utils/sharedFilesSync";
 
 const SharedFilesContext = createContext(null);
 
-
 export function SharedFilesProvider({ children }) {
   const [sharedFiles, setSharedFiles] = useState([]);
+  const [filesReady, setFilesReady] = useState(false);
+    const [storageNotice, setStorageNotice] = useState(null);
+  const [lifecycleVersion, setLifecycleVersion] = useState(0);
+  const filesRef = useRef([]);
+  const hydratedRef = useRef(false);
+  const cancellations = useRef(new Set());
+  const syncRef = useRef(null);
+  const coordinatorRef = useRef(null);
+  if (!coordinatorRef.current) coordinatorRef.current = createScannerCoordinator();
+  const { enqueue: enqueueMutation, getGeneration, invalidate } = coordinatorRef.current;
 
-  // Load shared files metadata from IndexedDB on mount
+  const publish = useCallback((files) => {
+    filesRef.current = files;
+    setSharedFiles(files);
+  }, []);
+  const invalidateScans = useCallback(() => {
+    invalidate();
+    cancellations.current.forEach((cancel) => cancel());
+    setLifecycleVersion((version) => version + 1);
+  }, [invalidate]);
+  const registerCancellation = useCallback((cancel) => {
+    cancellations.current.add(cancel);
+    return () => cancellations.current.delete(cancel);
+  }, []);
+  const notifyCommitted = useCallback(() => syncRef.current?.publish("changed"), []);
+
   useEffect(() => {
-    const loadSharedFiles = async () => {
-      try {
-        const { default: getStorage } = await import(
-          "@/utils/indexedDBStorage"
-        );
-        const storage = getStorage();
-        const savedMetadata = await storage.loadData("sharedFiles");
-
-        if (savedMetadata && savedMetadata.length > 0) {
-          setSharedFiles(
-            savedMetadata.map((meta) => ({ ...meta, file: null }))
-          );
-        }
-      } catch (err) {
-        console.error("Failed to load shared files:", err);
-      }
+    let active = true;
+    const refresh = () => enqueueMutation(async () => {
+      const files = await getStorage().loadSharedArchives();
+      if (!active) return;
+      publish(restoreSharedFiles(files));
+      hydratedRef.current = true;
+      setFilesReady(true);
+    }).catch((err) => {
+      if (!active) return;
+      console.error("Failed to load shared archives:", err);
+      toast.error("Failed to load shared archives. Check browser storage and reload.");
+    });
+    const onRemoteChange = () => {
+      invalidateScans();
+      refresh();
     };
+    const onStorageBlocked = (event) => setStorageNotice(event.detail
+          ? "Close other CobbleToolkit tabs to finish upgrading browser storage. Saved data will be retained; this tab will continue automatically."
+          : null);
+        window.addEventListener("cobbletoolkit:storage-blocked", onStorageBlocked);
+        const sync = createSharedFilesSync(onRemoteChange, window);
+    syncRef.current = sync;
+    // Also recover from missed notifications (suspended tabs / unavailable channel).
+    window.addEventListener("focus", onRemoteChange);
+    refresh();
+    return () => {
+      active = false;
+      sync.close();
+      syncRef.current = null;
+      window.removeEventListener("focus", onRemoteChange);
+            window.removeEventListener("cobbletoolkit:storage-blocked", onStorageBlocked);
+    };
+  }, [enqueueMutation, invalidateScans, publish]);
 
-    loadSharedFiles();
-  }, []);
-
-  // Save shared files metadata to IndexedDB
-  const saveSharedFiles = useCallback(async (files) => {
-    try {
-      const { default: getStorage } = await import("@/utils/indexedDBStorage");
-      const storage = getStorage();
-
-      // Save metadata only (File objects can't be serialized)
-      const metadata = files.map(({ id, name, size, uploadedAt }) => ({
-        id,
-        name,
-        size,
-        uploadedAt,
-      }));
-
-      await storage.saveData("sharedFiles", metadata);
-      setSharedFiles(files);
-    } catch (err) {
-      console.error("Failed to save shared files:", err);
-      toast.error("Failed to save shared files");
-    }
-  }, []);
-
-  const addSharedFile = useCallback(
-    async (file) => {
-      if (!file) return;
-
-      // Validate file structure before adding
-      toast.loading(`Validating "${file.name}"...`, {
-        id: `validate-${file.name}`,
-      });
-      const validation = await validateFileStructure(file);
-
-      if (!validation.valid) {
-        toast.error(validation.reason, { id: `validate-${file.name}` });
-        return;
-      }
-
-      const newFile = {
-        id: crypto.randomUUID(),
-        file,
-        name: file.name,
-        size: file.size,
-        uploadedAt: Date.now(),
-      };
-
-      const updated = [...sharedFiles, newFile];
-      await saveSharedFiles(updated);
-      const supports = validation.labels?.length
-        ? ` — supports ${validation.labels.join(", ")}`
-        : "";
-      toast.success(`✅ Added "${file.name}"${supports}`, {
-        id: `validate-${file.name}`,
-      });
-    },
-    [sharedFiles, saveSharedFiles]
-  );
-
-  const removeSharedFile = useCallback(
-    async (fileId) => {
-      const removedFile = sharedFiles.find((f) => f.id === fileId);
-      const updated = sharedFiles.filter((f) => f.id !== fileId);
-      await saveSharedFiles(updated);
-
-      // Purge this file's contribution from every tool's parsed data, and
-      // forget it was "processed" so re-adding the same file re-parses it.
+  const addSharedFile = useCallback((file, { allowRepairs = false } = {}) => {
+    if (!file) return Promise.resolve(false);
+    return enqueueMutation(async () => {
+      const toastId = `validate-${crypto.randomUUID()}`;
+      toast.loading(`Validating "${file.name}"...`, { id: toastId });
       try {
-        const { default: getStorage } = await import("@/utils/indexedDBStorage");
-        const storage = getStorage();
-
-        if (removedFile) {
-          await Promise.all([
-            ...TOOL_DATA_STORES.map(({ store, matchesFile }) =>
-              storage.removeMatchingEntries(store, (item) =>
-                matchesFile(item, removedFile.name)
-              )
-            ),
-            ...SCANNER_NAMES.map((scannerName) =>
-              storage.unmarkFileProcessed(scannerName, fileId)
-            ),
-          ]);
+        if (!hydratedRef.current) throw new Error("Shared files have not loaded");
+        if (file.size > 128 * 1024 ** 2) throw Object.assign(new Error("Archive exceeds 128 MiB. Choose a smaller archive."), { name: "ArchiveLimitError" });
+        const validation = await validateFileStructure(file);
+        if (!validation.valid) {
+          toast.error(validation.reason, { id: toastId });
+          return false;
         }
+        const digest = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
+        const contentHash = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+        const existing = filesRef.current.find((entry) => entry.contentHash === contentHash && entry.allowRepairs === allowRepairs);
+        await getStorage().persistSharedArchive({
+          id: crypto.randomUUID(), name: file.name, size: file.size,
+          uploadedAt: Date.now(), contentHash, allowRepairs,
+        }, file);
+        publish(restoreSharedFiles(await getStorage().loadSharedArchives()));
+        notifyCommitted();
+        toast.success(existing ? `Reconnected "${existing.name}" — saved results retained` : `Saved "${file.name}" in this browser`, { id: toastId });
+        return true;
       } catch (err) {
-        console.error("Failed to purge tool data for removed file:", err);
+        console.error("Failed to add shared archive:", err);
+        toast.error(storageFailureMessage(err, `save "${file.name}"`), { id: toastId });
+        return false;
       }
+    });
+  }, [enqueueMutation, publish, notifyCommitted]);
 
-      window.dispatchEvent(new CustomEvent(SHARED_FILES_CHANGED_EVENT));
-      toast.success("File removed — its data was cleared from every tool");
-    },
-    [sharedFiles, saveSharedFiles]
-  );
+  const purge = useCallback((fileId) => {
+    invalidateScans();
+    syncRef.current?.publish("invalidate");
+    return enqueueMutation(async () => {
+      try {
+        if (!hydratedRef.current) throw new Error("Shared files have not loaded");
+        await getStorage().purgeSharedFiles(fileId);
+        publish(restoreSharedFiles(await getStorage().loadSharedArchives()));
+        toast.success(fileId === null ? "All archives and tool data cleared" : "Archive and its results removed from every tool");
+        return true;
+      } catch (err) {
+        console.error("Failed to purge shared files:", err);
+        toast.error("Could not clear file data. Try again; no success was confirmed.");
+        return false;
+      } finally {
+        setLifecycleVersion((version) => version + 1);
+        notifyCommitted();
+      }
+    });
+  }, [enqueueMutation, invalidateScans, notifyCommitted, publish]);
 
-  const clearSharedFiles = useCallback(async () => {
-    try {
-      const { default: getStorage } = await import("@/utils/indexedDBStorage");
-      const storage = getStorage();
-
-      await Promise.all([
-        storage.clearStore("sharedFiles"),
-        ...TOOL_DATA_STORES.map(({ store }) => storage.clearStore(store)),
-        ...SCANNER_NAMES.map((scannerName) =>
-          storage.clearProcessedFiles(scannerName)
-        ),
-      ]);
-
-      setSharedFiles([]);
-      window.dispatchEvent(new CustomEvent(SHARED_FILES_CHANGED_EVENT));
-      toast.success("All shared files and tool data cleared");
-    } catch (err) {
-      console.error("Failed to clear shared files:", err);
-      toast.error("Failed to clear shared files");
-    }
-  }, []);
+  const removeSharedFile = useCallback((fileId) => purge(fileId), [purge]);
+  const clearSharedFiles = useCallback(() => purge(null), [purge]);
 
   return (
-    <SharedFilesContext.Provider
-      value={{
-        sharedFiles,
-        addSharedFile,
-        removeSharedFile,
-        clearSharedFiles,
-      }}
-    >
+    <SharedFilesContext.Provider value={{
+      sharedFiles, filesReady, lifecycleVersion, getGeneration, enqueueMutation,
+      registerCancellation, notifyCommitted, addSharedFile, removeSharedFile, clearSharedFiles,
+    }}>
+      {storageNotice && <div role="status" className="border-b border-border bg-bg-surface-2 px-4 py-3 text-sm text-text-primary">{storageNotice}</div>}
       {children}
     </SharedFilesContext.Provider>
   );
@@ -173,8 +142,6 @@ export function SharedFilesProvider({ children }) {
 
 export function useSharedFiles() {
   const context = useContext(SharedFilesContext);
-  if (!context) {
-    throw new Error("useSharedFiles must be used within SharedFilesProvider");
-  }
+  if (!context) throw new Error("useSharedFiles must be used within SharedFilesProvider");
   return context;
 }

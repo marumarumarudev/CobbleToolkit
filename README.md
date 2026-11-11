@@ -1,6 +1,6 @@
 # 🧰 CobbleToolkit
 
-Browser-based tools for digging through **Cobblemon** and **Cobbleverse RCT** datapacks so you don't have to open a single `.json` file yourself. Everything runs entirely client-side — drop a datapack in, and it never leaves your tab. No backend, no account, no upload.
+Browser-based tools for digging through **Cobblemon** and **Cobbleverse RCT** datapacks so you don't have to open a single `.json` file yourself. Datapack processing runs client-side — your datapacks are never uploaded. External species lookups, images, video, and comments use third-party services.
 
 ## ⚙️ Tools
 
@@ -16,9 +16,9 @@ Pick a species, see its base stats and moveset right next to its loot table. One
 
 Built for Cobbleverse RCT trainers specifically. Team, AI config, and battle rules — plus fully resolved loot tables, including nested `generic/**` pools flattened all the way down to the actual items. Catches cycles and missing table references instead of silently breaking on them. Search covers trainer names, team species, and resolved loot items.
 
-### 🍡 Pokésnack Maker
+### 🍲 Campfire Kitchen
 
-Pick a species and a target rarity (and optionally a goal — efficient, max shiny, hidden ability), get back up to 3 seasonings that actually make sense for that target instead of a copy-paste combo. Recommended cards are interactive — click one to swap it for another valid option when a species has more than one good fit (dual types, multiple EV yields, etc).
+Plan up to three seasonings for Poké Snacks or fishing Poké Bait. Pick a species, rarity bucket, and goal; cycle available alternatives from a recommendation card or the matching pot slot. The old `/pokesnack-maker/` URL remains supported.
 
 ### ❓ FAQ
 
@@ -34,7 +34,7 @@ I kept needing to answer questions like "what actually drops from this trainer" 
 - [React](https://reactjs.org/) + [Tailwind CSS](https://tailwindcss.com/)
 - [JSZip](https://stuk.github.io/jszip/) for reading datapack archives in-browser
 - [@tanstack/react-virtual](https://tanstack.com/virtual) for scanning huge tables without melting your browser
-- IndexedDB for local storage — nothing is ever sent anywhere
+- IndexedDB (schema v7) for local archives, file metadata, committed parsed results, and bounded parsing diagnostics
 
 ## 🚀 Live
 
@@ -43,8 +43,24 @@ Hosted on GitHub Pages: **https://marumarumarudev.github.io/CobbleToolkit/**
 ## 📦 Using it
 
 1. Open the tool you need and drop in a `.zip` or `.jar` datapack (or use the upload button in the nav — files are shared across tools).
-2. Search, sort, and click around. Every tool remembers what you've uploaded between visits (IndexedDB, not localStorage).
-3. That's it. No export step, no config.
+2. New uploads use strict JSON by default. **Upload File** offers an optional compatibility-repair checkbox for malformed JSON. Repair is heuristic and may alter values; parsing diagnostics are saved and bounded. Existing legacy entries retain their old compatibility behavior.
+3. Archives, metadata, and committed parsed results are saved in IndexedDB (v7), with a 128 MiB limit per archive and a 256 MiB total stored-archive limit. Saved archives can be used by other scanners after a refresh, but browser storage is not a backup: the browser may evict it, and clearing site data removes everything.
+4. Re-uploading identical content (SHA-256) with the same repair policy automatically reconnects to the existing entry ID and results, even if the file was renamed. Different content or a different repair policy creates a separate entry. Legacy metadata without a fingerprint cannot safely reconnect by filename: uploading creates a new entry and retains the old cached results.
+5. Older entries whose archive blobs are missing still show “Archive unavailable — re-upload to scan in another tool”. Their cached results remain usable. Removing an archive atomically removes its associated reports too.
+6. Changes sync across tabs using BroadcastChannel, with a storage-event fallback and a refresh when the tab regains focus.
+
+## 🧪 Development checks
+
+- `npm test` — run the test suite.
+- `npm run lint` — run lint checks.
+- `npm run build` — build the static export.
+- `npm run test:browser` — Chromium acceptance tests at desktop and mobile viewport sizes, using a managed local static server. First run `npx playwright install chromium` and `npm run build`. External services are stubbed during tests.
+
+Parsing also limits archives to 50,000 entries, 512 MiB declared uncompressed data, 10 MiB per JSON entry, and 500,000 emitted rows. Species & Loot reuse one archive load per scan. Cancellation stops work at processing checkpoints; JSZip's internal load and individual extraction cannot be interrupted mid-operation.
+
+Verified upstream regression fixtures are pinned to Cobblemon **1.8.0**, commit `b33536e8721c9419d664fee15aa9e35cbf1900a8`. Source URLs and hashes are recorded in `tests/fixtures/upstream/manifest.json`. These samples do not establish full compatibility with every server datapack.
+
+Schema v7 upgrades preserve existing caches. If an older tab blocks upgrading, close that tab when prompted; do not delete browser storage. A rollback build must retain v7 storage compatibility rather than attempting to reopen the database at v6.
 
 ## ⚠️ Disclaimer
 

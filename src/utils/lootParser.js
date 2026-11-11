@@ -1,5 +1,6 @@
-import JSZip from "jszip";
-import { parseJsonWithFallbacks } from "@/utils/parseJson";
+import { loadArchive, readArchiveText, createProcessingContext, rethrowProcessingError } from "./archiveProcessing.js";
+import { parseJsonWithFallbacks } from "./parseJson.js";
+import { indexDatapackArchive } from "./archivePaths.js";
 
 const DEBUG =
   typeof process !== "undefined" && process.env.NODE_ENV === "development";
@@ -47,41 +48,47 @@ function extractLootFallback(content) {
   return fallbackJson;
 }
 
-export async function parseLootFromZip(file) {
+export async function parseLootFromZip(file, options = {}) {
+  const { onDiagnostic = () => {} } = options;
+  const processing = createProcessingContext(options);
+  const buildDrops = async (entries) => {
+    const drops = [];
+    for (const entry of entries) {
+      await processing.checkpoint();
+      processing.row();
+      drops.push({ item: entry.item || "unknown_item", quantity: entry.quantityRange || 1, chance: entry.percentage });
+    }
+    return drops;
+  };
   try {
-    const zip = await JSZip.loadAsync(file);
+    const zip = indexDatapackArchive(await loadArchive(file, options), options);
     const results = [];
     let successCount = 0;
     let errorCount = 0;
 
-    const speciesFiles = Object.keys(zip.files).filter((rawPath) => {
-      const normalized = rawPath.replace(/\\/g, "/");
-      const dataIndex = normalized.indexOf("data/");
-      if (dataIndex === -1) return false;
-      const rel = normalized.slice(dataIndex);
-      return /^data\/[^/]+\/(species|species_additions)\/.+\.json$/.test(rel);
-    });
+    const speciesFiles = Object.keys(zip.files).filter((path) =>
+      /^data\/[^/]+\/(species|species_additions)\/.+\.json$/.test(path),
+    );
 
     for (const path of speciesFiles) {
+      await processing.checkpoint();
       try {
         const zipEntry = zip.files[path];
-        if (!zipEntry || zipEntry._data?.uncompressedSize === 0) continue;
+        if (!zipEntry) continue;
 
-        const jsonStr = await zipEntry.async("string");
+        const jsonStr = await readArchiveText(zipEntry, options);
         const data = parseJsonWithFallbacks(jsonStr, path, {
+          ...options,
           extractFallback: extractLootFallback,
         });
 
         if (data && (data.name || data.target)) {
           const displayName =
             data.name || (data.target ? data.target.split(":").pop() : null);
-          const baseDrops = (data?.drops?.entries || []).map((entry) => ({
-            item: entry.item || "unknown_item",
-            quantity: entry.quantityRange || 1,
-            chance: entry.percentage,
-          }));
+          const baseDrops = await buildDrops(data?.drops?.entries || []);
 
           const pushEntry = (pokemonName, drops) => {
+            processing.row();
             results.push({
               name: pokemonName || "unknown_pokemon",
               namespace: path.split("/")[1],
@@ -98,12 +105,9 @@ export async function parseLootFromZip(file) {
           if (Array.isArray(data.forms)) {
             const baseName = (displayName || "").toLowerCase().trim();
             for (const form of data.forms) {
+              await processing.checkpoint();
               try {
-                const formDrops = (form?.drops?.entries || []).map((entry) => ({
-                  item: entry.item || "unknown_item",
-                  quantity: entry.quantityRange || 1,
-                  chance: entry.percentage,
-                }));
+                const formDrops = await buildDrops(form?.drops?.entries || []);
                 if (formDrops.length === 0) continue;
 
                 const lowerAspects = (form.aspects || []).map((a) =>
@@ -127,27 +131,23 @@ export async function parseLootFromZip(file) {
                 const formName = `${adjective} ${baseName}`.trim();
                 pushEntry(formName, formDrops);
               } catch (formErr) {
+                rethrowProcessingError(formErr);
+                onDiagnostic({ path, code: "invalid-form", message: formErr.message });
                 errorCount++;
                 logWarn(`Failed to process form drops for ${path}`, formErr);
               }
             }
           }
 
-          if (
-            baseDrops.length === 0 &&
-            (!Array.isArray(data.forms) ||
-              data.forms.every(
-                (f) => !f?.drops?.entries || f.drops.entries.length === 0,
-              ))
-          ) {
-            errorCount++;
-            logWarn(`Skipping ${path} - no valid drops found`);
-          }
+
         } else {
           errorCount++;
+          if (data) onDiagnostic({ path, code: "invalid-structure", message: "Missing valid species identity." });
           logWarn(`Skipping ${path} - no valid data extracted`);
         }
       } catch (err) {
+        rethrowProcessingError(err);
+        onDiagnostic({ path: typeof path === "string" ? path : file.name, code: "processing-error", message: err.message });
         errorCount++;
         logWarn(`Failed to parse ${path}: ${err.message}`);
       }
@@ -158,6 +158,8 @@ export async function parseLootFromZip(file) {
     );
     return results;
   } catch (err) {
+        rethrowProcessingError(err);
+        onDiagnostic({ path: typeof path === "string" ? path : file.name, code: "processing-error", message: err.message });
     console.error(`Failed to process zip file ${file.name}:`, err);
     throw new Error(`Failed to process zip file: ${err.message}`);
   }

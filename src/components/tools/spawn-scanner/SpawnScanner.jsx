@@ -1,15 +1,19 @@
 "use client";
 
+import ScannerErrorNotice from "@/components/ScannerErrorNotice";
 import { useState, useEffect, useMemo } from "react";
 import { parseCobblemonZip } from "@/utils/spawnParser";
+import { createParseDiagnostics } from "@/utils/parseDiagnostics";
+import SpawnParseDiagnostics from "@/components/SpawnParseDiagnostics";
 import toast from "react-hot-toast";
 import { Search, X, SlidersHorizontal, Radar } from "lucide-react";
-import { useStorage, usePreferences } from "@/hooks/useStorage";
+import { usePreferences } from "@/hooks/useStorage";
 import { withBasePath } from "@/utils/basePath";
 import StorageInfo from "@/components/StorageInfo";
 import { formatPokemonName, matchesSearch } from "@/utils/nameUtils";
 import { useSharedFiles } from "@/contexts/SharedFilesContext";
-import { SHARED_FILES_CHANGED_EVENT } from "@/utils/toolDataStores";
+import { useScannerLifecycle } from "@/hooks/useScannerLifecycle";
+import ArchiveAvailabilityNotice from "@/components/ArchiveAvailabilityNotice";
 import {
   Card,
   CardBody,
@@ -22,6 +26,26 @@ import {
 } from "@/components/ui";
 
 const SCANNER_NAME = "spawnScanner";
+
+const SCANNER_CONFIG = {
+  scannerName: SCANNER_NAME,
+  storeNames: ["spawnReports"],
+  async parse(sharedFile, { signal } = {}) {
+    const collector = createParseDiagnostics();
+    const parsed = await parseCobblemonZip(sharedFile.file, { signal, allowRepair: sharedFile.allowRepairs ?? true, onDiagnostic: collector.record });
+    const diagnostics = collector.snapshot();
+    if (!parsed?.length && !diagnostics.total) return [];
+    const report = {
+      id: crypto.randomUUID(),
+      name: sharedFile.name,
+      sharedFileId: sharedFile.id,
+      data: parsed,
+      diagnostics,
+      fromShared: true,
+    };
+    return [{ storeName: "spawnReports", hasWarnings: diagnostics.total > 0, merge: (current) => [report, ...current] }];
+  },
+};
 
 const RARITY_ORDER = { common: 0, uncommon: 1, rare: 2, "ultra-rare": 3 };
 const RARITY_TONE = {
@@ -126,6 +150,10 @@ const TABLE_COLUMNS = [
   { key: "sourceFile", label: "Source File" },
 ];
 
+const ESSENTIAL_COLUMN_KEYS = new Set([
+  "pokemon", "bucket", "level", "weight", "spawnablePositionType", "biomes", "sourceFile",
+]);
+
 const SEARCH_FIELDS = [
   { value: "all", label: "All Fields" },
   ...TABLE_COLUMNS.filter((c) => c.key !== "weightMultipliers").map((c) => ({
@@ -175,12 +203,12 @@ function colWidth(key) {
 }
 
 export default function SpawnScanner() {
-  const [loading, setLoading] = useState(false);
   const [searchField, setSearchField] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [contextFilter, setContextFilter] = useState("all");
   const [showAdvanced, setShowAdvanced] = useState(false);
+    const [columnView, setColumnView] = useState("all");
 
   // Biome tags map loaded from BiomeTags.md — enables hover tooltips.
   const [biomeTagsMap, setBiomeTagsMap] = useState({});
@@ -223,15 +251,9 @@ export default function SpawnScanner() {
     return [];
   };
 
-  const {
-    data: fileReports,
-    setData: setFileReports,
-    saveData: saveReports,
-    loadData: reloadReports,
-  } = useStorage("spawnReports", []);
-  const { sharedFiles, addSharedFile } = useSharedFiles();
-  const [processedFiles, setProcessedFiles] = useState(new Set());
-  const [processedFilesLoaded, setProcessedFilesLoaded] = useState(false);
+  const { data, loading, unavailableFiles, error } = useScannerLifecycle(SCANNER_CONFIG);
+  const { spawnReports: fileReports } = data;
+  const { addSharedFile } = useSharedFiles();
 
   usePreferences("spawnScanner", { column: "pokemon", direction: "asc" });
 
@@ -295,109 +317,6 @@ export default function SpawnScanner() {
     };
   }, [biomeTagsLoaded]);
 
-  // Load processed-files tracking
-  useEffect(() => {
-    (async () => {
-      try {
-        const { default: getStorage } = await import(
-          "@/utils/indexedDBStorage"
-        );
-        const storage = getStorage();
-        setProcessedFiles(await storage.getProcessedFiles(SCANNER_NAME));
-      } catch (err) {
-        console.error("Failed to load processed files:", err);
-      } finally {
-        setProcessedFilesLoaded(true);
-      }
-    })();
-  }, []);
-
-  // The nav upload widget is the single place files/data get removed. When
-  // it removes a file or clears everything, refresh our data + processed
-  // set from IndexedDB so this view never shows stale rows.
-  useEffect(() => {
-    const handleFilesChanged = async () => {
-      await reloadReports();
-      try {
-        const { default: getStorage } = await import(
-          "@/utils/indexedDBStorage"
-        );
-        const storage = getStorage();
-        setProcessedFiles(await storage.getProcessedFiles(SCANNER_NAME));
-      } catch (err) {
-        console.error("Failed to refresh processed files:", err);
-      }
-    };
-    window.addEventListener(SHARED_FILES_CHANGED_EVENT, handleFilesChanged);
-    return () =>
-      window.removeEventListener(
-        SHARED_FILES_CHANGED_EVENT,
-        handleFilesChanged
-      );
-  }, [reloadReports]);
-
-  // Auto-process shared files
-  useEffect(() => {
-    const run = async () => {
-      if (!processedFilesLoaded || !sharedFiles.length || loading) return;
-
-      const unprocessed = sharedFiles.filter(
-        (sf) => sf.file && !processedFiles.has(sf.id)
-      );
-      if (!unprocessed.length) return;
-
-      setLoading(true);
-      const parsedReports = [];
-      const existingFileNames = new Set(fileReports.map((r) => r.name));
-      const { default: getStorage } = await import("@/utils/indexedDBStorage");
-      const storage = getStorage();
-
-      for (const sharedFile of unprocessed) {
-        if (existingFileNames.has(sharedFile.name)) {
-          await storage.markFileProcessed(SCANNER_NAME, sharedFile.id);
-          setProcessedFiles((prev) => new Set([...prev, sharedFile.id]));
-          continue;
-        }
-        try {
-          const parsed = await parseCobblemonZip(sharedFile.file);
-          if (parsed?.length) {
-            parsedReports.push({
-              id: crypto.randomUUID(),
-              name: sharedFile.name,
-              data: parsed,
-              fromShared: true,
-            });
-            existingFileNames.add(sharedFile.name);
-          }
-        } catch (err) {
-          console.error(`Failed to process ${sharedFile.name}:`, err);
-        }
-        await storage.markFileProcessed(SCANNER_NAME, sharedFile.id);
-        setProcessedFiles((prev) => new Set([...prev, sharedFile.id]));
-      }
-
-      if (parsedReports.length > 0) {
-        const updated = [...parsedReports, ...fileReports];
-        try {
-          await saveReports(updated);
-          setFileReports(updated);
-          toast.success(
-            `Processed ${parsedReports.length} shared file${
-              parsedReports.length === 1 ? "" : "s"
-            } for spawn data`
-          );
-        } catch (err) {
-          console.error("Failed to save spawn reports:", err);
-          setFileReports(updated);
-        }
-      }
-
-      setLoading(false);
-    };
-    run();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sharedFiles, processedFilesLoaded, loading]);
-
   // Debounced search
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(searchTerm), 300);
@@ -450,6 +369,11 @@ export default function SpawnScanner() {
     [fileReports]
   );
 
+  const pokemonEntryCount = useMemo(
+    () => new Set(allSpawnData.map((row) => row.pokemon).filter((value) => value !== null && value !== undefined && value !== "")).size,
+    [allSpawnData]
+  );
+
   const filteredData = useMemo(() => {
     return allSpawnData.filter((r) => {
       const matchesContext =
@@ -488,6 +412,7 @@ export default function SpawnScanner() {
   const visibleColumnDefs = useMemo(
     () =>
       TABLE_COLUMNS.filter(({ key }) =>
+        (columnView === "all" || ESSENTIAL_COLUMN_KEYS.has(key)) &&
         filteredData.some((d) => {
           const value = d[key];
           return Array.isArray(value)
@@ -497,7 +422,7 @@ export default function SpawnScanner() {
             : value !== null && value !== undefined && value !== "";
         })
       ),
-    [filteredData]
+    [filteredData, columnView]
   );
 
   // Show all tags. Row height is dynamic (DataTable measures each row), so
@@ -512,7 +437,7 @@ export default function SpawnScanner() {
           const isTagVisual =
             tok.startsWith("#") || /^[a-zA-Z_\s]+$/.test(tok);
           const chipClass = [
-            "max-w-full truncate whitespace-nowrap rounded px-1.5 py-0.5 text-[11px] leading-tight",
+            "max-w-full truncate whitespace-nowrap rounded px-1.5 py-0.5 text-xs leading-tight",
             isTagVisual
               ? "border border-accent/30 bg-accent-soft text-accent"
               : "bg-bg-surface-2 text-text-secondary",
@@ -571,6 +496,7 @@ export default function SpawnScanner() {
             key: col.key,
             label: col.label,
             width: colWidth(col.key),
+            wrap: true,
             sortValue: (row) => RARITY_ORDER[row.bucket] ?? 99,
             render: (row) => (
               <Badge tone={RARITY_TONE[row.bucket] || "neutral"}>
@@ -604,7 +530,7 @@ export default function SpawnScanner() {
             render: (row) => (
               <span
                 title={row.sourceFile}
-                className="font-mono text-[11px] text-text-muted leading-snug line-clamp-2 break-all"
+                className="font-mono text-xs text-text-secondary leading-snug line-clamp-2 break-all"
               >
                 {row.sourceFile}
               </span>
@@ -625,7 +551,7 @@ export default function SpawnScanner() {
                     <span
                       key={i}
                       title={weightMultiplierSummary(wm) || "(invalid)"}
-                      className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-[11px] text-text-secondary"
+                      className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-xs text-text-secondary"
                     >
                       {weightMultiplierSummary(wm) || "(invalid)"}
                     </span>
@@ -679,14 +605,24 @@ export default function SpawnScanner() {
 
   const clearSearch = () => {
     setSearchTerm("");
+    setDebouncedSearch("");
     setSearchField("all");
   };
 
+  const resetFilters = () => {
+    clearSearch();
+    setContextFilter("all");
+  };
+  const activeFilters = [
+    searchTerm ? `Search: “${searchTerm}”` : null,
+    searchField !== "all" ? `Field: ${SEARCH_FIELDS.find((field) => field.value === searchField)?.label}` : null,
+    contextFilter !== "all" ? `Position: ${contextFilter}` : null,
+  ].filter(Boolean);
   const hasData = fileReports.length > 0;
 
   return (
     <div
-      className="flex flex-col gap-6"
+      className="flex flex-col gap-4"
       onClick={() =>
         setHoverTooltip((prev) =>
           prev.pinned
@@ -695,7 +631,12 @@ export default function SpawnScanner() {
         )
       }
     >
-      <header>
+      <header className="dex-console">
+        <div className="dex-screen p-3 sm:p-4">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-text-secondary">
+          <span className="uppercase tracking-widest">Spawn data</span>
+          <span role="status">{loading ? "Scanning archives…" : error ? "Scanner needs attention" : hasData ? "Scan ready" : "Awaiting datapack"}</span>
+        </div>
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent-soft text-accent">
             <Radar size={16} />
@@ -705,10 +646,17 @@ export default function SpawnScanner() {
           </h1>
         </div>
         <p className="mt-1 text-sm text-text-secondary">
-          Inspect spawn pool entries — rarity, level, weight, and every spawn
-          condition — from an uploaded datapack.
+          Find spawns, compare weights, and check conditions in your datapack.
         </p>
-        <p className="mt-1 text-xs text-text-muted">
+        <dl aria-label="Dataset overview" className="mt-3 flex flex-wrap gap-x-6 gap-y-2 border-t border-border pt-2 text-text-primary">
+          <div className="flex items-baseline gap-2"><dd className="font-mono font-semibold">{allSpawnData.length.toLocaleString()}</dd><dt className="text-xs">Spawn entries</dt></div>
+          <div className="flex items-baseline gap-2" title="Distinct raw Pokémon values; forms and properties are not normalized into species."><dd className="font-mono font-semibold">{pokemonEntryCount.toLocaleString()}</dd><dt className="text-xs">Pokémon entries</dt></div>
+          <div className="flex items-baseline gap-2"><dd className="font-mono font-semibold">{fileReports.filter((report) => !report.error).length.toLocaleString()}</dd><dt className="text-xs">Sources</dt></div>
+        </dl>
+        </div>
+        <details className="mt-3 rounded-lg border border-border bg-bg-surface p-3 text-sm text-text-secondary">
+          <summary className="w-fit cursor-pointer hover:text-text-primary">About biome tags</summary>
+          <p className="mt-1 max-w-2xl leading-relaxed">
           Biome tags like{" "}
           <code className="font-mono text-accent">#cobblemon:is_arid</code>{" "}
           show their resolved biomes on hover. See the{" "}
@@ -718,24 +666,28 @@ export default function SpawnScanner() {
             rel="noopener noreferrer"
             className="text-accent hover:underline"
           >
-            full Cobblemon biome tag reference
+            Cobblemon 1.6.1 biome tag reference
           </a>
           .
-        </p>
+          </p>
+        </details>
       </header>
+      <ScannerErrorNotice error={error} />
+      <ArchiveAvailabilityNotice files={unavailableFiles} />
+      <SpawnParseDiagnostics reports={fileReports} />
 
       {!hasData && !loading && (
         <EmptyState
           icon={Radar}
-          title="No datapack loaded yet"
-          description="Drop a Cobblemon datapack .zip (or .jar) below, or use the upload button in the nav. This tool reads the spawn_pool_world/ folder."
+          title={unavailableFiles.length ? "Upload an archive again to scan here" : "No datapack loaded yet"}
+          description="Upload a Cobblemon datapack to read its spawn_pool_world/ folder."
           action={
             <FileDropzone
               accept=".zip,.jar"
               multiple
               onFiles={handleDroppedFiles}
               label="Drop your datapack here"
-              hint="ZIP or JAR — parsed entirely in your browser"
+              hint="ZIP or JAR. Files stay in your browser."
               className="w-full max-w-md"
             />
           }
@@ -756,10 +708,8 @@ export default function SpawnScanner() {
       {hasData && (
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-3 text-xs text-text-muted">
-              <span>{filteredData.length} spawn entries</span>
-              <span className="text-border">•</span>
-              <span>{fileReports.filter((r) => !r.error).length} files</span>
+            <div className="flex flex-wrap items-center gap-3 text-xs text-text-muted">
+              <span>Pokémon entries include distinct forms and properties.</span>
               {loading && (
                 <span className="flex items-center gap-1.5 text-accent">
                   <Spinner size={12} /> Parsing more files…
@@ -771,49 +721,65 @@ export default function SpawnScanner() {
             </div>
           </div>
 
-          <Card>
-            <CardBody className="flex flex-col gap-3">
-              <div className="flex flex-col gap-3 lg:flex-row">
-                <div className="relative flex-1">
+          <section aria-label="Spawn filters" className="flex flex-col gap-3 rounded-lg border border-accent/30 bg-bg-surface p-3">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-sm font-semibold text-text-primary">Refine spawns</h2>
+                <Button variant="secondary" onClick={resetFilters}>Reset filters</Button>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                <div className="min-w-0 flex-1">
+                  <label htmlFor="spawn-search" className="mb-1 block text-sm font-medium text-text-primary">Search spawn data</label>
+                  <div className="relative">
                   <Search
                     size={15}
                     className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
                   />
                   <input
+                    id="spawn-search"
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Search spawn data…"
+                    aria-label="Search spawn data"
+                    placeholder="Search Pokémon, biome, or condition…"
                     className="w-full rounded-md border border-border bg-bg-surface-2 py-2 pl-9 pr-8 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
                   />
                   {searchTerm && (
                     <button
                       onClick={clearSearch}
+                      aria-label="Clear search"
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
                     >
                       <X size={14} />
                     </button>
                   )}
+                  </div>
                 </div>
                 <Button
                   variant="secondary"
                   icon={SlidersHorizontal}
                   onClick={() => setShowAdvanced((v) => !v)}
+                  aria-expanded={showAdvanced}
+                  aria-controls="spawn-advanced-filters"
                 >
-                  Advanced
+                  Filters
                 </Button>
               </div>
 
+              <p className="min-w-0 wrap-anywhere text-sm text-text-secondary">
+                <span className="font-medium text-text-primary">Active filters: </span>
+                {activeFilters.length ? activeFilters.join(" · ") : "None"}
+              </p>
               {showAdvanced && (
-                <div className="grid gap-3 rounded-md border border-border bg-bg-surface-2 p-3 sm:grid-cols-3">
+                <div id="spawn-advanced-filters" className="grid gap-3 rounded-md bg-bg-surface-2 p-3 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-text-secondary">
+                    <label htmlFor="spawn-search-field" className="mb-1 block text-sm font-medium text-text-primary">
                       Search field
                     </label>
                     <select
+                      id="spawn-search-field"
                       value={searchField}
                       onChange={(e) => setSearchField(e.target.value)}
-                      className="w-full rounded-md border border-border bg-bg-surface p-2 text-xs text-text-primary focus:border-accent focus:outline-none"
+                      className="w-full rounded-md border border-border bg-bg-surface p-2 text-sm text-text-primary focus:border-accent focus:outline-none"
                     >
                       {SEARCH_FIELDS.map((f) => (
                         <option key={f.value} value={f.value}>
@@ -823,13 +789,14 @@ export default function SpawnScanner() {
                     </select>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-medium text-text-secondary">
+                    <label htmlFor="spawn-position-type" className="mb-1 block text-sm font-medium text-text-primary">
                       Position type
                     </label>
                     <select
+                      id="spawn-position-type"
                       value={contextFilter}
                       onChange={(e) => setContextFilter(e.target.value)}
-                      className="w-full rounded-md border border-border bg-bg-surface p-2 text-xs text-text-primary focus:border-accent focus:outline-none"
+                      className="w-full rounded-md border border-border bg-bg-surface p-2 text-sm text-text-primary focus:border-accent focus:outline-none"
                     >
                       <option value="all">All position types</option>
                       {availableContexts.map((ctx) => (
@@ -839,28 +806,42 @@ export default function SpawnScanner() {
                       ))}
                     </select>
                   </div>
-                  <div className="flex items-end">
-                    <Button
-                      variant="secondary"
-                      className="w-full"
-                      onClick={() => {
-                        clearSearch();
-                        setContextFilter("all");
-                      }}
-                    >
-                      Clear filters
-                    </Button>
-                  </div>
+
                 </div>
               )}
-            </CardBody>
-          </Card>
+            </section>
 
-          {filteredData.length === 0 ? (
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-base font-semibold text-text-primary">Spawn results</h2>
+              <p role="status" aria-live="polite" aria-atomic="true" className="text-xs text-text-secondary">
+                {filteredData.length.toLocaleString()} of {allSpawnData.length.toLocaleString()} spawn entries
+              </p>
+            </div>
+            <div>
+              <label htmlFor="spawn-column-view" className="mb-1 block text-sm font-medium text-text-primary">Column view</label>
+              <select id="spawn-column-view" value={columnView} onChange={(event) => setColumnView(event.target.value)} aria-describedby="spawn-column-help" className="rounded-md border border-border bg-bg-surface p-2 text-sm text-text-primary focus:border-accent focus:outline-none">
+                <option value="all">All fields</option>
+                <option value="essentials">Essentials</option>
+              </select>
+            </div>
+          </div>
+          <p id="spawn-column-help" className="text-sm leading-relaxed text-text-secondary">
+            Column view only changes visible columns. Search still uses all fields or your selected search field. Scroll horizontally to explore more columns.
+          </p>
+          {allSpawnData.length === 0 ? (
+            <EmptyState
+              icon={Radar}
+              title="No spawn entries in this dataset"
+              description="No spawn entries found. Check diagnostics or upload a datapack with a spawn_pool_world/ folder."
+              action={<FileDropzone accept=".zip,.jar" multiple onFiles={handleDroppedFiles} label="Drop another datapack here" hint="ZIP or JAR. Files stay in your browser." className="w-full max-w-md" />}
+            />
+          ) : filteredData.length === 0 ? (
             <EmptyState
               icon={Search}
-              title="No spawn data found"
-              description="Try adjusting your search terms or filters."
+              title="No matching spawns"
+              description="Reset filters to see all spawn entries."
+              action={<Button variant="secondary" onClick={resetFilters}>Show all spawns</Button>}
             />
           ) : (
             <DataTable
@@ -869,7 +850,7 @@ export default function SpawnScanner() {
               getRowKey={(row) => row._rowId}
               virtualized
               rowHeight={48}
-              maxHeight="70vh"
+              maxHeight="clamp(20rem, calc(100dvh - 20rem), 70rem)"
             />
           )}
         </div>
@@ -883,10 +864,10 @@ export default function SpawnScanner() {
             left: hoverTooltip.x,
             top: hoverTooltip.y,
           }}
-          className="z-50 max-w-md rounded-lg border border-border bg-bg-base/95 text-xs text-text-primary shadow-2xl backdrop-blur-sm"
+          className="z-50 max-w-md rounded-lg border border-border bg-bg-base/95 text-sm text-text-primary shadow-2xl backdrop-blur-sm"
         >
           <div className="flex items-center justify-between gap-3 border-b border-border px-3 py-2">
-            <div className="truncate font-semibold">
+            <div className="min-w-0 wrap-anywhere font-semibold">
               {hoverTooltip.content?.title || "Biome tag"}
             </div>
           </div>
@@ -900,7 +881,7 @@ export default function SpawnScanner() {
                     <span
                       key={idx}
                       className={[
-                        "rounded px-1.5 py-0.5 text-[11px]",
+                        "max-w-full wrap-anywhere rounded px-1.5 py-0.5 text-xs",
                         isTagVisual
                           ? "border border-accent/30 bg-accent-soft text-accent"
                           : "bg-bg-surface-2 text-text-secondary",
@@ -915,19 +896,19 @@ export default function SpawnScanner() {
               hoverTooltip.content.entries.length > 0 ? (
               <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2">
                 {hoverTooltip.content.entries.map((e, idx) => (
-                  <li key={idx} className="leading-5 text-text-secondary">
+                  <li key={idx} className="min-w-0 wrap-anywhere leading-5 text-text-secondary">
                     {e}
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="text-text-muted">
+              <div className="text-text-secondary">
                 No entries found for this tag
               </div>
             )}
           </div>
           {hoverTooltip.pinned && (
-            <div className="border-t border-border px-3 py-2 text-[11px] text-text-muted">
+            <div className="border-t border-border px-3 py-2 text-xs text-text-secondary">
               Click anywhere outside to close
             </div>
           )}

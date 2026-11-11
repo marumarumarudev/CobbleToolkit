@@ -1,5 +1,51 @@
-import JSZip from "jszip";
-import { parseJsonWithFallbacks } from "@/utils/parseJson";
+import { loadArchive, readArchiveText, createProcessingContext, rethrowProcessingError } from "./archiveProcessing.js";
+import { parseJsonWithFallbacks } from "./parseJson.js";
+import { indexDatapackArchive } from "./archivePaths.js";
+import { mergeSpeciesJson } from "../lib/speciesLootMerge.js";
+
+const owns = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
+
+function formIdentity(form) {
+  if (typeof form?.name === "string" && form.name.trim()) {
+    return `name:${form.name.trim().toLowerCase()}`;
+  }
+  if (Array.isArray(form?.aspects) && form.aspects.length > 0 &&
+      form.aspects.every((aspect) => typeof aspect === "string" && aspect.trim())) {
+    return `aspects:${JSON.stringify(form.aspects.map((aspect) => aspect.trim().toLowerCase()).sort())}`;
+  }
+  return null;
+}
+
+async function mergeDocument(base, patch, processing) {
+  await processing.checkpoint();
+  processing.row();
+  const merged = mergeSpeciesJson(base, patch);
+  merged.ridingSources = [...(base?.ridingSources || []), ...(patch.ridingSources || [])];
+  if (Array.isArray(patch.forms)) {
+    merged.forms = [...(base?.forms || [])];
+    const indices = new Map();
+    for (const [index, form] of merged.forms.entries()) {
+      await processing.checkpoint();
+      processing.row();
+      const identity = formIdentity(form);
+      // Preserve findIndex's first-match behavior for duplicate base forms.
+      if (identity !== null && !indices.has(identity)) indices.set(identity, index);
+    }
+    for (const form of patch.forms) {
+      await processing.checkpoint();
+      processing.row();
+      const identity = formIdentity(form);
+      const index = identity === null ? undefined : indices.get(identity);
+      if (index === undefined) {
+        if (identity !== null) indices.set(identity, merged.forms.length);
+        merged.forms.push(form);
+      } else {
+        merged.forms[index] = await mergeDocument(merged.forms[index], form, processing);
+      }
+    }
+  }
+  return merged;
+}
 
 const DEBUG =
   typeof process !== "undefined" && process.env.NODE_ENV === "development";
@@ -72,25 +118,67 @@ function extractSpeciesFallback(content) {
  * Parses species/*.json inside a Cobblemon datapack zip
  * and returns a list of Pokémon with dex, types, stats, EVs, moves, and source.
  */
-export async function parseSpeciesAndSpawnFromZip(file) {
+export async function parseSpeciesAndSpawnFromZip(file, options = {}) {
+  const { onDiagnostic = () => {} } = options;
+  const processing = createProcessingContext(options);
+  const mergeProcessing = createProcessingContext(options);
   try {
-    const zip = await JSZip.loadAsync(file);
+    const zip = indexDatapackArchive(await loadArchive(file, options), options);
     const files = Object.keys(zip.files);
+    const documents = new Map();
+    // Resolve bases before additions regardless of ZIP insertion order.
+    const ordered = [
+      ...files.filter((path) => /\/species\//.test(path)),
+      ...files.filter((path) => /\/species_additions\//.test(path)),
+    ];
+    for (const path of ordered) {
+      await processing.checkpoint();
+      if (!/^data\/[^/]+\/(species|species_additions)\/.+\.json$/.test(path)) continue;
+      try {
+        const isAddition = path.includes("/species_additions/");
+        const content = await readArchiveText(zip.files[path], options);
+        const json = parseJsonWithFallbacks(content, path, {
+          ...options, extractFallback: isAddition ? undefined : extractSpeciesFallback,
+        });
+        if (!json) continue;
+        const identity = isAddition ? json.target : json.name;
+        if (typeof identity !== "string" || !identity.trim()) {
+          onDiagnostic({ path, code: "invalid-structure", message: "Missing valid species identity." });
+          continue;
+        }
+        const name = identity.split(":").pop().toLowerCase().trim();
+        const provenance = { sourceFile: file.name, path };
+        json.ridingSources = owns(json, "riding") ? [provenance] : [];
+        if (Array.isArray(json.forms)) {
+          const forms = [];
+          for (const form of json.forms) {
+            await mergeProcessing.checkpoint();
+            mergeProcessing.row();
+            forms.push(form && ({ ...form,
+              ridingSources: owns(form, "riding") ? [provenance] : [],
+            }));
+          }
+          json.forms = forms;
+        }
+        const previous = documents.get(name);
+        documents.set(name, {
+          path, isAddition: isAddition && (!previous || previous.isAddition),
+          json: isAddition ? await mergeDocument(previous?.json, { ...json, name }, mergeProcessing) : json,
+        });
+      } catch (err) {
+        rethrowProcessingError(err);
+        onDiagnostic({ path, code: "processing-error", message: err.message });
+      }
+    }
 
     const results = [];
     let successCount = 0;
     let errorCount = 0;
     let skippedCount = 0;
 
-    for (const path of files) {
-      if (!path.match(/^data\/[^/]+\/species\/.+\.json$/)) continue;
-
+    for (const { path, json, isAddition } of documents.values()) {
+      await processing.checkpoint();
       try {
-        const content = await zip.files[path].async("string");
-        const json = parseJsonWithFallbacks(content, path, {
-          extractFallback: extractSpeciesFallback,
-        });
-
         if (json && json.name) {
           const baseName = (json.name || "").toLowerCase().trim();
 
@@ -102,7 +190,7 @@ export async function parseSpeciesAndSpawnFromZip(file) {
             const secondaryType =
               specObj.secondaryType ?? fallback?.secondaryType;
             const baseStats =
-              specObj.baseStats ?? fallback?.baseStats ?? {};
+              specObj.baseStats ?? fallback?.baseStats;
 
             // Prefer form's own evYield; fall back to root only when missing
             const evYield =
@@ -122,22 +210,29 @@ export async function parseSpeciesAndSpawnFromZip(file) {
               types: [primaryType, secondaryType]
                 .filter(Boolean)
                 .map((t) => t.trim()),
-              stats: {
-                hp: parseInt(baseStats?.hp, 10) || 0,
-                attack: parseInt(baseStats?.attack, 10) || 0,
-                defence: parseInt(baseStats?.defence, 10) || 0,
-                special_attack: parseInt(baseStats?.special_attack, 10) || 0,
-                special_defence: parseInt(baseStats?.special_defence, 10) || 0,
-                speed: parseInt(baseStats?.speed, 10) || 0,
-              },
+              stats: baseStats == null ? null : Object.fromEntries(
+                ["hp", "attack", "defence", "special_attack", "special_defence", "speed"]
+                  .filter((key) => !isAddition || owns(baseStats, key))
+                  .map((key) => [key, parseInt(baseStats[key], 10) || 0]),
+              ),
               evYield,
               moves: movesArr,
               sourceFile: file.name,
+              isAddition,
+              speciesFields: Object.entries({
+                nationalDex: ["nationalPokedexNumber"], types: ["primaryType", "secondaryType"],
+                stats: ["baseStats"], evYield: ["evYield"], moves: ["moves"], riding: ["riding"],
+              }).filter(([, keys]) => keys.some((key) => owns(specObj, key) || (fallback && owns(fallback, key))))
+                .map(([field]) => field),
+              riding: owns(specObj, "riding") ? specObj.riding : (fallback?.riding ?? null),
+              ridingSources: owns(specObj, "riding") ? specObj.ridingSources : (fallback?.ridingSources || []),
+              mountDataVersion: 1,
             };
           };
 
           const baseEntry = buildEntry(baseName, json, null);
           if (baseEntry.name) {
+            processing.row();
             results.push(baseEntry);
             successCount++;
           } else {
@@ -147,6 +242,7 @@ export async function parseSpeciesAndSpawnFromZip(file) {
 
           if (Array.isArray(json.forms)) {
             for (const form of json.forms) {
+              await processing.checkpoint();
               try {
                 const lowerAspects = (form.aspects || []).map((a) =>
                   (a || "").toLowerCase(),
@@ -172,6 +268,7 @@ export async function parseSpeciesAndSpawnFromZip(file) {
                 const formEntry = buildEntry(formDisplayName, form, json);
 
                 if (formEntry.name) {
+                  processing.row();
                   results.push(formEntry);
                   successCount++;
                 } else {
@@ -179,6 +276,8 @@ export async function parseSpeciesAndSpawnFromZip(file) {
                   logWarn(`Skipping form for ${path} - invalid form name`);
                 }
               } catch (formErr) {
+                rethrowProcessingError(formErr);
+                onDiagnostic({ path, code: "invalid-form", message: formErr.message });
                 errorCount++;
                 logWarn(`Failed to process form for ${path}`, formErr);
               }
@@ -186,9 +285,12 @@ export async function parseSpeciesAndSpawnFromZip(file) {
           }
         } else {
           errorCount++;
+          if (json) onDiagnostic({ path, code: "invalid-structure", message: "Missing valid species identity." });
           logWarn(`Skipping ${path} - no valid data extracted`);
         }
       } catch (err) {
+        rethrowProcessingError(err);
+        onDiagnostic({ path: typeof path === "string" ? path : file.name, code: "processing-error", message: err.message });
         errorCount++;
         logWarn(`Failed to parse species file: ${path}`, err);
       }
@@ -199,6 +301,8 @@ export async function parseSpeciesAndSpawnFromZip(file) {
     );
     return results;
   } catch (err) {
+    rethrowProcessingError(err);
+    onDiagnostic({ path: typeof path === "string" ? path : file.name, code: "processing-error", message: err.message });
     console.error(`Failed to process zip file ${file.name}:`, err);
     throw new Error(`Failed to process zip file: ${err.message}`);
   }

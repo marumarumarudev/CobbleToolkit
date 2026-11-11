@@ -6,8 +6,11 @@
  * rather than a single all-or-nothing check.
  */
 
+import { indexDatapackArchive } from "./archivePaths.js";
+import { loadArchive } from "./archiveProcessing.js";
+
 const KIND_CHECKS = {
-  spawn: (paths) => paths.some((p) => p.includes("/spawn_pool_world/")),
+  spawn: (paths) => paths.some((p) => /^data\/[^/]+\/spawn_pool_world\/.+\.json$/.test(p)),
 
   species: (paths) =>
     paths.some((p) =>
@@ -17,7 +20,7 @@ const KIND_CHECKS = {
   rctTrainer: (paths) =>
     paths.some(
       (p) =>
-        /^data\/rctmod\/trainers\/.+\.json$/.test(p) ||
+        /^data\/[^/]+\/trainers\/[^/]+\.json$/.test(p) ||
         /^data\/[^/]+\/loot_table\/trainers\/.+\.json$/.test(p)
     ),
 };
@@ -28,11 +31,6 @@ const KIND_LABELS = {
   rctTrainer: "RCT Trainer Scanner",
 };
 
-function normalizePath(rawPath) {
-  const normalized = rawPath.replace(/\\/g, "/");
-  const dataIndex = normalized.indexOf("data/");
-  return dataIndex === -1 ? normalized : normalized.slice(dataIndex);
-}
 
 /**
  * @param {File} file
@@ -40,13 +38,9 @@ function normalizePath(rawPath) {
  */
 export async function validateFileStructure(file) {
   try {
-    const JSZip = (await import("jszip")).default;
-    const zip = await JSZip.loadAsync(file, {
-      checkCRC32: false,
-      streamFiles: true,
-    });
+    const zip = indexDatapackArchive(await loadArchive(file));
 
-    const filePaths = Object.keys(zip.files).map(normalizePath);
+    const filePaths = Object.keys(zip.files);
 
     const kinds = Object.entries(KIND_CHECKS)
       .filter(([, check]) => check(filePaths))
@@ -58,7 +52,7 @@ export async function validateFileStructure(file) {
         kinds: [],
         labels: [],
         reason:
-          "File doesn't contain data any tool here reads. Needs at least one of: spawn_pool_world/, species/ (or species_additions/), or rctmod trainers/loot_table data.",
+          "File doesn't contain data any tool here reads. Needs at least one of: spawn_pool_world/, species/ (or species_additions/), or trainers/loot_table data.",
       };
     }
 

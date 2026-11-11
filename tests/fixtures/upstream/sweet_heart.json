@@ -1,0 +1,10 @@
+{
+    "item": "cobblemon:sweet_heart",
+    "effects": [
+        {
+            "type": "cobblemon:friendship",
+            "chance": 1.0,
+            "value": 35.0
+        }
+    ]
+}

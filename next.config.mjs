@@ -7,6 +7,8 @@ const basePath =
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
+    // Keep production builds from overwriting a running dev server's chunks.
+    distDir: isDev ? ".next-dev" : ".next",
   trailingSlash: true,
   basePath,
   assetPrefix: basePath,

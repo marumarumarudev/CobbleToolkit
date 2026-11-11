@@ -49,6 +49,7 @@ export default function DataTable({
     const sorted = [...rows].sort((a, b) => {
       const av = col?.sortValue ? col.sortValue(a) : a[sort.key];
       const bv = col?.sortValue ? col.sortValue(b) : b[sort.key];
+      if (av == null && bv == null) return 0;
       if (av == null) return 1;
       if (bv == null) return -1;
       return av > bv ? 1 : av < bv ? -1 : 0;
@@ -68,7 +69,7 @@ export default function DataTable({
     getRowKey ? getRowKey(row, index) : index;
 
   const headerCell = (col) => (
-    <th key={col.key}>
+    <th key={col.key} scope="col" aria-sort={sort.key === col.key ? (sort.dir === "asc" ? "ascending" : "descending") : undefined}>
       {col.sortable === false ? (
         col.label
       ) : (
@@ -178,15 +179,21 @@ function VirtualizedBody({
       ].join(" ")}
       style={{ maxHeight }}
     >
-      <div style={{ minWidth: totalWidth }}>
+      <div role="table" aria-rowcount={rows.length + 1} aria-colcount={columns.length} style={{ minWidth: totalWidth }}>
         {/* Header */}
+        <div role="rowgroup" className="sticky top-0 z-10">
         <div
+          role="row"
+          aria-rowindex={1}
           className="sticky top-0 z-10 grid bg-bg-surface-2 border-b border-border"
           style={{ gridTemplateColumns }}
         >
-          {columns.map((col) => (
+          {columns.map((col, columnIndex) => (
             <div
               key={col.key}
+              role="columnheader"
+              aria-colindex={columnIndex + 1}
+              aria-sort={sort.key === col.key ? (sort.dir === "asc" ? "ascending" : "descending") : undefined}
               className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-text-secondary truncate"
             >
               {col.sortable === false ? (
@@ -212,8 +219,11 @@ function VirtualizedBody({
           ))}
         </div>
 
+        </div>
+
         {/* Virtualized rows — height comes from measured content, not a fixed px */}
         <div
+          role="rowgroup"
           style={{
             height: virtualizer.getTotalSize(),
             position: "relative",
@@ -224,6 +234,8 @@ function VirtualizedBody({
             return (
               <div
                 key={resolveKey(row, virtualRow.index)}
+                role="row"
+                aria-rowindex={virtualRow.index + 2}
                 data-index={virtualRow.index}
                 ref={virtualizer.measureElement}
                 className="absolute left-0 top-0 w-full grid border-b border-border hover:bg-bg-surface-2 transition-colors duration-100"
@@ -232,9 +244,11 @@ function VirtualizedBody({
                   transform: `translateY(${virtualRow.start}px)`,
                 }}
               >
-                {columns.map((col) => (
+                {columns.map((col, columnIndex) => (
                   <div
                     key={col.key}
+                    role="cell"
+                    aria-colindex={columnIndex + 1}
                     className={[
                       "flex min-w-0 px-3 py-2 text-xs text-text-primary",
                       col.wrap

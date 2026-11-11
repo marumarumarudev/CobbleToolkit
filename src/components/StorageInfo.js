@@ -31,7 +31,7 @@ export default function StorageInfo() {
   };
 
   return (
-    <div className="text-xs text-gray-400 text-center">
+    <div className="text-xs text-text-secondary text-center">
       Storage: {formatBytes(storageInfo.usage)} ({storageInfo.percentage}%)
     </div>
   );

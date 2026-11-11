@@ -1,0 +1,22 @@
+{
+  "data/example/spawn_pool_world/solo.json": {
+    "spawns": [{ "id": "fixture-solo", "pokemon": "ditto", "type": "pokemon", "bucket": "common", "level": "5-10", "weight": 10 }]
+  },
+  "data/example/spawn_pool_world/herds/group.json": {
+    "spawns": [{ "id": "fixture-herd", "type": "pokemon-herd", "bucket": "common", "levelRange": "5-10", "weight": 20, "maxHerdSize": 2, "herdablePokemon": [{ "pokemon": "wooloo", "weight": 3, "isLeader": true }, { "pokemon": "dubwool", "weight": 1, "isFollower": true }] }]
+  },
+  "data/example/species/ditto.json": {
+    "name": "Ditto", "nationalPokedexNumber": 132, "primaryType": "normal",
+    "baseStats": { "hp": 48, "attack": 48, "defence": 48, "special_attack": 48, "special_defence": 48, "speed": 48 },
+    "drops": { "entries": [{ "item": "minecraft:stick", "quantityRange": 1, "percentage": 50 }] }
+  },
+  "data/rctmod/trainers/fixture.json": {
+    "name": { "literal": "Fixture Trainer" }, "team": [{ "species": "ditto", "level": 5 }]
+  },
+  "data/rctmod/loot_table/trainers/single/fixture.json": {
+    "pools": [{ "rolls": 1, "entries": [{ "type": "minecraft:loot_table", "value": "rctmod:generic/fixture" }] }]
+  },
+  "data/rctmod/loot_table/generic/fixture.json": {
+    "pools": [{ "rolls": 1, "entries": [{ "type": "minecraft:item", "name": "minecraft:stick", "weight": 1 }] }]
+  }
+}

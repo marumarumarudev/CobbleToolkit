@@ -1,5 +1,8 @@
 "use client";
 
+import ScannerErrorNotice from "@/components/ScannerErrorNotice";
+import SpawnParseDiagnostics from "@/components/SpawnParseDiagnostics";
+import { createParseDiagnostics } from "@/utils/parseDiagnostics";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import toast from "react-hot-toast";
@@ -16,9 +19,9 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-import { useStorage } from "@/hooks/useStorage";
 import { useSharedFiles } from "@/contexts/SharedFilesContext";
-import { SHARED_FILES_CHANGED_EVENT } from "@/utils/toolDataStores";
+import { useScannerLifecycle } from "@/hooks/useScannerLifecycle";
+import ArchiveAvailabilityNotice from "@/components/ArchiveAvailabilityNotice";
 import { parseRctTrainersFromZip } from "@/utils/rctTrainerParser";
 import { formatPokemonName, matchesSearch } from "@/utils/nameUtils";
 import { withBasePath } from "@/utils/basePath";
@@ -35,6 +38,27 @@ import {
 import StorageInfo from "@/components/StorageInfo";
 
 const SCANNER_NAME = "rctTrainerScanner";
+
+const SCANNER_CONFIG = {
+  scannerName: SCANNER_NAME,
+  storeNames: ["trainerReports"],
+  async parse(sharedFile, { signal } = {}) {
+    const collector = createParseDiagnostics();
+    const options = { signal, allowRepair: sharedFile.allowRepairs ?? true, onDiagnostic: collector.record };
+    const parsed = await parseRctTrainersFromZip(sharedFile.file, options);
+    const diagnostics = collector.snapshot();
+    if (!parsed?.length && !diagnostics.total) return [];
+    const report = {
+      id: crypto.randomUUID(),
+      name: sharedFile.name,
+      sharedFileId: sharedFile.id,
+      data: parsed,
+      diagnostics,
+      fromShared: true,
+    };
+    return [{ storeName: "trainerReports", hasWarnings: diagnostics.total > 0, merge: (current) => [report, ...current] }];
+  },
+};
 
 // Showdown gen5 ids: base is toID (mrmime, hooh), forms append with "-"
 // (mrmime-galar, tauros-paldeablaze, pinsir-mega). Aspects from RCT data
@@ -316,22 +340,17 @@ function formatSetCount(setCount) {
 }
 
 export default function TrainerScanner() {
-  const {
-    data: fileReports,
-    setData: setFileReports,
-    saveData: saveReports,
-    loadData: reloadReports,
-  } = useStorage("trainerReports", []);
-  const { sharedFiles, addSharedFile } = useSharedFiles();
-
-  const [processedFiles, setProcessedFiles] = useState(new Set());
-  const [processedFilesLoaded, setProcessedFilesLoaded] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { data, loading, unavailableFiles, error } = useScannerLifecycle(SCANNER_CONFIG);
+  const { trainerReports: fileReports } = data;
+  const { addSharedFile } = useSharedFiles();
 
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedId, setSelectedId] = useState(null);
   const [activeTab, setActiveTab] = useState("team");
+  const [sourceFilter, setSourceFilter] = useState("all");
+  const [lootFilter, setLootFilter] = useState("all");
+  const sourceRegistry = useRef({ order: new Map(), anonymous: new WeakMap() });
 
   useEffect(() => {
     document.title = "RCT Trainer Scanner | CobbleToolkit";
@@ -341,99 +360,6 @@ export default function TrainerScanner() {
     const t = setTimeout(() => setDebouncedSearch(search), 250);
     return () => clearTimeout(t);
   }, [search]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const { default: getStorage } = await import("@/utils/indexedDBStorage");
-        const storage = getStorage();
-        setProcessedFiles(await storage.getProcessedFiles(SCANNER_NAME));
-      } catch (err) {
-        console.error("Failed to load processed files:", err);
-      } finally {
-        setProcessedFilesLoaded(true);
-      }
-    })();
-  }, []);
-
-  // The nav upload widget is the single place files/data get removed. When
-  // it removes a file or clears everything, refresh our data + processed
-  // set from IndexedDB so this view never shows stale rows.
-  useEffect(() => {
-    const handleFilesChanged = async () => {
-      await reloadReports();
-      try {
-        const { default: getStorage } = await import(
-          "@/utils/indexedDBStorage"
-        );
-        const storage = getStorage();
-        setProcessedFiles(await storage.getProcessedFiles(SCANNER_NAME));
-      } catch (err) {
-        console.error("Failed to refresh processed files:", err);
-      }
-    };
-    window.addEventListener(SHARED_FILES_CHANGED_EVENT, handleFilesChanged);
-    return () =>
-      window.removeEventListener(
-        SHARED_FILES_CHANGED_EVENT,
-        handleFilesChanged
-      );
-  }, [reloadReports]);
-
-  useEffect(() => {
-    const run = async () => {
-      if (!processedFilesLoaded || !sharedFiles.length || loading) return;
-      const unprocessed = sharedFiles.filter(
-        (sf) => sf.file && !processedFiles.has(sf.id)
-      );
-      if (!unprocessed.length) return;
-
-      setLoading(true);
-      const { default: getStorage } = await import("@/utils/indexedDBStorage");
-      const storage = getStorage();
-      const existingFileNames = new Set(fileReports.map((r) => r.name));
-      const parsedReports = [];
-
-      for (const sharedFile of unprocessed) {
-        if (!existingFileNames.has(sharedFile.name)) {
-          try {
-            const trainers = await parseRctTrainersFromZip(sharedFile.file);
-            if (trainers?.length) {
-              parsedReports.push({
-                id: crypto.randomUUID(),
-                name: sharedFile.name,
-                data: trainers,
-                fromShared: true,
-              });
-              existingFileNames.add(sharedFile.name);
-            }
-          } catch (err) {
-            console.error(`Failed to process ${sharedFile.name}:`, err);
-          }
-        }
-        await storage.markFileProcessed(SCANNER_NAME, sharedFile.id);
-        setProcessedFiles((prev) => new Set([...prev, sharedFile.id]));
-      }
-
-      if (parsedReports.length) {
-        const updated = [...parsedReports, ...fileReports];
-        try {
-          await saveReports(updated);
-        } catch (err) {
-          console.error("Failed to save trainer reports:", err);
-        }
-        setFileReports(updated);
-        toast.success(
-          `Parsed ${parsedReports.length} file${
-            parsedReports.length === 1 ? "" : "s"
-          } for trainer data`
-        );
-      }
-      setLoading(false);
-    };
-    run();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sharedFiles, processedFilesLoaded, loading]);
 
   const handleDroppedFiles = async (fileList) => {
     const valid = Array.from(fileList).filter((f) =>
@@ -446,9 +372,36 @@ export default function TrainerScanner() {
     for (const file of valid) await addSharedFile(file);
   };
 
+  const sources = useMemo(() => {
+    const { order, anonymous } = sourceRegistry.current;
+    return fileReports.filter((report) => !report.error).map((report) => {
+      let key;
+      if (report.id != null) key = `report:${report.id}`;
+      else if (report.sharedFileId != null) key = `shared:${report.sharedFileId}`;
+      else {
+        // Legacy reports without IDs retain identity while other packs are added.
+        if (!anonymous.has(report)) anonymous.set(report, `anonymous:${order.size}`);
+        key = anonymous.get(report);
+      }
+      if (!order.has(key)) order.set(key, order.size);
+      return { key, name: report.name || "Unnamed pack", report };
+    }).sort((a, b) => order.get(a.key) - order.get(b.key));
+  }, [fileReports]);
+
+  useEffect(() => {
+    if (sourceFilter !== "all" && !sources.some((source) => source.key === sourceFilter)) {
+      setSourceFilter("all");
+    }
+  }, [sources, sourceFilter]);
+
   const allTrainers = useMemo(
-    () => fileReports.filter((r) => !r.error).flatMap((r) => r.data),
-    [fileReports]
+    () => sources.flatMap(({ key, name, report }) => report.data.map((trainer, index) => ({
+      ...trainer,
+      _trainerKey: JSON.stringify([key, index]),
+      _sourceKey: key,
+      _sourceName: name,
+    }))),
+    [sources]
   );
 
   // Precompute a search haystack per trainer so filtering doesn't re-walk
@@ -468,28 +421,44 @@ export default function TrainerScanner() {
   );
 
   const filtered = useMemo(() => {
-    if (!debouncedSearch) return searchable.map((s) => s.trainer);
     return searchable
-      .filter((s) => s.haystack.some((v) => matchesSearch(debouncedSearch, v)))
+      .filter(({ trainer, haystack }) =>
+        (sourceFilter === "all" || trainer._sourceKey === sourceFilter) &&
+        (lootFilter === "all" ||
+          (lootFilter === "linked" && trainer.loot.linkStatus !== "none") ||
+          (lootFilter === "none" && trainer.loot.linkStatus === "none") ||
+          (lootFilter === "issues" && trainer.loot.issues.length > 0)) &&
+        (!debouncedSearch || haystack.some((v) => matchesSearch(debouncedSearch, v)))
+      )
       .map((s) => s.trainer);
-  }, [searchable, debouncedSearch]);
+  }, [searchable, debouncedSearch, sourceFilter, lootFilter]);
 
   const selected = useMemo(
-    () => allTrainers.find((t) => `${t.namespace}:${t.id}` === selectedId) ?? null,
-    [allTrainers, selectedId]
+    () => filtered.find((t) => t._trainerKey === selectedId) ?? filtered[0] ?? null,
+    [filtered, selectedId]
   );
 
   useEffect(() => {
-    if (!selected && filtered.length > 0) {
-      setSelectedId(`${filtered[0].namespace}:${filtered[0].id}`);
-    }
-  }, [filtered, selected]);
+    setSelectedId(selected?._trainerKey ?? null);
+  }, [selected]);
+
+  const resetFilters = () => {
+    setSearch("");
+    setDebouncedSearch("");
+    setSourceFilter("all");
+    setLootFilter("all");
+  };
 
   const hasData = allTrainers.length > 0;
 
   return (
     <div className="flex flex-col gap-6">
-      <header>
+      <header className="dex-console">
+        <div className="dex-screen p-3 sm:p-4">
+        <div className="mb-2 flex flex-wrap justify-between gap-2 font-mono text-xs text-accent">
+          <span className="uppercase tracking-widest">Trainer data</span>
+          <span>{loading ? "Indexing archives…" : error ? "Scanner needs attention" : hasData ? "Archive ready" : "Awaiting datapack"}</span>
+        </div>
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent-soft text-accent">
             <Swords size={16} />
@@ -499,23 +468,29 @@ export default function TrainerScanner() {
           </h1>
         </div>
         <p className="mt-1 text-sm text-text-secondary">
-          Inspect Cobbleverse RCT trainers — team, AI, and fully resolved
-          loot tables (including nested generic pools).
+          Browse Cobbleverse RCT teams, AI, and loot tables, including nested pools.
         </p>
+        <p className="mt-3 border-t border-border pt-2 font-mono text-xs text-text-secondary">
+          {allTrainers.length} trainers · {sources.length} source packs · {allTrainers.filter((t) => t.loot.linkStatus !== "none").length} with linked loot
+        </p>
+        </div>
       </header>
+      <ScannerErrorNotice error={error} />
+      <SpawnParseDiagnostics reports={fileReports} />
+      <ArchiveAvailabilityNotice files={unavailableFiles} />
 
       {!hasData && !loading && (
         <EmptyState
           icon={Swords}
-          title="No datapack loaded yet"
-          description="Drop the RCT datapack .zip below, or use the upload button in the nav. Reads data/<namespace>/trainers/ and loot_table/ for trainer, group, and generic loot tables."
+          title={unavailableFiles.length ? "Upload an archive again to scan here" : "No datapack loaded yet"}
+          description="Upload an RCT datapack to read data/<namespace>/trainers/ and loot_table/ for trainer, group, and generic loot."
           action={
             <FileDropzone
               accept=".zip,.jar"
               multiple
               onFiles={handleDroppedFiles}
               label="Drop your datapack here"
-              hint="ZIP or JAR — parsed entirely in your browser"
+              hint="ZIP or JAR. Files stay in your browser."
               className="w-full max-w-md"
             />
           }
@@ -541,7 +516,7 @@ export default function TrainerScanner() {
               <span className="text-border">•</span>
               <span>
                 {allTrainers.filter((t) => t.loot.linkStatus !== "none").length}{" "}
-                with resolved loot
+                with linked loot
               </span>
               {loading && (
                 <span className="flex items-center gap-1.5 text-accent">
@@ -557,10 +532,11 @@ export default function TrainerScanner() {
             the right detail panel grows. minmax(0,1fr) lets the right side wrap
             instead of crushing the trainer list.
           */}
-          <div className="grid gap-4 lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)] lg:items-start">
+          <div className="grid gap-4 lg:grid-cols-[minmax(280px,320px)_minmax(0,1fr)] xl:grid-cols-[360px_minmax(0,1fr)] lg:items-start">
             {/* Trainer list */}
-            <Card className="flex min-w-0 flex-col overflow-hidden lg:sticky lg:top-4 lg:max-h-[calc(100vh-6rem)]">
-              <div className="border-b border-border p-3">
+            <Card className="flex min-w-0 flex-col overflow-hidden lg:sticky lg:top-36 lg:max-h-[calc(100dvh-10rem)]">
+              <div className="space-y-3 border-b border-border bg-bg-surface-2/50 p-4">
+                <h2 className="font-mono text-xs uppercase tracking-widest text-accent">Trainer roster</h2>
                 <div className="relative">
                   <Search
                     size={14}
@@ -570,38 +546,71 @@ export default function TrainerScanner() {
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
+                    aria-label="Search trainer, species, or loot item"
                     placeholder="Search trainer, species, or loot item…"
                     className="w-full rounded-md border border-border bg-bg-surface-2 py-1.5 pl-8 pr-7 text-xs text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
                   />
                   {search && (
                     <button
-                      onClick={() => setSearch("")}
+                      onClick={() => { setSearch(""); setDebouncedSearch(""); }}
+                      aria-label="Clear trainer search"
                       className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
                     >
                       <X size={12} />
                     </button>
                   )}
                 </div>
+                <label className="block text-xs text-text-secondary">
+                  Source pack
+                  <select
+                    aria-label="Trainer source pack"
+                    value={sourceFilter}
+                    onChange={(e) => setSourceFilter(e.target.value)}
+                    className="mt-1 w-full rounded-md border border-border bg-bg-surface-2 p-2 text-xs text-text-primary"
+                  >
+                    <option value="all">All source packs</option>
+                    {sources.map((source) => <option key={source.key} value={source.key}>{source.name}</option>)}
+                  </select>
+                </label>
+                <label className="block text-xs text-text-secondary">
+                  Loot status
+                  <select
+                    aria-label="Trainer loot status"
+                    value={lootFilter}
+                    onChange={(e) => setLootFilter(e.target.value)}
+                    className="mt-1 w-full rounded-md border border-border bg-bg-surface-2 p-2 text-xs text-text-primary"
+                  >
+                    <option value="all">All loot statuses</option>
+                    <option value="linked">Linked loot</option>
+                    <option value="none">No linked loot</option>
+                    <option value="issues">Loot issues</option>
+                  </select>
+                </label>
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <span role="status" className="text-text-muted">{filtered.length} of {allTrainers.length} trainers</span>
+                  <button type="button" onClick={resetFilters} className="text-accent hover:underline">Reset trainer filters</button>
+                </div>
               </div>
 
               <div className="min-h-0 flex-1 overflow-y-auto max-h-[50vh] lg:max-h-none">
                 {filtered.length === 0 ? (
                   <p className="px-3 py-6 text-center text-xs text-text-muted">
-                    No trainers match &quot;{debouncedSearch}&quot;.
+                    No matching trainers
                   </p>
                 ) : (
                   filtered.map((t) => {
-                    const key = `${t.namespace}:${t.id}`;
+                    const key = t._trainerKey;
                     return (
                       <button
                         key={key}
+                        aria-pressed={key === selected?._trainerKey}
                         onClick={() => {
                           setSelectedId(key);
                           setActiveTab("team");
                         }}
                         className={[
                           "flex w-full items-center justify-between gap-2 border-b border-border px-3 py-2.5 text-left transition-colors duration-100",
-                          key === selectedId
+                          key === selected?._trainerKey
                             ? "bg-accent-soft"
                             : "hover:bg-bg-surface-2",
                         ].join(" ")}
@@ -609,15 +618,21 @@ export default function TrainerScanner() {
                         <span className="min-w-0">
                           <span
                             className={[
-                              "block truncate text-xs font-medium",
-                              key === selectedId
+                              "block break-words text-sm font-semibold leading-snug",
+                              key === selected?._trainerKey
                                 ? "text-accent"
                                 : "text-text-primary",
                             ].join(" ")}
                           >
                             {t.name}
                           </span>
-                          <span className="block truncate text-[10px] text-text-muted">
+                          <span className="block truncate text-xs text-text-secondary" title={t._sourceName}>
+                            {t._sourceName}
+                          </span>
+                          <span className="block break-all font-mono text-xs text-text-secondary">
+                            {t.namespace}:{t.id}
+                          </span>
+                          <span className="block truncate text-xs text-text-muted">
                             {t.teamSize} mon{t.teamSize === 1 ? "" : "s"} · avg
                             Lv {t.averageLevel}
                           </span>
@@ -645,21 +660,29 @@ export default function TrainerScanner() {
               {!selected ? (
                 <EmptyState
                   icon={Search}
-                  title="Select a trainer"
-                  description="Choose a trainer from the list to see their team, loot, and metadata."
+                  title="No matching trainers"
+                  description="Change or reset filters to view a trainer."
                 />
               ) : (
                 <>
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <h2 className="text-base font-semibold text-text-primary">
+                  <div className="rounded-xl border border-border bg-bg-surface p-2">
+                  <div className="dex-screen flex flex-wrap items-center justify-between gap-3 p-4">
+                    <div className="min-w-0">
+                      <p className="mb-2 font-mono text-xs uppercase tracking-widest text-accent">Selected trainer</p>
+                      <h2 className="break-words text-lg font-semibold text-text-primary">
                         {selected.name}
                       </h2>
-                      <p className="text-[11px] text-text-muted">
+                      <p className="break-all font-mono text-sm text-text-muted">
                         {selected.namespace}:{selected.id}
                       </p>
+                      <h3 className="mt-2 break-words text-xs font-medium text-text-secondary">Source pack: {selected._sourceName}</h3>
+                      <dl className="mt-3 flex gap-6 text-xs">
+                        <div><dt className="text-text-muted">Team size</dt><dd className="font-mono font-semibold text-text-primary">{selected.teamSize}</dd></div>
+                        <div><dt className="text-text-muted">Avg level</dt><dd className="font-mono font-semibold text-text-primary">{selected.averageLevel}</dd></div>
+                      </dl>
                     </div>
                     <Tabs
+                      ariaLabel="Trainer detail view"
                       tabs={[
                         {
                           id: "team",
@@ -681,9 +704,10 @@ export default function TrainerScanner() {
                     />
                   </div>
 
-                  {activeTab === "team" && <TeamPanel trainer={selected} />}
-                  {activeTab === "loot" && <LootPanel trainer={selected} />}
-                  {activeTab === "meta" && <MetaPanel trainer={selected} />}
+                  </div>
+                  {activeTab === "team" && <TeamPanel key={selected._trainerKey} trainer={selected} />}
+                  {activeTab === "loot" && <LootPanel key={selected._trainerKey} trainer={selected} />}
+                  {activeTab === "meta" && <MetaPanel key={selected._trainerKey} trainer={selected} />}
                 </>
               )}
             </div>
@@ -708,13 +732,13 @@ function TeamPanel({ trainer }) {
           .filter((e) => e.value > 0);
 
         return (
-          <Card key={mon.index}>
+          <Card key={mon.index} className="min-w-0 border-t-2 border-t-accent/40">
             <CardBody className="flex flex-col gap-3">
               <div className="flex items-start gap-3">
                 <PokemonSprite mon={mon} />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center justify-between gap-1.5">
-                    <p className="truncate text-sm font-semibold capitalize text-text-primary">
+                    <p className="break-words text-base font-semibold capitalize text-text-primary">
                       {formatPokemonName(mon.species)}
                     </p>
                     <div className="flex shrink-0 items-center gap-1.5">
@@ -735,7 +759,7 @@ function TeamPanel({ trainer }) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-[11px]">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm leading-relaxed [&>div]:min-w-0 [&>div]:break-words">
                 <div>
                   <p className="text-text-muted">Nature</p>
                   <p className="capitalize text-text-primary">{mon.nature}</p>
@@ -755,7 +779,7 @@ function TeamPanel({ trainer }) {
                     {evEntries.map(({ stat, value }) => (
                       <span
                         key={stat}
-                        className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-[11px] font-mono font-semibold"
+                        className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-sm font-mono font-semibold"
                         style={{ color: EV_STAT_COLORS[stat] }}
                       >
                         {value} {EV_STAT_LABELS[stat]}
@@ -767,12 +791,12 @@ function TeamPanel({ trainer }) {
 
               {mon.moveset.length > 0 && (
                 <div>
-                  <p className="mb-1 text-[11px] text-text-muted">Moves</p>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">Moves</p>
                   <div className="flex flex-wrap gap-1">
                     {mon.moveset.map((mv) => (
                       <span
                         key={mv}
-                        className="rounded border border-border px-1.5 py-0.5 text-[10px] capitalize text-text-secondary"
+                        className="rounded-md border border-border bg-bg-surface-2 px-2.5 py-1 text-sm capitalize leading-relaxed text-text-primary"
                       >
                         {mv.replace(/_/g, " ")}
                       </span>
@@ -783,8 +807,8 @@ function TeamPanel({ trainer }) {
 
               {mon.heldItem?.length > 0 && (
                 <div>
-                  <p className="text-[11px] text-text-muted">Held item</p>
-                  <p className="text-[11px] capitalize text-text-primary">
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-text-secondary">Held item</p>
+                  <p className="text-sm capitalize text-text-primary">
                     {mon.heldItem.map((h) => h.replace(/_/g, " ")).join(", ")}
                   </p>
                 </div>
@@ -898,7 +922,7 @@ function LootPanel({ trainer }) {
       <EmptyState
         icon={PackageSearch}
         title="No loot table matched"
-        description="No trainers/single or trainers/groups loot table filename matches this trainer — it likely doesn't drop loot in this pack."
+        description="No trainers/single or trainers/groups loot table filename matches this trainer. It may have no loot in this pack."
       />
     );
   }
@@ -923,26 +947,25 @@ function LootPanel({ trainer }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-2 text-[11px] text-text-muted">
+      <div className="flex flex-wrap items-center gap-2 text-sm text-text-muted">
         <Badge tone={loot.linkStatus === "single" ? "accent" : "info"}>
           {loot.linkStatus === "single"
             ? "Direct trainer loot table"
             : `Group loot: ${trainer.loot.groupMatch}`}
         </Badge>
-        <span className="font-mono truncate max-w-60">{loot.rootTableId}</span>
-        <span className="text-border">•</span>
-        <span>{items.length} possible items</span>
+        <span className="min-w-0 break-all font-mono text-xs text-text-secondary">{loot.rootTableId}</span>
+        <span className="rounded-md border border-border bg-bg-surface px-2.5 py-1 text-text-primary">{items.length} reward entries</span>
       </div>
 
       {issueCount > 0 && (
         <div className="flex flex-col gap-1 rounded-md border border-warning/30 bg-warning-soft p-2.5">
           {loot.issues.slice(0, 5).map((issue, i) => (
-            <p key={i} className="flex flex-wrap items-start gap-1.5 text-[11px] text-warning">
+            <p key={i} className="flex flex-wrap items-start gap-1.5 text-sm text-warning">
               <AlertTriangle size={12} className="mt-0.5 shrink-0" />
               {issue.type === "missing"
                 ? `Referenced loot table not found: ${issue.id}`
                 : issue.type === "cycle"
-                ? `Cycle detected — table references itself: ${issue.id}`
+                ? `Cycle detected. Table references itself: ${issue.id}`
                 : `Resolution depth limit hit at: ${issue.id}`}
               <span className="text-text-muted break-all">
                 ({issue.sourcePath.join(" → ")})
@@ -950,7 +973,7 @@ function LootPanel({ trainer }) {
             </p>
           ))}
           {issueCount > 5 && (
-            <p className="text-[11px] text-text-muted">
+            <p className="text-sm text-text-muted">
               +{issueCount - 5} more issue{issueCount - 5 === 1 ? "" : "s"}
             </p>
           )}
@@ -961,10 +984,27 @@ function LootPanel({ trainer }) {
         <EmptyState
           icon={PackageSearch}
           title="No items resolved"
-          description="The loot table resolved but produced no item entries — it may be entirely conditional or reference only missing tables."
+          description="No items found in the loot table. It may be conditional or reference missing tables."
         />
       ) : (
         <>
+          <div className="rounded-lg border border-border bg-bg-surface p-4">
+            <h3 className="text-sm font-semibold text-text-primary">Possible rewards</h3>
+            <p className="mt-1 text-sm leading-relaxed text-text-secondary">
+              Chances are theoretical, per-pool estimates—not a guaranteed chance per battle.
+              Rolls, conditions, and nested tables can affect the rewards you receive.
+              Repeated items may come from different entries or tables.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p role="status" className="text-sm text-text-secondary">
+              {rows.length} of {items.length} entries · {groups.length} tables
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" onClick={() => { setExpandedGroups(new Set(groups.map((group) => group.key))); setAutoExpandedGroups(new Set()); }} className="rounded-md border border-border bg-bg-surface px-3 py-2 text-sm text-accent hover:bg-bg-surface-2 focus-visible:outline-2 focus-visible:outline-accent">Expand all</button>
+              <button type="button" onClick={() => { setExpandedGroups(new Set()); setAutoExpandedGroups(new Set()); }} className="rounded-md border border-border bg-bg-surface px-3 py-2 text-sm text-text-secondary hover:bg-bg-surface-2 focus-visible:outline-2 focus-visible:outline-accent">Collapse all</button>
+            </div>
+          </div>
           <div className="relative">
             <Search
               size={14}
@@ -974,12 +1014,14 @@ function LootPanel({ trainer }) {
               type="text"
               value={lootSearch}
               onChange={(e) => setLootSearch(e.target.value)}
-              placeholder={`Search ${items.length} possible drops…`}
-              className="w-full rounded-md border border-border bg-bg-surface-2 py-2 pl-8 pr-8 text-xs text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
+              aria-label="Search possible drops"
+                            placeholder={`Search ${items.length} possible drops…`}
+              className="w-full rounded-md border border-border bg-bg-surface-2 py-2.5 pl-8 pr-8 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
             />
             {lootSearch && (
               <button
                 onClick={() => setLootSearch("")}
+                aria-label="Clear drop search"
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
               >
                 <X size={13} />
@@ -1055,8 +1097,10 @@ function LootGroupSection({ group, isOpen, onToggle }) {
   return (
     <div className="rounded-lg border border-border overflow-hidden">
       <button
+        type="button"
+        aria-expanded={isOpen}
         onClick={onToggle}
-        className="flex w-full items-center gap-2 px-3 py-2.5 text-left hover:bg-bg-surface-2 transition-colors duration-100"
+        className="flex w-full items-center gap-3 bg-bg-surface px-4 py-3 text-left hover:bg-bg-surface-2 focus-visible:outline-2 focus-visible:outline-accent focus-visible:-outline-offset-2 transition-colors duration-100"
       >
         <ChevronRight
           size={14}
@@ -1065,12 +1109,12 @@ function LootGroupSection({ group, isOpen, onToggle }) {
           }`}
         />
         <span className="min-w-0 flex-1">
-          <span className="block text-xs font-medium text-text-primary truncate">
+          <span className="block break-words text-sm font-semibold text-text-primary">
             {group.label}
           </span>
           {group.subtitle && (
             <span
-              className="block text-[10px] text-text-muted truncate"
+              className="block break-all text-xs leading-relaxed text-text-secondary"
               title={group.subtitle}
             >
               {group.subtitle}
@@ -1092,7 +1136,7 @@ function LootGroupSection({ group, isOpen, onToggle }) {
 // trainer has enough drops to matter (some RCT trainers flatten to 1000+).
 // Uses a fixed row size on purpose — dynamic measureElement calls flushSync
 // under React 19 and throws during layout.
-const LOOT_ROW_SIZE = 64;
+const LOOT_ROW_SIZE = 128;
 
 function LootRowList({ rows, bordered = true }) {
   const scrollRef = useRef(null);
@@ -1140,7 +1184,9 @@ function LootRowList({ rows, bordered = true }) {
           return (
             <div
               key={row.id}
-              className="absolute left-0 top-0 w-full border-b border-border overflow-hidden"
+              tabIndex={0}
+                            aria-label={`Reward entry: ${row.item}`}
+                            className="absolute left-0 top-0 w-full overflow-auto border-b border-border focus-visible:outline-2 focus-visible:outline-accent focus-visible:-outline-offset-2"
               style={{
                 height: `${virtualRow.size}px`,
                 transform: `translateY(${virtualRow.start}px)`,
@@ -1168,8 +1214,9 @@ function LootRow({ row }) {
   return (
     <div className="flex flex-col gap-1.5 px-3 py-2.5 hover:bg-bg-surface-2 transition-colors duration-100">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <span className="font-mono text-xs text-text-primary min-w-0 break-all">
-          {row.item}
+        <span className="min-w-0 break-words text-sm font-semibold capitalize text-text-primary" title={row.item}>
+          {row.item.split(":").pop().replace(/_/g, " ")}
+          <span className="ml-2 font-mono text-xs font-normal normal-case text-text-secondary">{row.item}</span>
         </span>
         <span className="ml-auto flex shrink-0 items-center gap-1.5">
           {chanceLabel && (
@@ -1179,9 +1226,9 @@ function LootRow({ row }) {
                   ? `Theoretical chance ${chanceLabel} — this entry's weight (${row.weight}) is shared across a nested/grouped table, working out to an effective weight of ~${row.theoreticalWeight.toFixed(2)} out of this pool's ${row.poolTotalWeight} total weight. A simplified model, not a full simulation — see the source for details.`
                   : `Theoretical chance ${chanceLabel} — weight ${row.weight} out of this pool's ${row.poolTotalWeight} total weight.`
               }
-              className="rounded bg-accent-soft px-1.5 py-0.5 text-[10px] font-semibold text-accent"
+              className="rounded bg-accent-soft px-1.5 py-0.5 text-xs font-semibold text-accent"
             >
-              {chanceLabel}
+              {chanceLabel} chance
             </span>
           )}
           <span
@@ -1190,24 +1237,24 @@ function LootRow({ row }) {
                 ? `Raw entry weight ${row.weight} (effective weight after nested grouping: ~${row.theoreticalWeight.toFixed(2)})`
                 : "Weight"
             }
-            className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-[10px] text-text-secondary"
+            className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-xs text-text-secondary"
           >
-            w{row.weight}
+            Weight {row.weight}
           </span>
           <span
             title="Rolls"
-            className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-[10px] text-text-secondary"
+            className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-xs text-text-secondary"
           >
-            ×{row.rolls}
+            Rolls {row.rolls}
           </span>
           {row.setCount && (
-            <Badge tone="accent">{row.setCount}</Badge>
+            <Badge tone="accent">Quantity {row.setCount}</Badge>
           )}
           {row.direct ? (
             <Badge tone="neutral">Direct</Badge>
           ) : (
             <span
-              className="max-w-35 truncate text-[10px] text-text-muted"
+              className="max-w-35 truncate text-xs text-text-muted"
               title={row.sourcePath.join(" → ")}
             >
               via {row.sourcePath.slice(1).join(" → ")}
@@ -1220,7 +1267,7 @@ function LootRow({ row }) {
           {row.conditions.map((c, i) => (
             <span
               key={i}
-              className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-[10px] text-text-secondary"
+              className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-xs text-text-secondary"
             >
               {formatCondition(c)}
             </span>
@@ -1253,7 +1300,7 @@ function MetaPanel({ trainer }) {
               {Object.entries(trainer.ai.data).map(([k, v]) => (
                 <span
                   key={k}
-                  className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-[10px] text-text-secondary"
+                  className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-xs text-text-secondary"
                 >
                   {k}: {String(v)}
                 </span>
@@ -1261,7 +1308,7 @@ function MetaPanel({ trainer }) {
             </div>
           )}
           {Object.keys(trainer.battleRules || {}).length > 0 && (
-            <pre className="mt-1 overflow-x-auto rounded bg-bg-surface-2 p-2 text-[10px] text-text-secondary">
+            <pre className="mt-1 overflow-x-auto rounded bg-bg-surface-2 p-2 text-xs text-text-secondary">
               {JSON.stringify(trainer.battleRules, null, 2)}
             </pre>
           )}
@@ -1273,7 +1320,7 @@ function MetaPanel({ trainer }) {
           <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
             Source
           </p>
-          <p className="truncate font-mono text-[11px] text-text-secondary">
+          <p className="break-all font-mono text-sm leading-relaxed text-text-secondary">
             {trainer.sourceFile}
           </p>
           <p className="text-xs text-text-primary">
@@ -1292,14 +1339,14 @@ function MetaPanel({ trainer }) {
           </p>
           {trainer.bag?.length > 0 && (
             <div>
-              <p className="mt-1 text-[11px] font-medium text-text-secondary">
+              <p className="mt-1 text-sm font-medium text-text-secondary">
                 Bag
               </p>
               <div className="mt-1 flex flex-wrap gap-1">
                 {trainer.bag.map((b, i) => (
                   <span
                     key={i}
-                    className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-[10px] text-text-secondary"
+                    className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-xs text-text-secondary"
                   >
                     {typeof b === "string" ? b : JSON.stringify(b)}
                   </span>

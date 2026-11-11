@@ -8,11 +8,25 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
+# Test sources and fixtures stay tracked: CI uses them before deployment.
+# Generated test output and local browser downloads do not belong in Git.
+/coverage/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/.cache/
+
+# Local datapacks and scratch files (not application assets or test fixtures)
+/*.zip
+/*.jar
+/tmp/
+/temp/
+*.log
 
 # next.js
 /.next/
+/.next-dev/
 /out/
 
 # production

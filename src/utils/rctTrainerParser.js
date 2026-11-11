@@ -1,4 +1,6 @@
-import JSZip from "jszip";
+import { parseJsonWithFallbacks } from "./parseJson.js";
+import { loadArchive, readArchiveText, createProcessingContext, rethrowProcessingError } from "./archiveProcessing.js";
+import { indexDatapackArchive } from "./archivePaths.js";
 
 // ─────────────────────────────────────────────────────────────────────────
 // Path/id helpers
@@ -16,31 +18,28 @@ function pathToId(path) {
   return `${m[1]}:${m[2]}`;
 }
 
-async function readJson(zip, path) {
+async function readJson(zip, path, options) {
   const entry = zip.files[path];
   if (!entry || entry.dir) return null;
-  let text = await entry.async("string");
-  if (text.charCodeAt(0) === 0xfeff) text = text.slice(1); // strip BOM
-  try {
-    return JSON.parse(text);
-  } catch {
-    return null;
-  }
+  const text = await readArchiveText(entry, options);
+  return parseJsonWithFallbacks(text, path, options);
 }
 
 // ─────────────────────────────────────────────────────────────────────────
 // Loot table index — every file under any namespace's loot_table/, keyed
 // by its resolved id ("namespace:path/without/extension").
 // ─────────────────────────────────────────────────────────────────────────
-async function buildLootTableIndex(zip) {
+async function buildLootTableIndex(zip, options) {
   const index = new Map();
   const paths = Object.keys(zip.files).filter((p) =>
     p.match(/^data\/[^/]+\/loot_table\/.+\.json$/)
   );
+  const processing = createProcessingContext(options);
   for (const path of paths) {
+    await processing.checkpoint();
     const id = pathToId(path);
     if (!id) continue;
-    const data = await readJson(zip, path);
+    const data = await readJson(zip, path, options);
     if (data) index.set(id, data);
   }
   return index;
@@ -105,7 +104,9 @@ function extractSetCount(functions) {
  * @param {Object} ctx
  * @returns {{ items: object[], issues: object[] }}
  */
-function resolveLootTable(id, index, ctx) {
+async function resolveLootTable(id, index, ctx) {
+  await ctx.processing.checkpoint();
+  ctx.processing.row();
   const {
     visited,
     sourcePath,
@@ -143,19 +144,26 @@ function resolveLootTable(id, index, ctx) {
   const issues = [];
 
   const pools = Array.isArray(table.pools) ? table.pools : [];
-  pools.forEach((pool, poolIndex) => {
+  for (const [poolIndex, pool] of pools.entries()) {
+    await ctx.processing.checkpoint();
     const rolls = normalizeRolls(pool.rolls);
     const poolConditions = pool.conditions || [];
     const entries = Array.isArray(pool.entries) ? pool.entries : [];
 
 
-    const poolTotalWeight =
-      entries.reduce((sum, e) => sum + (e.weight ?? 1), 0) || 1;
+    let poolTotalWeight = 0;
+    for (const entry of entries) {
+      await ctx.processing.checkpoint();
+      poolTotalWeight += entry.weight ?? 1;
+    }
+    poolTotalWeight ||= 1;
 
 
     const thisPoolRootTotal = depth === 0 ? poolTotalWeight : rootPoolTotalWeight;
 
     for (const entry of entries) {
+      await ctx.processing.checkpoint();
+      ctx.processing.row();
       const entryConditions = entry.conditions || [];
       const combinedConditions = [
         ...inheritedConditions,
@@ -189,7 +197,8 @@ function resolveLootTable(id, index, ctx) {
         if (typeof entry.value === "string") {
           const nestedTable = index.get(entry.value);
           const numPoolsNested = nestedTable?.pools?.length || 1;
-          const nested = resolveLootTable(entry.value, index, {
+          const nested = await resolveLootTable(entry.value, index, {
+            processing: ctx.processing,
             visited: nextVisited,
             sourcePath: nextSourcePath,
             inheritedConditions: combinedConditions,
@@ -197,8 +206,8 @@ function resolveLootTable(id, index, ctx) {
             probability: entryProbability / numPoolsNested,
             rootPoolTotalWeight: thisPoolRootTotal,
           });
-          items.push(...nested.items);
-          issues.push(...nested.issues);
+          for (const item of nested.items) items.push(item);
+          for (const issue of nested.issues) issues.push(issue);
         } else if (entry.value && typeof entry.value === "object") {
 
           const inlineId = `${id}#inline-pool${poolIndex}`;
@@ -208,7 +217,8 @@ function resolveLootTable(id, index, ctx) {
           const numPoolsNested = inlinePools.length || 1;
           const fakeIndex = new Map(index);
           fakeIndex.set(inlineId, { pools: inlinePools });
-          const nested = resolveLootTable(inlineId, fakeIndex, {
+          const nested = await resolveLootTable(inlineId, fakeIndex, {
+            processing: ctx.processing,
             visited: nextVisited,
             sourcePath: nextSourcePath,
             inheritedConditions: combinedConditions,
@@ -216,8 +226,8 @@ function resolveLootTable(id, index, ctx) {
             probability: entryProbability / numPoolsNested,
             rootPoolTotalWeight: thisPoolRootTotal,
           });
-          items.push(...nested.items);
-          issues.push(...nested.issues);
+          for (const item of nested.items) items.push(item);
+          for (const issue of nested.issues) issues.push(issue);
         }
       } else if (entry.type === "minecraft:empty") {
         items.push({
@@ -240,16 +250,17 @@ function resolveLootTable(id, index, ctx) {
       // this pack only uses item / loot_table / empty, but new entry types
       // shouldn't break parsing of the rest of the file.
     }
-  });
+  }
 
   return { items, issues };
 }
 
-function resolveTrainerLoot(rootId, index) {
+async function resolveTrainerLoot(rootId, index, processing) {
   if (!rootId) {
     return { status: "none", rootTableId: null, items: [], issues: [] };
   }
-  const { items, issues } = resolveLootTable(rootId, index, {
+  const { items, issues } = await resolveLootTable(rootId, index, {
+    processing,
     visited: new Set(),
     sourcePath: [],
     inheritedConditions: [],
@@ -301,9 +312,11 @@ function resolveLootLink(trainerId, namespace, index) {
 // ─────────────────────────────────────────────────────────────────────────
 // Trainer parsing
 // ─────────────────────────────────────────────────────────────────────────
-export async function parseRctTrainersFromZip(file) {
-  const zip = await JSZip.loadAsync(file);
-  const lootIndex = await buildLootTableIndex(zip);
+export async function parseRctTrainersFromZip(file, options = {}) {
+  const { onDiagnostic = () => {} } = options;
+  const processing = createProcessingContext(options);
+  const zip = indexDatapackArchive(await loadArchive(file, options), options);
+  const lootIndex = await buildLootTableIndex(zip, options);
 
   const trainerPaths = Object.keys(zip.files).filter((p) =>
     p.match(/^data\/[^/]+\/trainers\/[^/]+\.json$/)
@@ -312,21 +325,25 @@ export async function parseRctTrainersFromZip(file) {
   const results = [];
 
   for (const path of trainerPaths) {
+    await processing.checkpoint();
     try {
-      const data = await readJson(zip, path);
+      const data = await readJson(zip, path, options);
       if (!data) continue;
 
       const m = path.match(/^data\/([^/]+)\/trainers\/([^/]+)\.json$/);
       const namespace = m[1];
       const trainerId = m[2];
 
-      const team = (data.team || []).map((mon, i) => {
+      const team = [];
+      for (const [i, mon] of (data.team || []).entries()) {
+        await processing.checkpoint();
+        processing.row();
         const evs = mon.evs || {};
         const totalEVs = Object.values(evs).reduce(
           (sum, v) => sum + (v || 0),
           0
         );
-        return {
+        team.push({
           index: i + 1,
           species: mon.species || "unknown",
           gender: mon.gender || "UNKNOWN",
@@ -341,15 +358,16 @@ export async function parseRctTrainersFromZip(file) {
           gimmicks: mon.gimmicks || {},
           aspects: mon.aspects || [],
           shiny: Boolean(mon.shiny),
-        };
-      });
+        });
+      }
 
       const lootLink = resolveLootLink(trainerId, namespace, lootIndex);
-      const loot = resolveTrainerLoot(lootLink.rootTableId, lootIndex);
+      const loot = await resolveTrainerLoot(lootLink.rootTableId, lootIndex, processing);
 
       const levels = team.map((p) => p.level);
 
-      results.push({
+      processing.row();
+            results.push({
         id: trainerId,
         namespace,
         name: data.name?.literal || data.identity || trainerId,
@@ -371,6 +389,8 @@ export async function parseRctTrainersFromZip(file) {
         },
       });
     } catch (err) {
+        rethrowProcessingError(err);
+        onDiagnostic({ path: typeof path === "string" ? path : file.name, code: "processing-error", message: err.message });
       console.warn(`Failed to parse trainer ${path}:`, err.message);
     }
   }

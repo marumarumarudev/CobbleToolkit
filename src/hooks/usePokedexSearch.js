@@ -1,9 +1,42 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { searchNameSuggestions } from "@/utils/nameUtils";
 
 const POKEAPI_BASE = "https://pokeapi.co/api/v2";
 const LIST_STORE = "pokedexListCache";
+const REQUEST_TIMEOUT_MS = 15_000;
+
+async function fetchPokedexJson(path, signal, name) {
+  const controller = new AbortController();
+  let timedOut = false;
+  const abort = () => controller.abort();
+  signal.addEventListener("abort", abort, { once: true });
+  if (signal.aborted) abort();
+  const timeout = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, REQUEST_TIMEOUT_MS);
+  try {
+    const response = await fetch(`${POKEAPI_BASE}/${path}`, { signal: controller.signal });
+    if (!response.ok) {
+      if (response.status === 404 && name) {
+        throw new Error(`Couldn't find "${name}" in the Pokédex`);
+      }
+      if (response.status === 429) {
+        throw new Error("PokeAPI rate limit reached. Please try again shortly.");
+      }
+      throw new Error(`PokeAPI request failed (HTTP ${response.status}). Please try again.`);
+    }
+    return await response.json();
+  } catch (error) {
+    if (timedOut) throw new Error("PokeAPI request timed out. Please try again.");
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+    signal.removeEventListener("abort", abort);
+  }
+}
 
 // Bumped from "pokedexDetailCache" → busts all previously cached entries
 // that stored raw PokeAPI stat names ("special-attack") instead of the
@@ -75,44 +108,57 @@ export function usePokedexSearch() {
   const [listError, setListError]   = useState(null);
   const detailCache       = useRef(new Map());
   const detailStoreLoaded = useRef(false);
+  const requestControllers = useRef(new Set());
+
+  useEffect(() => {
+    const controllers = requestControllers.current;
+    return () => {
+      controllers.forEach((controller) => controller.abort());
+      controllers.clear();
+    };
+  }, []);
 
   // ── Pokédex name list (cached in IDB) ──────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
+    const controller = new AbortController();
 
     async function loadList() {
       let storage = null;
+      let hasCachedNames = false;
       try {
         const { default: getStorage } = await import("@/utils/indexedDBStorage");
         storage = getStorage();
         const cached = await storage.loadData(LIST_STORE);
         if (Array.isArray(cached) && cached.length > 0) {
+          hasCachedNames = true;
           if (!cancelled) { setAllNames(cached); setListLoading(false); }
-          return;
         }
       } catch {
         // Cache read failed — fall through to live fetch
       }
 
+      if (cancelled) return;
       try {
-        const res = await fetch(`${POKEAPI_BASE}/pokemon?limit=2000`);
-        if (!res.ok) throw new Error(`PokeAPI list request failed (${res.status})`);
-        const data = await res.json();
+        const data = await fetchPokedexJson("pokemon?limit=2000", controller.signal);
         const names = data.results.map((p) => p.name);
-        if (!cancelled) setAllNames(names);
+        if (cancelled) return;
+        setAllNames(names);
+        setListError(null);
         if (storage) {
           try { await storage.saveData(LIST_STORE, names); }
           catch (e) { console.warn("Couldn't persist Pokédex list cache:", e.message); }
         }
       } catch (err) {
-        if (!cancelled) setListError(err.message || "Failed to load Pokédex list");
+        // A failed refresh must not disable a usable cached list.
+        if (!cancelled && !hasCachedNames) setListError(err.message || "Failed to load Pokédex list");
       } finally {
         if (!cancelled) setListLoading(false);
       }
     }
 
     loadList();
-    return () => { cancelled = true; };
+    return () => { cancelled = true; controller.abort(); };
   }, []);
 
   // ── Detail cache (IDB → in-memory Map) ────────────────────────────────────
@@ -147,16 +193,11 @@ export function usePokedexSearch() {
   const searchNames = useCallback(
     (query, limit = 20) => {
       if (!query || query.trim().length === 0) return [];
-      const q = query.trim().toLowerCase();
-      return allNames
-        .filter((n) => n.includes(q) && !NON_SPAWNABLE_FORM_PATTERN.test(n))
-        .sort((a, b) => {
-          const aStarts = a.startsWith(q) ? 0 : 1;
-          const bStarts = b.startsWith(q) ? 0 : 1;
-          if (aStarts !== bStarts) return aStarts - bStarts;
-          return a.localeCompare(b);
-        })
-        .slice(0, limit);
+      return searchNameSuggestions(
+        allNames.filter((name) => !NON_SPAWNABLE_FORM_PATTERN.test(name)),
+        query,
+        limit
+      );
     },
     [allNames] // NON_SPAWNABLE_FORM_PATTERN is stable (module-level const) — not needed here
   );
@@ -164,61 +205,64 @@ export function usePokedexSearch() {
   // ── Detail fetch ──────────────────────────────────────────────────────────
   const fetchDetail = useCallback(
     async (name) => {
-      await ensureDetailStoreLoaded();
+      const controller = new AbortController();
+      requestControllers.current.add(controller);
+      try {
+        await ensureDetailStoreLoaded();
+        if (controller.signal.aborted) throw new DOMException("Request aborted", "AbortError");
 
-      if (detailCache.current.has(name)) {
-        return detailCache.current.get(name);
+        if (detailCache.current.has(name)) {
+          return detailCache.current.get(name);
+        }
+
+        const pokemon = await fetchPokedexJson(`pokemon/${name}`, controller.signal, name);
+
+        // Species endpoint requires the base slug, not form-suffixed names
+        const species = await fetchPokedexJson(`pokemon-species/${pokemon.species.name}`, controller.signal, name);
+
+        const genderRate = species.gender_rate;
+        const genderRatio =
+          genderRate === -1
+            ? { genderless: true }
+            : { female: genderRate / 8, male: 1 - genderRate / 8 };
+
+        // Normalize stat names before storing — this is the core fix.
+        // PokeAPI returns "special-attack" / "special-defense" (hyphens, American).
+        // baitSeasoningData expects "special_attack" / "special_defence" (underscores, British).
+        // Mismatch caused EV_YIELD_BERRIES.find() to always return undefined for
+        // Sp.Atk/Sp.Def Pokémon, recommending the wrong berry silently.
+        const evYield = pokemon.stats
+          .filter((s) => s.effort > 0)
+          .map((s) => ({
+            stat:   normalizeStatName(s.stat.name),
+            amount: s.effort,
+          }))
+          .sort((a, b) => b.amount - a.amount);
+
+        const result = {
+          id:          pokemon.id,
+          name:        capitalize(pokemon.name.replace(/-/g, " ")),
+          slug:        pokemon.name,
+          sprite:      pokemon.sprites?.other?.["official-artwork"]?.front_default || spriteUrl(pokemon.id),
+          types:       pokemon.types.map((t) => capitalize(t.type.name)),
+          eggGroups:   species.egg_groups.map(
+            (g) => EGG_GROUP_DISPLAY_NAMES[g.name] || capitalize(g.name)
+          ),
+          isLegendary: species.is_legendary,
+          isMythical:  species.is_mythical,
+          isHighRarity: species.is_legendary || species.is_mythical,
+          genderRatio,
+          habitat:     species.habitat?.name ? capitalize(species.habitat.name) : null,
+          evYield,
+        };
+
+        detailCache.current.set(name, result);
+        persistDetailCache(); // fire-and-forget
+
+        return result;
+      } finally {
+        requestControllers.current.delete(controller);
       }
-
-      const pokemonRes = await fetch(`${POKEAPI_BASE}/pokemon/${name}`);
-      if (!pokemonRes.ok) throw new Error(`Couldn't find "${name}" in the Pokédex`);
-      const pokemon = await pokemonRes.json();
-
-      // Species endpoint requires the base slug, not form-suffixed names
-      const speciesRes = await fetch(`${POKEAPI_BASE}/pokemon-species/${pokemon.species.name}`);
-      if (!speciesRes.ok) throw new Error(`Couldn't find "${name}" in the Pokédex`);
-      const species = await speciesRes.json();
-
-      const genderRate = species.gender_rate;
-      const genderRatio =
-        genderRate === -1
-          ? { genderless: true }
-          : { female: genderRate / 8, male: 1 - genderRate / 8 };
-
-      // Normalize stat names before storing — this is the core fix.
-      // PokeAPI returns "special-attack" / "special-defense" (hyphens, American).
-      // baitSeasoningData expects "special_attack" / "special_defence" (underscores, British).
-      // Mismatch caused EV_YIELD_BERRIES.find() to always return undefined for
-      // Sp.Atk/Sp.Def Pokémon, recommending the wrong berry silently.
-      const evYield = pokemon.stats
-        .filter((s) => s.effort > 0)
-        .map((s) => ({
-          stat:   normalizeStatName(s.stat.name),
-          amount: s.effort,
-        }))
-        .sort((a, b) => b.amount - a.amount);
-
-      const result = {
-        id:          pokemon.id,
-        name:        capitalize(pokemon.name.replace(/-/g, " ")),
-        slug:        pokemon.name,
-        sprite:      pokemon.sprites?.other?.["official-artwork"]?.front_default || spriteUrl(pokemon.id),
-        types:       pokemon.types.map((t) => capitalize(t.type.name)),
-        eggGroups:   species.egg_groups.map(
-          (g) => EGG_GROUP_DISPLAY_NAMES[g.name] || capitalize(g.name)
-        ),
-        isLegendary: species.is_legendary,
-        isMythical:  species.is_mythical,
-        isHighRarity: species.is_legendary || species.is_mythical,
-        genderRatio,
-        habitat:     species.habitat?.name ? capitalize(species.habitat.name) : null,
-        evYield,
-      };
-
-      detailCache.current.set(name, result);
-      persistDetailCache(); // fire-and-forget
-
-      return result;
     },
     [ensureDetailStoreLoaded, persistDetailCache]
   );

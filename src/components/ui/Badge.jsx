@@ -12,7 +12,7 @@ export default function Badge({ tone = "neutral", className = "", children }) {
     <span
       className={[
         "inline-flex items-center gap-1 rounded-full border px-2 py-0.5",
-        "text-[11px] font-medium leading-none whitespace-nowrap",
+        "text-xs font-medium leading-4 whitespace-nowrap",
         TONES[tone],
         className,
       ].join(" ")}

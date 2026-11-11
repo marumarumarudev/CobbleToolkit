@@ -1,34 +1,21 @@
-import JSZip from "jszip";
+import { loadArchive, readArchiveText, createProcessingContext, rethrowProcessingError } from "./archiveProcessing.js";
+import { parseJsonWithFallbacks } from "./parseJson.js";
+import { indexDatapackArchive } from "./archivePaths.js";
 
-export async function parseCobblemonZip(file) {
-  // Add timeout protection for Chrome
-  const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(
-      () =>
-        reject(new Error("File processing timeout - file may be corrupted")),
-      30000
-    ); // 30 second timeout
-  });
-
-  const processingPromise = async () => {
-    // Use a more memory-efficient approach for Chrome
-    const zip = await JSZip.loadAsync(file, {
-      // Limit memory usage by processing files individually
-      checkCRC32: false,
-      // Use streaming for large files
-      streamFiles: true,
-    });
-
+export async function parseCobblemonZip(file, { signal, onDiagnostic = () => {}, allowRepair = true } = {}) {
+  const options = { signal, onDiagnostic, allowRepair };
+  const processing = createProcessingContext(options);
+  const zip = indexDatapackArchive(await loadArchive(file, options), options);
     if (Object.keys(zip.files).length === 0) {
       throw new Error("The archive is empty.");
     }
 
     const hasSpawnData = Object.keys(zip.files).some((name) =>
-      name.includes("/spawn_pool_world/")
+      /^data\/[^/]+\/spawn_pool_world\/.+\.json$/.test(name)
     );
-    if (!hasSpawnData) {
-      throw new Error("No spawn_pool_world folder found.");
-    }
+    // Shared uploads may be trainer-only or species-only. Absence of this
+    // tool's data is a successful no-op, not a malformed archive.
+    if (!hasSpawnData) return [];
 
     const results = [];
 
@@ -57,16 +44,19 @@ export async function parseCobblemonZip(file) {
 
         // Process batch with small delays to allow garbage collection
         for (const fileName of batch) {
+          await processing.checkpoint();
           try {
             const zipEntry = zip.files[fileName];
 
             if (!zipEntry || zipEntry._data.uncompressedSize === 0) {
+              onDiagnostic({ path: fileName, code: "empty-file", message: "File is empty or missing." });
               console.warn(`⚠️ Skipping empty or missing file: ${fileName}`);
               continue;
             }
 
             // Check file size to avoid processing extremely large files
             if (zipEntry._data.uncompressedSize > 10 * 1024 * 1024) {
+              onDiagnostic({ path: fileName, code: "oversized-file", message: "File exceeds the 10 MB limit." });
               // 10MB limit
               console.warn(
                 `⚠️ Skipping very large file: ${fileName} (${Math.round(
@@ -78,8 +68,10 @@ export async function parseCobblemonZip(file) {
 
             let content;
             try {
-              content = await zipEntry.async("string");
+              content = await readArchiveText(zipEntry, options);
             } catch (contentErr) {
+                rethrowProcessingError(contentErr);
+              onDiagnostic({ path: fileName, code: "unreadable-file", message: "File content could not be read." });
               console.warn(
                 `⚠️ Failed to read file content: ${fileName}`,
                 contentErr
@@ -93,70 +85,15 @@ export async function parseCobblemonZip(file) {
               typeof content !== "string" ||
               content.trim().length === 0
             ) {
+              onDiagnostic({ path: fileName, code: "empty-file", message: "File content is empty or invalid." });
               console.warn(
                 `⚠️ Skipping empty or invalid content in: ${fileName}`
               );
               continue;
             }
 
-            // Ensure it is valid JSON
-            let json;
-            try {
-              json = JSON.parse(content);
-            } catch (parseErr) {
-              // Try to fix common JSON formatting issues
-              try {
-                // Fix common indentation and formatting issues
-                let fixedContent = content
-                  // Remove trailing commas before closing brackets/braces
-                  .replace(/,(\s*[}\]])/g, "$1")
-                  // Fix missing quotes around property names
-                  .replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":')
-                  // Fix single quotes to double quotes
-                  .replace(/'/g, '"')
-                  // Remove comments (simple line comments)
-                  .replace(/\/\/.*$/gm, "")
-                  // Remove trailing commas in arrays
-                  .replace(/,(\s*\])/g, "$1")
-                  // Fix common spacing issues
-                  .replace(/\s+/g, " ")
-                  .trim();
-
-                // Try to parse the fixed content
-                json = JSON.parse(fixedContent);
-                console.log(`✅ Fixed JSON formatting for ${fileName}`);
-              } catch (fixErr) {
-                // Try more aggressive JSON repair
-                try {
-                  let repairedContent = content
-                    // Fix missing opening braces/brackets
-                    .replace(/^([^{]*?)(\w+\s*:)/, "{$1$2")
-                    .replace(/(\w+\s*:)([^}]*?)$/, "$1$2}")
-                    // Fix missing quotes around string values
-                    .replace(
-                      /:\s*([a-zA-Z_][a-zA-Z0-9_]*)(\s*[,}])/g,
-                      ':"$1"$2'
-                    )
-                    // Fix boolean and null values
-                    .replace(/:\s*(true|false|null)(\s*[,}])/g, ":$1$2")
-                    // Fix numeric values
-                    .replace(/:\s*(\d+\.?\d*)(\s*[,}])/g, ":$1$2")
-                    // Remove any remaining problematic characters
-                    .replace(/[^\x20-\x7E]/g, "")
-                    .trim();
-
-                  // Try to parse the repaired content
-                  json = JSON.parse(repairedContent);
-                  console.log(`✅ Repaired JSON structure for ${fileName}`);
-                } catch (repairErr) {
-                  console.warn(
-                    `⚠️ Skipping invalid JSON in: ${fileName}`,
-                    parseErr
-                  );
-                  continue;
-                }
-              }
-            }
+            let json = parseJsonWithFallbacks(content, fileName, options);
+            if (!json) continue;
 
             // Validate JSON structure before processing
             if (
@@ -164,6 +101,7 @@ export async function parseCobblemonZip(file) {
               typeof json !== "object" ||
               !Array.isArray(json.spawns)
             ) {
+              onDiagnostic({ path: fileName, code: "invalid-structure", message: "Expected an object with a spawns array." });
               console.warn(
                 `⚠️ Skipping file with invalid spawn structure: ${fileName}`
               );
@@ -172,9 +110,11 @@ export async function parseCobblemonZip(file) {
 
             // Process spawns with additional validation
             for (const entry of json.spawns) {
+              await processing.checkpoint();
               try {
                 // Validate entry structure
                 if (!entry || typeof entry !== "object") {
+                  onDiagnostic({ path: fileName, code: "invalid-entry", message: "Spawn entry is null or not an object." });
                   continue; // Skip invalid entries
                 }
 
@@ -235,16 +175,18 @@ export async function parseCobblemonZip(file) {
                   ? entry.herdablePokemon
                   : null;
                 const units = [];
-                if (herdMembers && herdMembers.length) {
-                  for (const member of herdMembers) {
-                    if (!member || typeof member !== "object") continue;
+                if (entry.type === "pokemon-herd" || herdMembers) {
+                  if (!herdMembers?.length) onDiagnostic({ path: fileName, code: "invalid-herd", message: "Herd has no valid member list." });
+                  for (const member of herdMembers || []) {
+                    await processing.checkpoint();
+                    if (!member || typeof (member.pokemon || member.species) !== "string" || !(member.pokemon || member.species).trim()) {
+                      onDiagnostic({ path: fileName, code: "invalid-member", message: "Herd member has no species." });
+                      continue;
+                    }
                     units.push({
                       pokemon:
                         member.pokemon ||
-                        member.species ||
-                        entry.pokemon ||
-                        entry.id ||
-                        "Unknown",
+                        member.species,
                       level:
                         member.levelRange ??
                         entry.levelRange ??
@@ -261,9 +203,9 @@ export async function parseCobblemonZip(file) {
                       entryWeight: entry.weight ?? "",
                     });
                   }
-                } else if (entry.pokemon || entry.species || entry.id) {
+                } else if (entry.pokemon || entry.species) {
                   units.push({
-                    pokemon: entry.pokemon || entry.species || entry.id || "Unknown",
+                    pokemon: entry.pokemon || entry.species || "Unknown",
                     level: entry.level ?? entry.levelRange ?? "",
                     weight: entry.weight ?? "",
                     spawnType: entry.type || "pokemon",
@@ -277,7 +219,11 @@ export async function parseCobblemonZip(file) {
                   });
                 }
 
+                if (!units.length && entry.type !== "pokemon-herd" && !herdMembers) {
+                  onDiagnostic({ path: fileName, code: "invalid-entry", message: "Spawn has no species." });
+                }
                 for (const unit of units) {
+                  await processing.checkpoint();
                   const spawnData = {
                     pokemon: String(unit.pokemon),
                     bucket: String(entry.bucket || "Unknown"),
@@ -606,9 +552,12 @@ export async function parseCobblemonZip(file) {
                         : "",
                   };
 
+                  processing.row();
                   results.push(spawnData);
                 }              // ends for (const unit of units)
               } catch (entryErr) {
+                rethrowProcessingError(entryErr);
+                onDiagnostic({ path: fileName, code: "entry-error", message: "Spawn entry could not be processed." });
                 console.warn(
                   `⚠️ Skipping invalid spawn entry in ${fileName}:`,
                   entryErr
@@ -621,25 +570,16 @@ export async function parseCobblemonZip(file) {
             content = null;
             json = null;
 
-            // Force garbage collection hint for Chrome
-            if (typeof window !== "undefined" && window.gc) {
-              try {
-                window.gc();
-              } catch (e) {
-                // gc() might not be available
-              }
-            }
           } catch (err) {
+                rethrowProcessingError(err);
+            onDiagnostic({ path: fileName, code: "file-error", message: "File could not be processed." });
             console.error(`❌ Failed to process ${fileName}`, err);
             // Continue with next file instead of stopping
             continue;
           }
         }
 
-        // Small delay between batches to allow garbage collection
-        if (i + batchSize < jsonFiles.length) {
-          await new Promise((resolve) => setTimeout(resolve, 20)); // Increased delay
-        }
+        await processing.checkpoint();
       }
     }
 
@@ -647,8 +587,4 @@ export async function parseCobblemonZip(file) {
     zip.files = null;
 
     return results;
-  };
-
-  // Race between processing and timeout
-  return Promise.race([processingPromise(), timeoutPromise]);
-};
+}

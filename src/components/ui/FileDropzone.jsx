@@ -68,7 +68,7 @@ export default function FileDropzone({
         {isDragging ? <UploadCloud size={18} /> : <FileArchive size={18} />}
       </div>
       <p className="text-sm font-medium text-text-primary">{label}</p>
-      <p className="text-xs text-text-muted">{hint}</p>
+      <p className="text-sm leading-relaxed text-text-secondary">{hint}</p>
       <input
         ref={inputRef}
         type="file"

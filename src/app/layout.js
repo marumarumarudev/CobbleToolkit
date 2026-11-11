@@ -1,10 +1,11 @@
 import "./globals.css";
+import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import ClientNav from "@/components/layout/ClientNav";
 import Footer from "@/components/layout/Footer";
 import PageTransition from "@/components/layout/PageTransition";
-import GlobalErrorFilters from "@/components/GlobalErrorFilters";
+
 import { SharedFilesProvider } from "@/contexts/SharedFilesContext";
 
 const geistSans = Geist({
@@ -20,13 +21,16 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "CobbleToolkit",
   description:
-    "Browser-based tools for inspecting and understanding Cobblemon datapacks — nothing leaves your machine.",
+    "Explore Cobblemon datapacks in your browser. Your packs stay local. Species lookups, images, video, and comments use external services.",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <Script id="restore-page-theme" strategy="beforeInteractive">
+          {`try { const theme = localStorage.getItem("cobbletoolkit-theme"); if (["retro", "pokedex", "rotom", "dark", "light"].includes(theme)) document.documentElement.dataset.theme = theme; } catch {}`}
+        </Script>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
@@ -34,7 +38,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-bg-base text-text-primary`}
       >
         <SharedFilesProvider>
-          <GlobalErrorFilters />
+
           <div className="flex min-h-screen flex-col">
             <ClientNav />
             <main className="mx-auto w-full max-w-[100rem] flex-1 px-4 py-6 sm:px-6 sm:py-8 xl:px-8">
@@ -46,18 +50,19 @@ export default function RootLayout({ children }) {
 
         <Toaster
           position="top-right"
+          containerStyle={{ zIndex: 55, top: 64 }}
           reverseOrder={false}
           toastOptions={{
             style: {
-              background: "#15171c",
-              color: "#f2f3f5",
-              border: "1px solid #262a33",
+              background: "var(--color-bg-surface)",
+              color: "var(--color-text-primary)",
+              border: "1px solid var(--color-border)",
               fontFamily: "var(--font-geist-mono)",
               fontSize: "13px",
             },
             iconTheme: {
-              primary: "#e6b800",
-              secondary: "#15171c",
+              primary: "#a8e6b0",
+              secondary: "#192b29",
             },
           }}
         />

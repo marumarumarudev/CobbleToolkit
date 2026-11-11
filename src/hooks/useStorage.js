@@ -43,7 +43,7 @@ export function useStorage(storeName, initialData = []) {
         );
         const storage = getStorage();
 
-        await storage.saveData(storeName, newData);
+        if (await storage.saveData(storeName, newData) === false) throw new Error("Browser storage is unavailable");
         setData(newData);
         return true;
       } catch (err) {
@@ -63,7 +63,7 @@ export function useStorage(storeName, initialData = []) {
       const { default: getStorage } = await import("@/utils/indexedDBStorage");
       const storage = getStorage();
 
-      await storage.clearStore(storeName);
+      if (await storage.clearStore(storeName) === false) throw new Error("Browser storage is unavailable");
       setData([]);
       return true;
     } catch (err) {
@@ -125,7 +125,7 @@ export function usePreferences(toolType, defaultPreferences = {}) {
         );
         const storage = getStorage();
 
-        await storage.savePreferences(toolType, newPreferences);
+        if (await storage.savePreferences(toolType, newPreferences) === false) throw new Error("Browser storage is unavailable");
         setPreferences(newPreferences);
         return true;
       } catch (err) {

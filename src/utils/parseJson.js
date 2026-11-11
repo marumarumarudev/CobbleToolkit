@@ -1,3 +1,4 @@
+import { checkAbort, rethrowProcessingError } from "./archiveProcessing.js";
 /**
  * Shared robust JSON parsing for Cobblemon datapack files.
  * Tries strict parse first, then progressive cleanups, then best-effort field extraction.
@@ -46,21 +47,35 @@ function aggressiveClean(content) {
  * @returns {object | null}
  */
 export function parseJsonWithFallbacks(content, filePath = "unknown", options = {}) {
+  const { signal, onDiagnostic = () => {}, allowRepair = true } = options;
+  checkAbort(signal);
+  const emit = (code, message) => onDiagnostic({ path: filePath, code, message });
   try {
     return JSON.parse(content);
-  } catch {
+  } catch (error) {
+    rethrowProcessingError(error);
     logWarn(`Direct JSON parse failed for ${filePath}, trying clean...`);
   }
 
+  if (!allowRepair) {
+    emit("invalid-json", "Strict JSON parsing failed; repairs disabled.");
+    return null;
+  }
   try {
-    return JSON.parse(cleanJsonString(content));
-  } catch {
+    const value = JSON.parse(cleanJsonString(content));
+    emit("repaired-json", "Cleaned JSON formatting.");
+    return value;
+  } catch (error) {
+    rethrowProcessingError(error);
     logWarn(`Cleaned JSON parse failed for ${filePath}, trying aggressive clean...`);
   }
 
   try {
-    return JSON.parse(aggressiveClean(content));
-  } catch {
+    const value = JSON.parse(aggressiveClean(content));
+    emit("repaired-json", "Aggressively cleaned JSON formatting.");
+    return value;
+  } catch (error) {
+    rethrowProcessingError(error);
     logWarn(`Aggressive cleaning failed for ${filePath}, trying fallback extraction...`);
   }
 
@@ -69,12 +84,15 @@ export function parseJsonWithFallbacks(content, filePath = "unknown", options = 
       const fallback = options.extractFallback(content);
       if (fallback) {
         logWarn(`Using fallback parsing for ${filePath} — basic fields only`);
+        emit("fallback-json", "Extracted partial fields from invalid JSON.");
         return fallback;
       }
-    } catch {
+    } catch (error) {
+      rethrowProcessingError(error);
       logWarn(`Fallback extraction failed for ${filePath}`);
     }
   }
 
+  emit("invalid-json", "JSON parsing and repairs failed.");
   return null;
 }

@@ -1,5 +1,9 @@
 "use client";
 
+import ScannerErrorNotice from "@/components/ScannerErrorNotice";
+import SpawnParseDiagnostics from "@/components/SpawnParseDiagnostics";
+import { createParseDiagnostics } from "@/utils/parseDiagnostics";
+import { createArchiveSession } from "@/utils/archiveProcessing";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import {
@@ -14,9 +18,9 @@ import {
   Dna,
 } from "lucide-react";
 
-import { useStorage } from "@/hooks/useStorage";
 import { useSharedFiles } from "@/contexts/SharedFilesContext";
-import { SHARED_FILES_CHANGED_EVENT } from "@/utils/toolDataStores";
+import { useScannerLifecycle } from "@/hooks/useScannerLifecycle";
+import ArchiveAvailabilityNotice from "@/components/ArchiveAvailabilityNotice";
 import { parseSpeciesAndSpawnFromZip } from "@/utils/speciesSpawnParser";
 import { parseLootFromZip } from "@/utils/lootParser";
 import { formatPokemonName, matchesSearch } from "@/utils/nameUtils";
@@ -35,8 +39,45 @@ import {
   SkeletonTable,
 } from "@/components/ui";
 import StorageInfo from "@/components/StorageInfo";
+import ItemDropBrowser from "./ItemDropBrowser";
+import MountStats from "./MountStats";
 
-const SCANNER_NAME = "speciesLootScanner";
+// Re-index persisted archives once to populate mount data absent from older caches.
+const SCANNER_NAME = "speciesLootScanner-mounts-v1";
+
+const SCANNER_CONFIG = {
+  scannerName: SCANNER_NAME,
+  storeNames: ["speciesData", "lootReports"],
+  async parse(sharedFile, { signal } = {}) {
+    const collector = createParseDiagnostics();
+    const archiveSession = await createArchiveSession(sharedFile.file, { signal });
+    const options = { signal, archiveSession, allowRepair: sharedFile.allowRepairs ?? true, onDiagnostic: collector.record };
+    const parsedSpecies = await parseSpeciesAndSpawnFromZip(sharedFile.file, options);
+    const parsedLoot = await parseLootFromZip(sharedFile.file, options);
+    const diagnostics = collector.snapshot();
+    const updates = [];
+    if (parsedSpecies?.length) {
+      const species = parsedSpecies.map((entry) => ({
+        ...entry,
+        sourceFile: sharedFile.name,
+        sharedFileId: sharedFile.id,
+      }));
+      updates.push({ storeName: "speciesData", merge: (current) => [...current.filter((entry) => entry.sharedFileId !== sharedFile.id), ...species] });
+    }
+    if (parsedLoot?.length || diagnostics.total) {
+      const report = {
+        id: crypto.randomUUID(),
+        name: sharedFile.name,
+        sharedFileId: sharedFile.id,
+        data: parsedLoot,
+        diagnostics,
+        fromShared: true,
+      };
+      updates.push({ storeName: "lootReports", hasWarnings: diagnostics.total > 0, merge: (current) => [report, ...current.filter((entry) => entry.sharedFileId !== sharedFile.id)] });
+    }
+    return updates;
+  },
+};
 
 // CDN-only sprites via Pokémon Showdown (https://play.pokemonshowdown.com).
 // At most 2 requests: exact form slug, then base species.
@@ -468,29 +509,15 @@ function PokemonSprite({ name, size = 40, className = "" }) {
 export default function SpeciesLootScanner() {
   // Same stores SpeciesScanner / LootScanner already use — this tool reads
   // and writes the same shapes, so nothing here forks the data model.
-  const {
-    data: species,
-    setData: setSpecies,
-    saveData: saveSpecies,
-    loadData: reloadSpecies,
-  } = useStorage("speciesData", []);
-  const {
-    data: lootReports,
-    setData: setLootReports,
-    saveData: saveLootReports,
-    loadData: reloadLootReports,
-  } = useStorage("lootReports", []);
-
-  const { sharedFiles, addSharedFile } = useSharedFiles();
-
-  const [processedFiles, setProcessedFiles] = useState(new Set());
-  const [processedFilesLoaded, setProcessedFilesLoaded] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { data, loading, unavailableFiles, error } = useScannerLifecycle(SCANNER_CONFIG);
+  const { speciesData: species, lootReports } = data;
+  const { addSharedFile } = useSharedFiles();
 
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedName, setSelectedName] = useState(null);
   const [activeTab, setActiveTab] = useState("species");
+    const [browseMode, setBrowseMode] = useState("species");
 
   useEffect(() => {
     document.title = "Species & Loot | CobbleToolkit";
@@ -500,144 +527,6 @@ export default function SpeciesLootScanner() {
     const handler = setTimeout(() => setDebouncedSearch(search), 250);
     return () => clearTimeout(handler);
   }, [search]);
-
-  // Load which shared files this tool has already parsed
-  useEffect(() => {
-    (async () => {
-      try {
-        const { default: getStorage } = await import(
-          "@/utils/indexedDBStorage"
-        );
-        const storage = getStorage();
-        const processed = await storage.getProcessedFiles(SCANNER_NAME);
-        setProcessedFiles(processed);
-      } catch (err) {
-        console.error("Failed to load processed files:", err);
-      } finally {
-        setProcessedFilesLoaded(true);
-      }
-    })();
-  }, []);
-
-  // The nav upload widget is the single place files/data get removed. When
-  // it removes a file or clears everything, refresh both stores + the
-  // processed set from IndexedDB so this view never shows stale rows.
-  useEffect(() => {
-    const handleFilesChanged = async () => {
-      await Promise.all([reloadSpecies(), reloadLootReports()]);
-      try {
-        const { default: getStorage } = await import(
-          "@/utils/indexedDBStorage"
-        );
-        const storage = getStorage();
-        setProcessedFiles(await storage.getProcessedFiles(SCANNER_NAME));
-      } catch (err) {
-        console.error("Failed to refresh processed files:", err);
-      }
-    };
-    window.addEventListener(SHARED_FILES_CHANGED_EVENT, handleFilesChanged);
-    return () =>
-      window.removeEventListener(
-        SHARED_FILES_CHANGED_EVENT,
-        handleFilesChanged
-      );
-  }, [reloadSpecies, reloadLootReports]);
-
-  // Process any shared files this tool hasn't seen yet through BOTH parsers
-  useEffect(() => {
-    const run = async () => {
-      if (!processedFilesLoaded || !sharedFiles.length || loading) return;
-
-      const unprocessed = sharedFiles.filter(
-        (sf) => sf.file && !processedFiles.has(sf.id)
-      );
-      if (!unprocessed.length) return;
-
-      setLoading(true);
-      const { default: getStorage } = await import("@/utils/indexedDBStorage");
-      const storage = getStorage();
-
-      const existingSpeciesFiles = new Set(
-        species.map((s) => s.sourceFile).filter(Boolean)
-      );
-      const existingLootFiles = new Set(lootReports.map((r) => r.name));
-
-      const newSpecies = [];
-      const newLootReports = [];
-      let filesWithData = 0;
-
-      for (const sharedFile of unprocessed) {
-        try {
-          if (!existingSpeciesFiles.has(sharedFile.name)) {
-            const parsedSpecies = await parseSpeciesAndSpawnFromZip(
-              sharedFile.file
-            );
-            if (parsedSpecies?.length) {
-              newSpecies.push(...parsedSpecies);
-              existingSpeciesFiles.add(sharedFile.name);
-            }
-          }
-
-          if (!existingLootFiles.has(sharedFile.name)) {
-            const parsedLoot = await parseLootFromZip(sharedFile.file);
-            if (parsedLoot?.length) {
-              newLootReports.push({
-                id: crypto.randomUUID(),
-                name: sharedFile.name,
-                data: parsedLoot,
-                fromShared: true,
-              });
-              existingLootFiles.add(sharedFile.name);
-            }
-          }
-
-          filesWithData++;
-        } catch (err) {
-          console.error(`Failed to process ${sharedFile.name}:`, err);
-        }
-
-        await storage.markFileProcessed(SCANNER_NAME, sharedFile.id);
-        setProcessedFiles((prev) => new Set([...prev, sharedFile.id]));
-      }
-
-      if (newSpecies.length) {
-        const merged = [...species, ...newSpecies].filter(
-          (s, i, self) =>
-            i ===
-            self.findIndex(
-              (o) => o.name === s.name && o.sourceFile === s.sourceFile
-            )
-        );
-        await saveSpecies(merged);
-        setSpecies(merged);
-      }
-
-      if (newLootReports.length) {
-        const merged = [...newLootReports, ...lootReports];
-        await saveLootReports(merged);
-        setLootReports(merged);
-      }
-
-      if (newSpecies.length || newLootReports.length) {
-        toast.success(
-          `Parsed ${unprocessed.length} file${
-            unprocessed.length === 1 ? "" : "s"
-          } — ${newSpecies.length} species, ${newLootReports.length} loot table${
-            newLootReports.length === 1 ? "" : "s"
-          }`
-        );
-      } else if (unprocessed.length) {
-        toast.error(
-          "No species or loot data found in the uploaded file(s)."
-        );
-      }
-
-      setLoading(false);
-    };
-
-    run();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sharedFiles, processedFilesLoaded, loading]);
 
   const merged = useMemo(
     () => mergeSpeciesAndLoot(species, lootReports),
@@ -729,7 +618,12 @@ export default function SpeciesLootScanner() {
 
   return (
     <div className="flex flex-col gap-6">
-      <header>
+      <header className="dex-console">
+        <div className="dex-screen p-4">
+        <div className="mb-3 flex flex-wrap justify-between gap-2 font-mono text-xs text-accent">
+          <span className="uppercase tracking-widest">Species data</span>
+          <span role="status">{loading ? "Indexing archives…" : error ? "Scanner needs attention" : hasAnyData ? "Archive ready" : "Awaiting datapack"}</span>
+        </div>
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent-soft text-accent">
             <Layers size={16} />
@@ -739,22 +633,29 @@ export default function SpeciesLootScanner() {
           </h1>
         </div>
         <p className="mt-1 text-sm text-text-secondary">
-          Pick a species to see its base data and drop table side by side.
+          Browse Pokémon stats and item drops.
         </p>
+        <p className="mt-3 border-t border-border pt-3 font-mono text-xs text-text-secondary">
+          {merged.length.toLocaleString()} species indexed · {merged.filter((entry) => entry.hasLootData).length.toLocaleString()} with loot data
+        </p>
+        </div>
       </header>
+            <ScannerErrorNotice error={error} />
+            <SpawnParseDiagnostics reports={lootReports} />
+            <ArchiveAvailabilityNotice files={unavailableFiles} />
 
       {!hasAnyData && !loading && (
         <EmptyState
           icon={Layers}
-          title="No datapack loaded yet"
-          description="Drop a Cobblemon datapack .zip (or .jar) below, or use the upload button in the nav. This tool reads the species/ and species_additions/ folders."
+          title={unavailableFiles.length ? "Upload an archive again to scan here" : "No datapack loaded yet"}
+          description="Upload a Cobblemon datapack to read its species/ and species_additions/ folders."
           action={
             <FileDropzone
               accept=".zip,.jar"
               multiple
               onFiles={handleDroppedFiles}
               label="Drop your datapack here"
-              hint="ZIP or JAR — parsed entirely in your browser"
+              hint="ZIP or JAR. Files stay in your browser."
               className="w-full max-w-md"
             />
           }
@@ -775,7 +676,7 @@ export default function SpeciesLootScanner() {
       {hasAnyData && (
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-3 text-xs text-text-muted">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-text-secondary">
               <span>{merged.length} species indexed</span>
               <span className="text-border">•</span>
               <span>
@@ -790,25 +691,58 @@ export default function SpeciesLootScanner() {
             <StorageInfo />
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-[300px_1fr]">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-bg-surface p-3">
+            <Tabs
+              ariaLabel="Browse mode"
+              tabs={[
+                { id: "species", label: "Species browser", icon: Dna },
+                { id: "items", label: "Item drops", icon: PackageSearch },
+              ]}
+              active={browseMode}
+              onChange={setBrowseMode}
+            />
+            <p className="text-sm leading-relaxed text-text-secondary">
+              {browseMode === "items" ? "Find drops across all Pokémon. No species selection needed." : "Browse stats, moves, types, and loot tables."}
+            </p>
+          </div>
+
+          <div hidden={browseMode !== "items"}>
+            <ItemDropBrowser
+              reports={lootReports}
+              onSelectSpecies={(name) => {
+                setSelectedName(name.toLowerCase().trim());
+                setSearch("");
+                setDebouncedSearch("");
+                setActiveTab("loot");
+                setBrowseMode("species");
+              }}
+            />
+          </div>
+
+          {browseMode === "species" && (
+          <div className="grid gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
             {/* Species selector */}
-            <Card className="flex flex-col overflow-hidden">
+            <Card className="flex min-w-0 flex-col overflow-hidden">
               <div className="border-b border-border p-3">
+                <label htmlFor="species-search" className="mb-2 block text-xs font-medium text-text-secondary">Search the species archive</label>
                 <div className="relative">
                   <Search
                     size={14}
                     className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted"
                   />
                   <input
+                    id="species-search"
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search species, type, or loot item…"
+                    aria-label="Search species, type, or loot item"
+                                        placeholder="Search species, type, or loot item…"
                     className="w-full rounded-md border border-border bg-bg-surface-2 py-1.5 pl-8 pr-7 text-xs text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
                   />
                   {search && (
                     <button
                       onClick={() => setSearch("")}
+                      aria-label="Clear species search"
                       className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
                     >
                       <X size={12} />
@@ -819,7 +753,7 @@ export default function SpeciesLootScanner() {
 
               <div className="max-h-[65vh] overflow-y-auto">
                 {filtered.length === 0 ? (
-                  <p className="px-3 py-6 text-center text-xs text-text-muted">
+                  <p className="break-words px-3 py-6 text-center text-sm leading-relaxed text-text-secondary">
                     No species match &quot;{debouncedSearch}&quot;.
                   </p>
                 ) : (
@@ -827,6 +761,7 @@ export default function SpeciesLootScanner() {
                     <button
                       key={mon.name}
                       onClick={() => setSelectedName(mon.name)}
+                                            aria-pressed={mon.name === selectedName}
                       className={[
                         "flex w-full items-center justify-between gap-2 border-b border-border px-3 py-2 text-left transition-colors duration-100",
                         mon.name === selectedName
@@ -847,7 +782,7 @@ export default function SpeciesLootScanner() {
                           >
                             {formatPokemonName(mon.name)}
                           </span>
-                          <span className="block text-[10px] text-text-muted">
+                          <span className="block text-xs text-text-secondary">
                             {mon.nationalDex ? `#${mon.nationalDex}` : "—"}
                           </span>
                         </span>
@@ -867,7 +802,7 @@ export default function SpeciesLootScanner() {
             </Card>
 
             {/* Detail panel */}
-            <div className="flex flex-col gap-3">
+            <div className="min-w-0 flex flex-col gap-3 rounded-lg border border-border bg-bg-surface/50 p-4">
               {!selected ? (
                 <EmptyState
                   icon={Search}
@@ -881,7 +816,7 @@ export default function SpeciesLootScanner() {
                       <PokemonSprite name={selected.name} size={56} />
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h2 className="text-base font-semibold capitalize text-text-primary">
+                          <h2 className="break-words text-base font-semibold capitalize text-text-primary">
                             {formatPokemonName(selected.name)}
                           </h2>
                           {selected.nationalDex && (
@@ -898,6 +833,7 @@ export default function SpeciesLootScanner() {
                       </div>
                     </div>
                     <Tabs
+                      ariaLabel="Species detail view"
                       tabs={[
                         { id: "species", label: "Species Data", icon: Dna },
                         {
@@ -920,6 +856,7 @@ export default function SpeciesLootScanner() {
               )}
             </div>
           </div>
+          )}
         </div>
       )}
     </div>
@@ -930,7 +867,7 @@ function StatRow({ label, value, max = 255 }) {
   const pct = Math.min(100, Math.round(((value ?? 0) / max) * 100));
   return (
     <div className="flex items-center gap-2 text-xs">
-      <span className="w-9 shrink-0 text-text-muted">{label}</span>
+      <span className="w-9 shrink-0 text-text-secondary">{label}</span>
       <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-bg-surface-2">
         <div
           className="h-full rounded-full bg-accent"
@@ -938,7 +875,7 @@ function StatRow({ label, value, max = 255 }) {
         />
       </div>
       <span className="w-7 shrink-0 text-right text-text-primary">
-        {value ?? 0}
+        {value ?? "—"}
       </span>
     </div>
   );
@@ -950,7 +887,7 @@ function SpeciesPanel({ entry }) {
       <EmptyState
         icon={Dna}
         title="No species data for this Pokémon"
-        description="A loot table was found, but no matching entry exists in species/ or species_additions/ — the species file may have failed to parse."
+        description="Loot was found, but no matching species/ or species_additions/ entry. The species file may have failed to parse."
       />
     );
   }
@@ -977,11 +914,13 @@ function SpeciesPanel({ entry }) {
 
   return (
     <div className="grid gap-3 sm:grid-cols-2">
+      <MountStats entry={entry} />
       <Card>
         <CardBody className="flex flex-col gap-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
             Base stats
           </p>
+          {!entry.stats && <p className="text-sm leading-relaxed text-text-secondary">Base stats are not included in the loaded data.</p>}
           <StatRow label="HP" value={entry.stats?.hp} />
           <StatRow label="Atk" value={entry.stats?.attack} />
           <StatRow label="Def" value={entry.stats?.defence} />
@@ -992,18 +931,18 @@ function SpeciesPanel({ entry }) {
       </Card>
 
       <Card>
-        <CardBody className="flex flex-col gap-3">
+        <CardBody className="flex min-w-0 flex-col gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+            <p className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
               EV yield
             </p>
-            <p className="mt-1 text-xs text-text-primary">{evText}</p>
+            <p className="mt-1 break-words text-sm text-text-primary">{evText}</p>
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+            <p className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
               Source
             </p>
-            <p className="mt-1 truncate font-mono text-[11px] text-text-secondary">
+            <p className="mt-1 break-all font-mono text-xs text-text-secondary">
               {entry.sourceFile || "—"}
             </p>
           </div>
@@ -1011,8 +950,8 @@ function SpeciesPanel({ entry }) {
       </Card>
 
       <Card className="sm:col-span-2">
-        <CardBody className="flex flex-col gap-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+        <CardBody className="flex min-w-0 flex-col gap-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-text-secondary">
             Moves ({entry.moves.length})
           </p>
           <div className="grid gap-3 sm:grid-cols-3">
@@ -1028,7 +967,7 @@ function SpeciesPanel({ entry }) {
 
 function MoveGroup({ icon: Icon, label, items }) {
   return (
-    <div>
+    <div className="min-w-0">
       <div className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-text-secondary">
         <Icon size={12} />
         {label}
@@ -1036,10 +975,10 @@ function MoveGroup({ icon: Icon, label, items }) {
       </div>
       <div className="max-h-40 space-y-0.5 overflow-y-auto rounded-md border border-border bg-bg-surface-2 p-1.5">
         {items.length === 0 ? (
-          <p className="px-1 py-1 text-[11px] italic text-text-muted">None</p>
+          <p className="px-1 py-1 text-xs italic text-text-secondary">None</p>
         ) : (
           items.map((move, i) => (
-            <p key={i} className="truncate px-1 py-0.5 text-[11px] text-text-primary">
+            <p key={i} className="break-words px-1 py-0.5 text-xs text-text-primary">
               {move}
             </p>
           ))
@@ -1055,7 +994,7 @@ function LootPanel({ entry }) {
       <EmptyState
         icon={PackageSearch}
         title="No loot data for this Pokémon"
-        description="This species doesn't define a drops.entries table in the datapack, or none was found in the uploaded file(s)."
+        description="No drops.entries table was found for this species in the uploaded files."
       />
     );
   }
