@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import JSZip from "jszip";
+import { MAX_ARCHIVE_BYTES } from "../src/utils/archiveLimits.js";
 import { parseJsonWithFallbacks } from "../src/utils/parseJson.js";
 import { parseCobblemonZip } from "../src/utils/spawnParser.js";
 import { parseSpeciesAndSpawnFromZip } from "../src/utils/speciesSpawnParser.js";
@@ -34,7 +35,7 @@ test("archive sessions still check cancellation on creation and reuse", async ()
   await assert.rejects(createArchiveSession(file, options), { name: "AbortError" });
   await assert.rejects(parseSpeciesAndSpawnFromZip(file, options), { name: "AbortError" });
   await assert.rejects(parseLootFromZip(file, options), { name: "AbortError" });
-  await assert.rejects(createArchiveSession({ size: 128 * 1024 ** 2 + 1 }), ProcessingBudgetError);
+  await assert.rejects(createArchiveSession({ size: MAX_ARCHIVE_BYTES + 1 }), ProcessingBudgetError);
 });
 
 test("streamed text preserves split UTF-8 and BOM at the exact byte limit", async () => {
@@ -179,7 +180,16 @@ test("all parsers propagate cancellation before archive loading", async () => {
   }
 });
 test("archive budgets apply to raw entries and compressed input", async () => {
-  await assert.rejects(loadArchive({ size: 128 * 1024 ** 2 + 1 }), ProcessingBudgetError);
+  assert.equal(MAX_ARCHIVE_BYTES, 512 * 1024 ** 2);
+  const file = await archive({ "data/example/species/test.json": '{"name":"ditto"}' });
+  for (const size of [128 * 1024 ** 2, 128 * 1024 ** 2 + 1, MAX_ARCHIVE_BYTES]) {
+    Object.defineProperty(file, "size", { value: size, configurable: true });
+    await createArchiveSession(file);
+    await loadArchive(file);
+  }
+  Object.defineProperty(file, "size", { value: MAX_ARCHIVE_BYTES + 1 });
+  await assert.rejects(createArchiveSession(file), ProcessingBudgetError);
+  await assert.rejects(loadArchive(file), ProcessingBudgetError);
   assert.throws(() => checkArchiveBudget({ files: { huge: { name: "huge.json", _data: { uncompressedSize: 10 * 1024 ** 2 + 1 } } } }), ProcessingBudgetError);
   assert.throws(() => checkArchiveBudget({ files: Object.fromEntries(Array.from({ length: 50001 }, (_, i) => [i, { dir: true }])) }), ProcessingBudgetError);
   assert.throws(() => checkArchiveBudget({ files: { huge: { name: "huge.bin", _data: { uncompressedSize: 512 * 1024 ** 2 + 1 } } } }), ProcessingBudgetError);

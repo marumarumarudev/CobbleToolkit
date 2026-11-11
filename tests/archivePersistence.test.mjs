@@ -2,6 +2,7 @@ import { before, beforeEach, test } from "node:test";
 import assert from "node:assert/strict";
 import { indexedDB } from "fake-indexeddb";
 import getStorage from "../src/utils/indexedDBStorage.js";
+import { MAX_ARCHIVE_BYTES, MAX_STORED_ARCHIVE_BYTES } from "../src/utils/archiveLimits.js";
 
 let storage;
 const metadata = (id, contentHash = id, allowRepairs = false) => ({
@@ -70,13 +71,33 @@ test("quota failure rolls back blob and metadata together", async () => {
 });
 
 test("archive limits include existing stored blobs and allow exact boundaries", async () => {
-  const large = new Blob([new Uint8Array(128 * 1024 * 1024)]);
-  await assert.rejects(storage.persistSharedArchive(metadata("oversize"), new Blob([large, "x"])), { name: "ArchiveLimitError" });
-  await storage.persistSharedArchive(metadata("a"), large);
-  await storage.persistSharedArchive(metadata("b"), large);
-  await assert.rejects(storage.persistSharedArchive(metadata("c"), new Blob(["x"])), { name: "ArchiveLimitError" });
-  assert.equal((await storage.loadSharedArchives()).length, 2);
-  await storage.persistSharedArchive(metadata("duplicate", "a"), large);
+  assert.equal(MAX_ARCHIVE_BYTES, 512 * 1024 ** 2);
+  assert.equal(MAX_STORED_ARCHIVE_BYTES, 1024 * 1024 ** 2);
+  const descriptor = Object.getOwnPropertyDescriptor(Blob.prototype, "size");
+  // The prototype getter also scales structured clones read back from IndexedDB.
+  const multiplier = 1024 ** 2;
+  Object.defineProperty(Blob.prototype, "size", {
+    ...descriptor,
+    get() { return descriptor.get.call(this) * multiplier; },
+  });
+  try {
+    const large = new Blob(["x".repeat(MAX_ARCHIVE_BYTES / multiplier)]);
+    await storage.persistSharedArchive(metadata("old-boundary"), new Blob(["x".repeat(128)]));
+    await storage.persistSharedArchive(metadata("above-old-boundary"), new Blob(["x".repeat(129)]));
+    await storage.purgeSharedFiles();
+    await assert.rejects(storage.persistSharedArchive(metadata("oversize"), new Blob([large, "x"])), { name: "ArchiveLimitError" });
+    await storage.persistSharedArchive(metadata("a"), large);
+    await storage.persistSharedArchive(metadata("b"), large);
+    await assert.rejects(storage.persistSharedArchive(metadata("c"), new Blob(["x"])), { name: "ArchiveLimitError" });
+    await storage.persistSharedArchive(metadata("duplicate", "a"), large);
+    await storage.persistSharedArchive({ ...metadata("replacement", "b"), reconnectId: "b" }, large);
+    const loaded = await storage.loadSharedArchives();
+    assert.deepEqual(loaded.map(({ id }) => id), ["a", "b"]);
+    assert.equal(loaded.reduce((sum, { file }) => sum + file.size, 0), MAX_STORED_ARCHIVE_BYTES);
+    assert.equal(await loaded[0].file.text(), "x".repeat(512));
+  } finally {
+    Object.defineProperty(Blob.prototype, "size", descriptor);
+  }
 });
 
 test("single purge and clear remove blobs atomically with metadata", async () => {

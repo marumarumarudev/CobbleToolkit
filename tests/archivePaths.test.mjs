@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import JSZip from "jszip";
+import { MAX_ARCHIVE_BYTES } from "../src/utils/archiveLimits.js";
 import { normalizeDatapackPath, indexDatapackArchive } from "../src/utils/archivePaths.js";
 import { validateFileStructure } from "../src/utils/fileValidation.js";
 import { parseCobblemonZip } from "../src/utils/spawnParser.js";
@@ -84,7 +85,19 @@ test("trainer validation agrees with parser namespaces and nesting", async () =>
   }
   const lootOnly = await archive({ "data/example/loot_table/trainers/test.json": { pools: [] } });
   assert.deepEqual((await validateFileStructure(lootOnly)).kinds, ["rctTrainer"]);
-  assert.equal((await validateFileStructure({ size: 128 * 1024 ** 2 + 1 })).valid, false);
+  assert.equal((await validateFileStructure({ size: MAX_ARCHIVE_BYTES + 1 })).valid, false);
+});
+
+test("validation accepts the old compressed cap and the new exact boundary", async () => {
+  const file = await archive({ "data/example/species/ditto.json": { name: "Ditto" } });
+  for (const size of [128 * 1024 ** 2, 128 * 1024 ** 2 + 1, MAX_ARCHIVE_BYTES]) {
+    Object.defineProperty(file, "size", { value: size, configurable: true });
+    assert.equal((await validateFileStructure(file)).valid, true);
+  }
+  Object.defineProperty(file, "size", { value: MAX_ARCHIVE_BYTES + 1 });
+  const result = await validateFileStructure(file);
+  assert.equal(result.valid, false);
+  assert.match(result.reason, /512 MiB/);
 });
 
 test("ambiguous normalized paths are rejected by validation and every parser", async () => {

@@ -162,7 +162,7 @@ export default function GlobalFileUpload() {
                 <p className="text-xs text-text-muted">.zip or .jar files only</p>
                 <p className="mt-1 text-xs text-text-muted">
                   Archives and results are saved in this browser, including after refresh.
-                  128 MiB per archive · 256 MiB stored archives total.
+                  512 MiB per archive · 1024 MiB stored archives total.
                   Removing an archive clears its results from every tool.
                 </p>
                 <input

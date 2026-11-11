@@ -30,7 +30,7 @@ const faqs = [
   {
     question: "Where is my data stored?",
     answer:
-      "Datapacks are never uploaded. IndexedDB (v7) stores archives, metadata, parsed results, and bounded diagnostics. Archives are limited to 128 MiB each and 256 MiB stored total; metadata reports the same limits. The browser may evict storage, and clearing site data removes everything. Removing an archive atomically removes its associated reports too. External species lookups, images, video, and comments still use external services.",
+      "Datapacks are never uploaded. IndexedDB (v7) stores archives, metadata, parsed results, and bounded diagnostics. Archives are limited to 512 MiB each and 1024 MiB stored total; metadata reports the same limits. The browser may evict storage, and clearing site data removes everything. Removing an archive atomically removes its associated reports too. External species lookups, images, video, and comments still use external services.",
   },
   {
     question: "When do I need to upload an archive again?",

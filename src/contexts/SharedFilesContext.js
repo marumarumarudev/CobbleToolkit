@@ -7,6 +7,7 @@ import getStorage from "@/utils/indexedDBStorage";
 import { createScannerCoordinator } from "@/utils/scannerCoordinator";
 import { restoreSharedFiles, storageFailureMessage } from "@/utils/archiveAvailability";
 import { createSharedFilesSync } from "@/utils/sharedFilesSync";
+import { MAX_ARCHIVE_BYTES } from "@/utils/archiveLimits";
 
 const SharedFilesContext = createContext(null);
 
@@ -80,7 +81,7 @@ export function SharedFilesProvider({ children }) {
       toast.loading(`Validating "${file.name}"...`, { id: toastId });
       try {
         if (!hydratedRef.current) throw new Error("Shared files have not loaded");
-        if (file.size > 128 * 1024 ** 2) throw Object.assign(new Error("Archive exceeds 128 MiB. Choose a smaller archive."), { name: "ArchiveLimitError" });
+        if (file.size > MAX_ARCHIVE_BYTES) throw Object.assign(new Error("Archive exceeds 512 MiB. Choose a smaller archive."), { name: "ArchiveLimitError" });
         const validation = await validateFileStructure(file);
         if (!validation.valid) {
           toast.error(validation.reason, { id: toastId });

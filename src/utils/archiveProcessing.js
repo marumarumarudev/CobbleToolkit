@@ -1,6 +1,7 @@
 import JSZip from "jszip";
+import { MAX_ARCHIVE_BYTES } from "./archiveLimits.js";
 
-export const ARCHIVE_LIMITS = Object.freeze({ compressed: 128 * 1024 ** 2, entries: 50000, uncompressed: 512 * 1024 ** 2, json: 10 * 1024 ** 2, rows: 500000 });
+export const ARCHIVE_LIMITS = Object.freeze({ compressed: MAX_ARCHIVE_BYTES, entries: 50000, uncompressed: 512 * 1024 ** 2, json: 10 * 1024 ** 2, rows: 500000 });
 export class ProcessingBudgetError extends Error {
   constructor(message) { super(message); this.name = "ProcessingBudgetError"; }
 }
@@ -58,7 +59,7 @@ export async function loadArchive(file, { signal, archiveSession } = {}) {
     return ArchiveSession.getZip(archiveSession, file);
   }
   const size = file.size ?? file.byteLength ?? file.length;
-  if (size > ARCHIVE_LIMITS.compressed) throw new ProcessingBudgetError("Archive exceeds 128 MiB compressed");
+  if (size > ARCHIVE_LIMITS.compressed) throw new ProcessingBudgetError("Archive exceeds 512 MiB compressed");
   const zip = await JSZip.loadAsync(file, { checkCRC32: false });
   checkAbort(signal);
   checkArchiveBudget(zip, { signal });

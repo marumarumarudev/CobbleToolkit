@@ -1,4 +1,5 @@
 import { TOOL_DATA_STORES, SCANNER_NAMES } from "./toolDataStores.js";
+import { MAX_ARCHIVE_BYTES, MAX_STORED_ARCHIVE_BYTES } from "./archiveLimits.js";
 
 function announceStorageBlocked(blocked) {
   if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
@@ -212,8 +213,8 @@ class CobblemonStorage {
     }
     if (!(blob instanceof Blob)) throw new TypeError("Archive must be a Blob");
     const limitError = (message) => Object.assign(new Error(message), { name: "ArchiveLimitError" });
-    if (blob.size > 128 * 1024 * 1024) {
-      throw limitError("Archive exceeds 128 MiB. Choose a smaller archive.");
+    if (blob.size > MAX_ARCHIVE_BYTES) {
+      throw limitError("Archive exceeds 512 MiB. Choose a smaller archive.");
     }
     await this.ensureInitialized();
     return new Promise((resolve, reject) => {
@@ -244,8 +245,8 @@ class CobblemonStorage {
           const saved = selected ?? { ...clean, size: blob.size };
           const total = blobRequest.result.reduce((sum, entry) =>
             sum + (entry.id === saved.id ? 0 : entry.blob.size), blob.size);
-          if (total > 256 * 1024 * 1024) {
-            throw limitError("Stored archives would exceed 256 MiB. Remove unneeded archives and try again.");
+          if (total > MAX_STORED_ARCHIVE_BYTES) {
+            throw limitError("Stored archives would exceed 1024 MiB. Remove unneeded archives and try again.");
           }
           files = selected ? existing : [...existing, saved];
           blobs.put({ id: saved.id, blob });

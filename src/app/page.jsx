@@ -131,7 +131,7 @@ export default function Home() {
             <h3 id="storage-heading" className="mb-2 text-base font-semibold text-text-primary">Local storage &amp; saved archives</h3>
       <p className="max-w-prose text-base leading-relaxed text-text-secondary">
         Archives, metadata, and parsed results are saved in IndexedDB (v7):
-        128 MiB per archive, 256 MiB of stored archives total, with the same limits
+        512 MiB per archive, 1024 MiB of stored archives total, with the same limits
         reported in metadata. The browser may evict storage; clearing site data
         removes everything. Uploading the same SHA-256 content again with the same
         repair policy reconnects to its existing ID and results, even if renamed.
