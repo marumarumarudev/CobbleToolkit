@@ -56,7 +56,7 @@ Hosted on GitHub Pages: **https://marumarumarudev.github.io/CobbleToolkit/**
 - `npm run build` — build the static export.
 - `npm run test:browser` — Chromium acceptance tests at desktop and mobile viewport sizes, using a managed local static server. First run `npx playwright install chromium` and `npm run build`. External services are stubbed during tests.
 
-Parsing also limits archives to 50,000 entries, 512 MiB declared uncompressed data, 10 MiB per JSON entry, and 500,000 emitted rows. Species & Loot reuse one archive load per scan. Cancellation stops work at processing checkpoints; JSZip's internal load and individual extraction cannot be interrupted mid-operation.
+Parsing also limits archives to 250,000 entries (including directories and non-data JAR assets), 512 MiB declared uncompressed data, 10 MiB per JSON entry, and 500,000 emitted rows. Species & Loot reuse one archive load per scan. Cancellation stops work at processing checkpoints; JSZip's internal load and individual extraction cannot be interrupted mid-operation.
 
 Verified upstream regression fixtures are pinned to Cobblemon **1.8.0**, commit `b33536e8721c9419d664fee15aa9e35cbf1900a8`. Source URLs and hashes are recorded in `tests/fixtures/upstream/manifest.json`. These samples do not establish full compatibility with every server datapack.
 

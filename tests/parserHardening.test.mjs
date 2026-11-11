@@ -191,7 +191,14 @@ test("archive budgets apply to raw entries and compressed input", async () => {
   await assert.rejects(createArchiveSession(file), ProcessingBudgetError);
   await assert.rejects(loadArchive(file), ProcessingBudgetError);
   assert.throws(() => checkArchiveBudget({ files: { huge: { name: "huge.json", _data: { uncompressedSize: 10 * 1024 ** 2 + 1 } } } }), ProcessingBudgetError);
-  assert.throws(() => checkArchiveBudget({ files: Object.fromEntries(Array.from({ length: 50001 }, (_, i) => [i, { dir: true }])) }), ProcessingBudgetError);
+  const entries = Object.fromEntries(Array.from({ length: 50001 }, (_, i) => [i, { dir: true }]));
+  assert.doesNotThrow(() => checkArchiveBudget({ files: entries }));
+  for (let i = 50001; i < 250000; i++) entries[i] = { dir: true };
+  assert.doesNotThrow(() => checkArchiveBudget({ files: entries }));
+  entries[250000] = { dir: true };
+  assert.throws(() => checkArchiveBudget({ files: entries }), {
+    name: "ProcessingBudgetError", message: "Archive exceeds 250,000 entries",
+  });
   assert.throws(() => checkArchiveBudget({ files: { huge: { name: "huge.bin", _data: { uncompressedSize: 512 * 1024 ** 2 + 1 } } } }), ProcessingBudgetError);
 });
 test("malformed herds never fabricate species; mixed valid members survive", async () => {

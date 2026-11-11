@@ -1,7 +1,7 @@
 import JSZip from "jszip";
 import { MAX_ARCHIVE_BYTES } from "./archiveLimits.js";
 
-export const ARCHIVE_LIMITS = Object.freeze({ compressed: MAX_ARCHIVE_BYTES, entries: 50000, uncompressed: 512 * 1024 ** 2, json: 10 * 1024 ** 2, rows: 500000 });
+export const ARCHIVE_LIMITS = Object.freeze({ compressed: MAX_ARCHIVE_BYTES, entries: 250000, uncompressed: 512 * 1024 ** 2, json: 10 * 1024 ** 2, rows: 500000 });
 export class ProcessingBudgetError extends Error {
   constructor(message) { super(message); this.name = "ProcessingBudgetError"; }
 }
@@ -18,7 +18,7 @@ export function rethrowProcessingError(error) {
 export function checkArchiveBudget(zip, { signal } = {}) {
   checkAbort(signal);
   const entries = Object.values(zip.files);
-  if (entries.length > ARCHIVE_LIMITS.entries) throw new ProcessingBudgetError("Archive exceeds 50,000 entries");
+  if (entries.length > ARCHIVE_LIMITS.entries) throw new ProcessingBudgetError(`Archive exceeds ${ARCHIVE_LIMITS.entries.toLocaleString("en-US")} entries`);
   let total = 0;
   for (const entry of entries) {
     checkAbort(signal);
