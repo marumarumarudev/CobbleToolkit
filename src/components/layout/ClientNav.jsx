@@ -99,9 +99,10 @@ function Navigation({ pathname }) {
         <div className="hidden min-w-0 flex-1 flex-wrap gap-1 py-2 lg:flex">
           {NAV_ITEMS.map((item) => (
             <Link key={item.path} href={item.path} aria-current={isActive(item.path) ? "page" : undefined}
-              className={`flex min-h-11 items-center gap-2 rounded-md border px-3 text-xs font-medium transition-colors ${isActive(item.path) ? "border-accent/35 bg-accent-soft text-accent shadow-inner" : "border-transparent text-text-secondary hover:bg-bg-surface-2 hover:text-text-primary"} ${item.path === "/faq" ? "ml-auto" : ""}`}>
+              className={`tool-nav-link relative flex min-h-11 items-center gap-2 rounded-md border px-3 text-xs font-medium transition-colors ${isActive(item.path) ? "border-accent/35 bg-accent-soft text-accent shadow-inner" : "border-transparent text-text-secondary hover:bg-bg-surface-2 hover:text-text-primary"} ${item.path === "/faq" ? "ml-auto" : ""}`}>
               <item.icon size={16} aria-hidden="true" />
               {item.name}
+              {isActive(item.path) && <span className="tool-nav-marker" aria-hidden="true" />}
             </Link>
           ))}
         </div>

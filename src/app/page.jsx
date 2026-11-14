@@ -61,7 +61,7 @@ export default function Home() {
       <section aria-labelledby="field-guide-title" className="dex-screen grid gap-8 rounded-2xl border border-accent/20 bg-emerald-950 p-5 sm:p-8 lg:grid-cols-[1.3fr_1fr] lg:items-center">
         <div>
 
-          <h1 id="field-guide-title" className="text-3xl sm:text-5xl font-semibold tracking-tight text-text-primary leading-[1.1]">
+          <h1 data-route-title id="field-guide-title" className="text-3xl sm:text-5xl font-semibold tracking-tight text-text-primary leading-[1.1]">
             See what’s in your <span className="text-accent">datapack.</span>
           </h1>
           <p className="mt-4 max-w-prose text-base leading-relaxed text-text-secondary">
@@ -86,7 +86,7 @@ export default function Home() {
               <path d="M156 68h8v8h-8z" />
             </svg>
           </div>
-          <p className="font-mono text-xs uppercase tracking-widest text-accent">At a glance</p>
+          <h2 className="text-base font-semibold text-text-primary">One pack. Three scanners.</h2>
           <ul className="mt-3 flex flex-col gap-2.5 text-base leading-relaxed text-text-secondary">
             <li className="flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-accent" />One upload for all three scanners
@@ -104,67 +104,86 @@ export default function Home() {
       </section>
       </div>
 
-      <details className="dex-screen rounded-xl border border-border bg-emerald-950 p-5">
-        <summary className="cursor-pointer rounded text-sm font-semibold text-text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">Storage, privacy &amp; JSON handling</summary>
-        <div className="mt-5 grid items-start gap-6 lg:grid-cols-2 lg:gap-8">
-          <div className="min-w-0 space-y-6">
-            <section aria-labelledby="privacy-heading">
-              <h3 id="privacy-heading" className="mb-2 text-base font-semibold text-text-primary">Privacy &amp; processing</h3>
+      <details className="dex-support-panel rounded-xl p-4 sm:p-5">
+        <summary className="min-h-6 cursor-pointer rounded text-sm font-semibold text-text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">Your packs, privacy &amp; storage</summary>
+        <div className="mt-5 grid items-start gap-6 lg:grid-cols-3 lg:gap-8">
+            <section aria-labelledby="privacy-heading" className="min-w-0">
+              <h3 id="privacy-heading" className="mb-2 text-base font-semibold text-text-primary">Your packs stay here</h3>
               <p className="max-w-prose text-base leading-relaxed text-text-secondary">
                 Datapack processing runs in your browser, with no server or account required.
                 Datapacks are never uploaded. Species lookups, images, video,
                 and comments use external services.
               </p>
             </section>
-            <section aria-labelledby="json-heading">
-              <h3 id="json-heading" className="mb-2 text-base font-semibold text-text-primary">JSON compatibility &amp; tab sync</h3>
+            <section aria-labelledby="json-heading" className="min-w-0 border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
+              <h3 id="json-heading" className="mb-2 text-base font-semibold text-text-primary">Repair only when needed</h3>
               <p className="max-w-prose text-base leading-relaxed text-text-secondary">
-                New uploads use strict JSON by default. Shared files has an optional
-                compatibility repair checkbox; its heuristics may alter values. Diagnostics
-                are saved and bounded, and legacy entries retain their old compatibility
-                behavior. Changes sync across tabs through BroadcastChannel or a
-                storage event fallback, with a refresh on focus.
+                New uploads use strict JSON by default. If a pack cannot be read,
+                Shared Files offers an optional compatibility repair. Repair may change
+                values, so keep your original archive and check the scan diagnostics.
+                Changes to shared files sync across open tabs.
               </p>
             </section>
-          </div>
           <section aria-labelledby="storage-heading" className="min-w-0 border-t border-border pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
-            <h3 id="storage-heading" className="mb-2 text-base font-semibold text-text-primary">Local storage &amp; saved archives</h3>
-      <p className="max-w-prose text-base leading-relaxed text-text-secondary">
-        Archives, metadata, and parsed results are saved in IndexedDB (v7):
-        512 MiB per archive, 1024 MiB of stored archives total, with the same limits
-        reported in metadata. The browser may evict storage; clearing site data
-        removes everything. Uploading the same SHA-256 content again with the same
-        repair policy reconnects to its existing ID and results, even if renamed.
-        Different content or policy creates a separate entry. Legacy metadata
-        without a fingerprint cannot safely reconnect by filename: a new entry
-        is created and old caches are retained. Missing archive blobs still show
-        the unavailable notice; saved results remain usable. Removing an archive
-        atomically removes its reports too.
-      </p>
+            <h3 id="storage-heading" className="mb-2 text-base font-semibold text-text-primary">Saved is not backed up</h3>
+            <p className="max-w-prose text-base leading-relaxed text-text-secondary">
+              Saved packs can disappear if you clear site data or your browser needs
+              the space. Keep a copy of your original files. You can store up to
+              512 MiB per archive and 1024 MiB of archives in total.
+            </p>
           </section>
         </div>
+        <details className="mt-5 border-t border-border pt-4">
+          <summary className="cursor-pointer rounded text-sm font-medium text-text-secondary">Technical storage details</summary>
+          <div className="mt-3 grid gap-6 text-sm leading-relaxed text-text-secondary lg:grid-cols-2 lg:gap-8">
+            <div className="min-w-0 space-y-3">
+              <p>
+                Archives, metadata, and parsed results are saved in IndexedDB (v7):
+                512 MiB per archive, 1024 MiB of stored archives total, with the same
+                limits reported in metadata. The browser may evict storage; clearing
+                site data removes everything.
+              </p>
+              <p>
+                Uploading the same SHA-256 content again with the same repair policy
+                reconnects to its existing ID and results, even if renamed.
+                Different content or policy creates a separate entry.
+              </p>
+            </div>
+            <div className="min-w-0 space-y-3">
+              <p>
+                Legacy metadata without a fingerprint cannot safely reconnect by
+                filename: a new entry is created and old caches are retained.
+                Missing archive blobs still show the unavailable notice; saved
+                results remain usable. Removing an archive atomically removes its
+                reports too.
+              </p>
+              <p>
+                Diagnostics are saved and bounded. Legacy entries retain their
+                original compatibility behavior. Tab updates use BroadcastChannel,
+                with a storage-event fallback and a refresh on focus.
+              </p>
+            </div>
+          </div>
+        </details>
       </details>
 
       {/* Tool modules */}
       <section>
         <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
-          <h2 className="text-xl font-semibold tracking-tight text-text-primary">Choose a tool</h2>
+          <h2 className="text-2xl font-semibold tracking-tight text-text-primary">Choose a tool</h2>
           <p className="font-mono text-xs text-text-muted">4 tools / shared files</p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          {TOOLS.map((tool, index) => (
+          {TOOLS.map((tool) => (
             <Link key={tool.path} href={tool.path} className="dex-tool-card group flex h-full flex-col gap-4 rounded-xl border border-border bg-emerald-950 p-5 transition-colors hover:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent sm:p-6">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-accent-soft text-accent">
                       <tool.icon size={20} aria-hidden="true" />
                     </div>
-                    <div className="flex items-center gap-3 font-mono text-sm text-accent">
-                      {tool.badge && <span className="rounded bg-accent-soft px-2 py-1">{tool.badge}</span>}
-                      <span>TOOL / {String(index + 1).padStart(2, "0")}</span>
-                    </div>
+
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-text-primary">
+                    <h3 className="text-xl font-semibold tracking-tight text-text-primary">
                       {tool.name}
                     </h3>
                     <p className="mt-2 text-base leading-relaxed text-text-secondary">

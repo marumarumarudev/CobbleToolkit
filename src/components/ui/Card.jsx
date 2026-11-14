@@ -31,7 +31,7 @@ export function CardTitle({ className = "", children, ...props }) {
   return (
     <h3
       className={[
-        "text-sm font-semibold text-text-primary tracking-tight",
+        "text-base font-semibold text-text-primary tracking-tight",
         className,
       ].join(" ")}
       {...props}
@@ -44,7 +44,7 @@ export function CardTitle({ className = "", children, ...props }) {
 export function CardDescription({ className = "", children, ...props }) {
   return (
     <p
-      className={["text-xs text-text-secondary mt-1", className].join(" ")}
+      className={["text-sm leading-relaxed text-text-secondary mt-1", className].join(" ")}
       {...props}
     >
       {children}

@@ -1,7 +1,7 @@
 "use client";
 
 import ScannerErrorNotice from "@/components/ScannerErrorNotice";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useId } from "react";
 import { parseCobblemonZip } from "@/utils/spawnParser";
 import { createParseDiagnostics } from "@/utils/parseDiagnostics";
 import SpawnParseDiagnostics from "@/components/SpawnParseDiagnostics";
@@ -208,25 +208,49 @@ export default function SpawnScanner() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [contextFilter, setContextFilter] = useState("all");
   const [showAdvanced, setShowAdvanced] = useState(false);
-    const [columnView, setColumnView] = useState("all");
+  const [columnView, setColumnView] = useState(null);
 
-  // Biome tags map loaded from BiomeTags.md — enables hover tooltips.
+  useEffect(() => {
+    // Choose once after hydration; resizing never replaces an explicit selection.
+    setColumnView((current) => current ?? (
+      window.matchMedia("(max-width: 767px)").matches ? "essentials" : "all"
+    ));
+  }, []);
+
+  // Biome tags map loaded from BiomeTags.md — resolves tag details.
   const [biomeTagsMap, setBiomeTagsMap] = useState({});
   const [biomeTagsLoaded, setBiomeTagsLoaded] = useState(false);
 
-  // Floating tooltip (fixed-position, not clipped by table overflow).
-  const [hoverTooltip, setHoverTooltip] = useState({
-    visible: false,
-    pinned: false,
-    x: 0,
-    y: 0,
-    content: null,
-  });
+  const [biomeDetails, setBiomeDetails] = useState(null);
+  const biomePanelId = useId();
+  const biomeTitleId = useId();
+  const biomeCloseRef = useRef(null);
+  const searchInputRef = useRef(null);
+  const scannerHeadingRef = useRef(null);
 
-  const showTooltip = (x, y, content) =>
-    setHoverTooltip({ visible: true, pinned: false, x, y, content });
-  const hideTooltip = () =>
-    setHoverTooltip((prev) => (prev.pinned ? prev : { ...prev, visible: false }));
+  const closeBiomeDetails = () => {
+    setBiomeDetails(null);
+    const target = biomeDetails?.trigger.isConnected
+      ? biomeDetails.trigger
+      : searchInputRef.current ?? scannerHeadingRef.current;
+    target?.focus();
+  };
+
+  useEffect(() => {
+    if (!biomeDetails) return;
+    biomeCloseRef.current?.focus({ preventScroll: true });
+    const handleEscape = (event) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setBiomeDetails(null);
+      const target = biomeDetails.trigger.isConnected
+        ? biomeDetails.trigger
+        : searchInputRef.current ?? scannerHeadingRef.current;
+      target?.focus();
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [biomeDetails]);
 
   const resolveBiomeTagEntries = (raw) => {
     if (!raw) return [];
@@ -261,7 +285,7 @@ export default function SpawnScanner() {
     document.title = "Spawn Scanner | CobbleToolkit";
   }, []);
 
-  // Load + parse BiomeTags.md for hover tooltips
+  // Load + parse BiomeTags.md for biome details
   useEffect(() => {
     let cancelled = false;
 
@@ -428,7 +452,7 @@ export default function SpawnScanner() {
   // Show all tags. Row height is dynamic (DataTable measures each row), so
   // sparse rows stay compact and tag-heavy rows grow only as needed — no
   // fixed max-height clip and no "+N more" nesting.
-  const renderTagList = (tokens) => {
+  const renderTagList = (tokens, groupKey) => {
     if (!tokens.length) return null;
 
     return (
@@ -453,35 +477,20 @@ export default function SpawnScanner() {
 
           const entries = resolveBiomeTagEntries(tok);
           const content = { title: tok, entries };
+          const triggerKey = JSON.stringify([groupKey, i]);
           return (
-            <span
+            <button
               key={i}
+              type="button"
               title={tok}
-              onMouseEnter={(e) => {
-                if (hoverTooltip.pinned) return;
-                const rect = e.currentTarget.getBoundingClientRect();
-                showTooltip(
-                  Math.min(rect.left, window.innerWidth - 20),
-                  Math.min(rect.bottom + 8, window.innerHeight - 20),
-                  content
-                );
-              }}
-              onMouseLeave={hideTooltip}
-              onClick={(e) => {
-                e.stopPropagation();
-                const rect = e.currentTarget.getBoundingClientRect();
-                setHoverTooltip({
-                  visible: true,
-                  pinned: true,
-                  x: Math.min(rect.left, window.innerWidth - 20),
-                  y: Math.min(rect.bottom + 8, window.innerHeight - 20),
-                  content,
-                });
-              }}
-              className={`cursor-pointer hover:underline ${chipClass}`}
+              aria-haspopup="dialog"
+              aria-expanded={biomeDetails?.triggerKey === triggerKey}
+              aria-controls={biomePanelId}
+              onClick={(event) => setBiomeDetails({ content, triggerKey, trigger: event.currentTarget })}
+              className={`cursor-pointer text-left hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${chipClass}`}
             >
               {tok}
-            </span>
+            </button>
           );
         })}
       </div>
@@ -571,7 +580,7 @@ export default function SpawnScanner() {
                 .split(/[|,]/)
                 .map((t) => t.trim())
                 .filter(Boolean);
-              return tokens.length ? renderTagList(tokens) : null;
+              return tokens.length ? renderTagList(tokens, [row._rowId, col.key]) : null;
             },
           };
         }
@@ -584,7 +593,7 @@ export default function SpawnScanner() {
             const value = row[col.key];
             if (Array.isArray(value)) {
               return value.length
-                ? renderTagList(value.map((v) => String(v)))
+                ? renderTagList(value.map((v) => String(v)), [row._rowId, col.key])
                 : null;
             }
             const text = value?.toString() ?? "";
@@ -600,7 +609,7 @@ export default function SpawnScanner() {
         };
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [visibleColumnDefs, hoverTooltip.pinned]
+    [visibleColumnDefs, biomeDetails, biomeTagsMap, biomePanelId]
   );
 
   const clearSearch = () => {
@@ -621,16 +630,7 @@ export default function SpawnScanner() {
   const hasData = fileReports.length > 0;
 
   return (
-    <div
-      className="flex flex-col gap-4"
-      onClick={() =>
-        setHoverTooltip((prev) =>
-          prev.pinned
-            ? { visible: false, pinned: false, x: 0, y: 0, content: null }
-            : prev
-        )
-      }
-    >
+    <div className="flex flex-col gap-4">
       <header className="dex-console">
         <div className="dex-screen p-3 sm:p-4">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-text-secondary">
@@ -641,7 +641,7 @@ export default function SpawnScanner() {
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent-soft text-accent">
             <Radar size={16} />
           </div>
-          <h1 className="text-xl font-semibold text-text-primary">
+          <h1 ref={scannerHeadingRef} tabIndex={-1} data-route-title className="text-xl font-semibold text-text-primary">
             Spawn Scanner
           </h1>
         </div>
@@ -659,7 +659,7 @@ export default function SpawnScanner() {
           <p className="mt-1 max-w-2xl leading-relaxed">
           Biome tags like{" "}
           <code className="font-mono text-accent">#cobblemon:is_arid</code>{" "}
-          show their resolved biomes on hover. See the{" "}
+          can be opened to see their biomes. See the{" "}
           <a
             href="https://gitlab.com/cable-mc/cobblemon/-/blob/main/docs/cobblemon-tags/1.6.1/BiomeTags.md"
             target="_blank"
@@ -736,18 +736,20 @@ export default function SpawnScanner() {
                   />
                   <input
                     id="spawn-search"
+                                        ref={searchInputRef}
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     aria-label="Search spawn data"
                     placeholder="Search Pokémon, biome, or condition…"
-                    className="w-full rounded-md border border-border bg-bg-surface-2 py-2 pl-9 pr-8 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
+                    className="min-h-11 w-full rounded-md border border-border bg-bg-surface-2 py-2 pl-9 pr-12 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
                   />
                   {searchTerm && (
                     <button
+                      type="button"
                       onClick={clearSearch}
                       aria-label="Clear search"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
+                      className="absolute right-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-md text-text-muted hover:text-text-primary focus-visible:outline-2 focus-visible:outline-accent"
                     >
                       <X size={14} />
                     </button>
@@ -820,7 +822,7 @@ export default function SpawnScanner() {
             </div>
             <div>
               <label htmlFor="spawn-column-view" className="mb-1 block text-sm font-medium text-text-primary">Column view</label>
-              <select id="spawn-column-view" value={columnView} onChange={(event) => setColumnView(event.target.value)} aria-describedby="spawn-column-help" className="rounded-md border border-border bg-bg-surface p-2 text-sm text-text-primary focus:border-accent focus:outline-none">
+              <select id="spawn-column-view" value={columnView ?? "all"} onChange={(event) => setColumnView(event.target.value)} aria-describedby="spawn-column-help" className="rounded-md border border-border bg-bg-surface p-2 text-sm text-text-primary focus:border-accent focus:outline-none">
                 <option value="all">All fields</option>
                 <option value="essentials">Essentials</option>
               </select>
@@ -856,62 +858,43 @@ export default function SpawnScanner() {
         </div>
       )}
 
-      {hoverTooltip.visible && (
+      {biomeDetails && (
         <div
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            position: "fixed",
-            left: hoverTooltip.x,
-            top: hoverTooltip.y,
-          }}
-          className="z-50 max-w-md rounded-lg border border-border bg-bg-base/95 text-sm text-text-primary shadow-2xl backdrop-blur-sm"
+          id={biomePanelId}
+          role="dialog"
+          aria-labelledby={biomeTitleId}
+          className="fixed bottom-2 right-2 z-50 flex max-h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] max-w-md flex-col rounded-lg border border-border bg-bg-base text-sm text-text-primary"
         >
-          <div className="flex items-center justify-between gap-3 border-b border-border px-3 py-2">
-            <div className="min-w-0 wrap-anywhere font-semibold">
-              {hoverTooltip.content?.title || "Biome tag"}
-            </div>
+          <div className="flex shrink-0 items-start justify-between gap-3 border-b border-border p-3">
+            <h2 id={biomeTitleId} className="min-w-0 max-h-[25dvh] overflow-y-auto wrap-anywhere font-semibold">
+              {biomeDetails.content.title}
+            </h2>
+            <button
+              ref={biomeCloseRef}
+              type="button"
+              onClick={closeBiomeDetails}
+              aria-label="Close biome details"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-text-secondary hover:bg-bg-surface-2 hover:text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              <X size={18} aria-hidden="true" />
+            </button>
           </div>
-          <div className="max-h-64 overflow-y-auto px-3 py-2">
-            {Array.isArray(hoverTooltip.content?.tokens) ? (
-              <div className="flex flex-wrap gap-1">
-                {hoverTooltip.content.tokens.map((tok, idx) => {
-                  const isTagVisual =
-                    tok.startsWith("#") || /^[a-zA-Z_\s]+$/.test(tok);
-                  return (
-                    <span
-                      key={idx}
-                      className={[
-                        "max-w-full wrap-anywhere rounded px-1.5 py-0.5 text-xs",
-                        isTagVisual
-                          ? "border border-accent/30 bg-accent-soft text-accent"
-                          : "bg-bg-surface-2 text-text-secondary",
-                      ].join(" ")}
-                    >
-                      {tok}
-                    </span>
-                  );
-                })}
-              </div>
-            ) : Array.isArray(hoverTooltip.content?.entries) &&
-              hoverTooltip.content.entries.length > 0 ? (
+          <div tabIndex={0} aria-label="Biome entries" className="min-h-0 overflow-y-auto px-3 py-2 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent">
+            {biomeDetails.content.entries.length > 0 ? (
               <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2">
-                {hoverTooltip.content.entries.map((e, idx) => (
-                  <li key={idx} className="min-w-0 wrap-anywhere leading-5 text-text-secondary">
-                    {e}
+                {biomeDetails.content.entries.map((entry, index) => (
+                  <li key={index} className="min-w-0 wrap-anywhere leading-5 text-text-secondary">
+                    {entry}
                   </li>
                 ))}
               </ul>
             ) : (
-              <div className="text-text-secondary">
-                No entries found for this tag
-              </div>
+              <p className="text-text-secondary">No entries found for this tag</p>
             )}
           </div>
-          {hoverTooltip.pinned && (
-            <div className="border-t border-border px-3 py-2 text-xs text-text-secondary">
-              Click anywhere outside to close
-            </div>
-          )}
+          <p className="shrink-0 border-t border-border px-3 py-2 text-xs text-text-secondary">
+            Close or press Escape to return to the biome tag.
+          </p>
         </div>
       )}
     </div>

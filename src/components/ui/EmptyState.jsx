@@ -9,7 +9,7 @@ export default function EmptyState({
     <div
       className={[
         "flex flex-col items-center justify-center text-center rounded-lg",
-        "border border-dashed border-border bg-bg-surface/50 px-6 py-14",
+        "bg-bg-surface/50 px-5 py-8 sm:px-6 sm:py-10",
         className,
       ].join(" ")}
     >
@@ -18,7 +18,7 @@ export default function EmptyState({
           <Icon size={18} />
         </div>
       )}
-      <p className="text-sm font-medium text-text-primary">{title}</p>
+      <p className="text-base font-semibold text-text-primary">{title}</p>
       {description && (
         <p className="mt-2 max-w-prose text-sm leading-relaxed text-text-secondary">
           {description}

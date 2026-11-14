@@ -347,6 +347,56 @@ export default function TrainerScanner() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+  const [mobileDetail, setMobileDetail] = useState(false);
+  const resultsRef = useRef(null);
+  const resultsCardRef = useRef(null);
+  const detailHeadingRef = useRef(null);
+  const detailPaneRef = useRef(null);
+  const backButtonRef = useRef(null);
+  const breakpointFocusRef = useRef(null);
+  const returnRef = useRef(null);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 1023px)");
+    let focused = document.activeElement;
+    const trackFocus = (event) => { focused = event.target; };
+    const reconcile = () => {
+      if (media.matches && resultsCardRef.current?.contains(focused)) {
+        const target = focused;
+        returnRef.current = null;
+        breakpointFocusRef.current = null;
+        setMobileDetail(false);
+        requestAnimationFrame(() => {
+          if (target.isConnected) target.focus({ preventScroll: true });
+        });
+      } else if (media.matches && detailPaneRef.current?.contains(focused)) {
+        returnRef.current ??= { trigger: resultsRef.current?.querySelector('[aria-pressed="true"]'), listTop: resultsRef.current?.scrollTop ?? 0, pageY: window.scrollY };
+        breakpointFocusRef.current = focused === backButtonRef.current ? detailHeadingRef.current : focused;
+        setMobileDetail(true);
+      } else if (!media.matches && focused === backButtonRef.current) {
+        detailHeadingRef.current?.focus({ preventScroll: true });
+      }
+    };
+    document.addEventListener("focusin", trackFocus);
+    media.addEventListener("change", reconcile);
+    return () => {
+      document.removeEventListener("focusin", trackFocus);
+      media.removeEventListener("change", reconcile);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (mobileDetail) {
+      (breakpointFocusRef.current || detailHeadingRef.current)?.focus();
+      breakpointFocusRef.current = null;
+    } else if (returnRef.current) {
+      const { trigger, listTop, pageY } = returnRef.current;
+      if (resultsRef.current) resultsRef.current.scrollTop = listTop;
+      (trigger?.isConnected ? trigger : resultsRef.current)?.focus({ preventScroll: true });
+      window.scrollTo({ top: pageY, behavior: "instant" });
+      returnRef.current = null;
+    }
+  }, [mobileDetail]);
   const [activeTab, setActiveTab] = useState("team");
   const [sourceFilter, setSourceFilter] = useState("all");
   const [lootFilter, setLootFilter] = useState("all");
@@ -463,7 +513,7 @@ export default function TrainerScanner() {
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent-soft text-accent">
             <Swords size={16} />
           </div>
-          <h1 className="text-xl font-semibold text-text-primary">
+          <h1 data-route-title className="text-xl font-semibold text-text-primary">
             RCT Trainer Scanner
           </h1>
         </div>
@@ -534,7 +584,7 @@ export default function TrainerScanner() {
           */}
           <div className="grid gap-4 lg:grid-cols-[minmax(280px,320px)_minmax(0,1fr)] xl:grid-cols-[360px_minmax(0,1fr)] lg:items-start">
             {/* Trainer list */}
-            <Card className="flex min-w-0 flex-col overflow-hidden lg:sticky lg:top-36 lg:max-h-[calc(100dvh-10rem)]">
+            <Card ref={resultsCardRef} className={`${mobileDetail ? "hidden lg:flex" : "flex"} min-w-0 flex-col overflow-hidden lg:sticky lg:top-36 lg:max-h-[calc(100dvh-10rem)]`}>
               <div className="space-y-3 border-b border-border bg-bg-surface-2/50 p-4">
                 <h2 className="font-mono text-xs uppercase tracking-widest text-accent">Trainer roster</h2>
                 <div className="relative">
@@ -548,13 +598,13 @@ export default function TrainerScanner() {
                     onChange={(e) => setSearch(e.target.value)}
                     aria-label="Search trainer, species, or loot item"
                     placeholder="Search trainer, species, or loot item…"
-                    className="w-full rounded-md border border-border bg-bg-surface-2 py-1.5 pl-8 pr-7 text-xs text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
+                    className="min-h-11 w-full rounded-md border border-border bg-bg-surface-2 py-1.5 pl-8 pr-12 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
                   />
                   {search && (
                     <button
-                      onClick={() => { setSearch(""); setDebouncedSearch(""); }}
+                      onClick={(event) => { setSearch(""); setDebouncedSearch(""); event.currentTarget.parentElement.querySelector("input")?.focus(); }}
                       aria-label="Clear trainer search"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
+                      className="absolute right-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded text-text-muted hover:text-text-primary focus-visible:outline-2 focus-visible:outline-accent"
                     >
                       <X size={12} />
                     </button>
@@ -588,11 +638,11 @@ export default function TrainerScanner() {
                 </label>
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                   <span role="status" className="text-text-muted">{filtered.length} of {allTrainers.length} trainers</span>
-                  <button type="button" onClick={resetFilters} className="text-accent hover:underline">Reset trainer filters</button>
+                  <button type="button" onClick={resetFilters} className="min-h-11 px-2 text-accent hover:underline">Reset trainer filters</button>
                 </div>
               </div>
 
-              <div className="min-h-0 flex-1 overflow-y-auto max-h-[50vh] lg:max-h-none">
+              <div ref={resultsRef} tabIndex={-1} role="region" aria-label="Trainer results" className="min-h-0 flex-1 overflow-y-auto max-h-[50vh] lg:max-h-none">
                 {filtered.length === 0 ? (
                   <p className="px-3 py-6 text-center text-xs text-text-muted">
                     No matching trainers
@@ -604,9 +654,13 @@ export default function TrainerScanner() {
                       <button
                         key={key}
                         aria-pressed={key === selected?._trainerKey}
-                        onClick={() => {
+                        onClick={(event) => {
                           setSelectedId(key);
                           setActiveTab("team");
+                          if (window.matchMedia("(max-width: 1023px)").matches) {
+                            returnRef.current = { trigger: event.currentTarget, listTop: resultsRef.current?.scrollTop ?? 0, pageY: window.scrollY };
+                            setMobileDetail(true);
+                          }
                         }}
                         className={[
                           "flex w-full items-center justify-between gap-2 border-b border-border px-3 py-2.5 text-left transition-colors duration-100",
@@ -656,7 +710,8 @@ export default function TrainerScanner() {
             </Card>
 
             {/* Detail panel */}
-            <div className="flex min-w-0 flex-col gap-3">
+            <div ref={detailPaneRef} className={`${mobileDetail ? "flex" : "hidden lg:flex"} min-w-0 flex-col gap-3`}>
+              <button ref={backButtonRef} type="button" onClick={() => setMobileDetail(false)} className="min-h-11 self-start rounded-md border border-border px-3 text-sm text-accent hover:bg-accent-soft focus-visible:outline-2 focus-visible:outline-accent lg:hidden">Back to results</button>
               {!selected ? (
                 <EmptyState
                   icon={Search}
@@ -669,7 +724,7 @@ export default function TrainerScanner() {
                   <div className="dex-screen flex flex-wrap items-center justify-between gap-3 p-4">
                     <div className="min-w-0">
                       <p className="mb-2 font-mono text-xs uppercase tracking-widest text-accent">Selected trainer</p>
-                      <h2 className="break-words text-lg font-semibold text-text-primary">
+                      <h2 ref={detailHeadingRef} tabIndex={-1} className="break-words text-lg font-semibold text-text-primary focus-visible:outline-2 focus-visible:outline-accent">
                         {selected.name}
                       </h2>
                       <p className="break-all font-mono text-sm text-text-muted">
@@ -846,15 +901,16 @@ function LootPanel({ trainer }) {
     setAutoExpandedGroups(new Set());
   }, [trainer.id]);
 
-  const items = loot.items.filter((i) => !i.empty);
+  // Identity belongs to the unfiltered parser result, including duplicate items.
+  const items = loot.items.map((item, index) => ({ ...item, rowId: `${trainer._trainerKey}:${index}` })).filter((item) => !item.empty);
   const issueCount = loot.issues.length;
 
   const filteredItems = debouncedLootSearch
     ? items.filter((it) => matchesSearch(debouncedLootSearch, it.item))
     : items;
 
-  const rows = filteredItems.map((it, i) => ({
-    id: `${it.item}-${i}`,
+  const rows = filteredItems.map((it) => ({
+    id: it.rowId,
     item: it.item,
     weight: it.weight,
     theoreticalWeight: it.theoreticalWeight,
@@ -1016,13 +1072,13 @@ function LootPanel({ trainer }) {
               onChange={(e) => setLootSearch(e.target.value)}
               aria-label="Search possible drops"
                             placeholder={`Search ${items.length} possible drops…`}
-              className="w-full rounded-md border border-border bg-bg-surface-2 py-2.5 pl-8 pr-8 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
+              className="min-h-11 w-full rounded-md border border-border bg-bg-surface-2 py-2.5 pl-8 pr-12 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
             />
             {lootSearch && (
               <button
-                onClick={() => setLootSearch("")}
+                onClick={(event) => { setLootSearch(""); setDebouncedLootSearch(""); event.currentTarget.parentElement.querySelector("input")?.focus(); }}
                 aria-label="Clear drop search"
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
+                className="absolute right-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded text-text-muted hover:text-text-primary focus-visible:outline-2 focus-visible:outline-accent"
               >
                 <X size={13} />
               </button>
@@ -1141,6 +1197,44 @@ const LOOT_ROW_SIZE = 128;
 function LootRowList({ rows, bordered = true }) {
   const scrollRef = useRef(null);
   const shouldVirtualize = rows.length > 150;
+  const [expandedId, setExpandedId] = useState(null);
+  const expanded = rows.find((row) => row.id === expandedId);
+  const expandedHeadingRef = useRef(null);
+  const returnRef = useRef(null);
+  const focusRequestedRef = useRef(false);
+
+  useEffect(() => {
+    if (focusRequestedRef.current) {
+      expandedHeadingRef.current?.focus();
+      focusRequestedRef.current = false;
+    }
+  }, [expandedId]);
+
+  useEffect(() => {
+    if (expandedId != null && !expanded) setExpandedId(null);
+  }, [expandedId, expanded]);
+
+  const closeDetail = () => {
+    setExpandedId(null);
+    const previous = returnRef.current;
+    if (!previous) return;
+    const list = scrollRef.current;
+    const index = rows.findIndex((row) => row.id === previous.rowId);
+    if (list) list.scrollTop = previous.listTop;
+    if (index >= 0 && index !== previous.index) virtualizer.scrollToIndex(index, { align: "start" });
+    let attempts = 0;
+    const restore = () => {
+      const trigger = list && Array.from(list.querySelectorAll("[data-reward-id]")).find((node) => node.dataset.rewardId === previous.rowId);
+      if (!trigger && index >= 0 && attempts++ < 10) {
+        if (attempts === 3) virtualizer.scrollToIndex(index, { align: "auto" });
+        requestAnimationFrame(restore);
+        return;
+      }
+      (trigger || list || expandedHeadingRef.current)?.focus({ preventScroll: true });
+      window.scrollTo({ top: previous.pageY, behavior: "instant" });
+    };
+    requestAnimationFrame(restore);
+  };
 
   const virtualizer = useVirtualizer({
     count: rows.length,
@@ -1165,8 +1259,12 @@ function LootRowList({ rows, bordered = true }) {
   }
 
   return (
+    <div className="min-w-0 space-y-3">
     <div
       ref={scrollRef}
+      role="region"
+      aria-label="Reward summaries"
+      tabIndex={-1}
       className={`overflow-y-auto ${
         bordered ? "rounded-lg border border-border" : ""
       }`}
@@ -1184,19 +1282,49 @@ function LootRowList({ rows, bordered = true }) {
           return (
             <div
               key={row.id}
-              tabIndex={0}
-                            aria-label={`Reward entry: ${row.item}`}
-                            className="absolute left-0 top-0 w-full overflow-auto border-b border-border focus-visible:outline-2 focus-visible:outline-accent focus-visible:-outline-offset-2"
+              className="absolute left-0 top-0 w-full overflow-hidden border-b border-border"
               style={{
                 height: `${virtualRow.size}px`,
                 transform: `translateY(${virtualRow.start}px)`,
               }}
             >
-              <LootRow row={row} />
+              <button
+                type="button"
+                aria-label={`Reward details for ${row.item}`}
+                data-reward-id={row.id}
+                aria-expanded={row.id === expandedId}
+                onClick={() => {
+                  returnRef.current = { rowId: row.id, index: virtualRow.index, listTop: scrollRef.current?.scrollTop ?? 0, pageY: window.scrollY };
+                  focusRequestedRef.current = true;
+                  if (expandedId === row.id) {
+                    expandedHeadingRef.current?.focus();
+                    focusRequestedRef.current = false;
+                  } else setExpandedId(row.id);
+                }}
+                className="flex h-full w-full min-w-0 flex-col justify-center gap-2 px-3 py-2 text-left hover:bg-bg-surface-2 focus-visible:outline-2 focus-visible:outline-accent focus-visible:-outline-offset-2"
+              >
+                <span className="block w-full truncate font-mono text-sm text-text-primary">{row.item}</span>
+                <span className="block w-full truncate text-xs text-text-secondary">{formatChancePercent(row.chancePercent) || "Chance not specified"} · Weight {row.weight} · Rolls {row.rolls}</span>
+                <span className="text-sm text-accent">View reward details</span>
+              </button>
             </div>
           );
         })}
       </div>
+    </div>
+    {expanded && (
+      <section aria-label="Selected reward details" className="min-w-0 rounded-lg border border-border bg-bg-surface p-3">
+        <h3 ref={expandedHeadingRef} tabIndex={-1} className="break-all font-mono text-sm font-semibold text-text-primary focus-visible:outline-2 focus-visible:outline-accent">{expanded.item}</h3>
+        <LootRow row={expanded} />
+        {expanded.conditions.length > 0 && (
+          <details className="mb-3 text-sm text-text-secondary">
+            <summary className="flex min-h-11 cursor-pointer items-center text-accent focus-visible:outline-2 focus-visible:outline-accent">Full condition data</summary>
+            <pre className="whitespace-pre-wrap break-all font-mono text-xs">{JSON.stringify(expanded.conditions, null, 2)}</pre>
+          </details>
+        )}
+        <button type="button" onClick={closeDetail} className="min-h-11 rounded-md border border-border px-3 text-sm text-accent hover:bg-accent-soft focus-visible:outline-2 focus-visible:outline-accent">Back to reward list</button>
+      </section>
+    )}
     </div>
   );
 }
@@ -1214,11 +1342,11 @@ function LootRow({ row }) {
   return (
     <div className="flex flex-col gap-1.5 px-3 py-2.5 hover:bg-bg-surface-2 transition-colors duration-100">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <span className="min-w-0 break-words text-sm font-semibold capitalize text-text-primary" title={row.item}>
+        <span className="min-w-0 break-all text-sm font-semibold capitalize text-text-primary" title={row.item}>
           {row.item.split(":").pop().replace(/_/g, " ")}
           <span className="ml-2 font-mono text-xs font-normal normal-case text-text-secondary">{row.item}</span>
         </span>
-        <span className="ml-auto flex shrink-0 items-center gap-1.5">
+        <span className="flex min-w-0 flex-wrap items-center gap-1.5">
           {chanceLabel && (
             <span
               title={
@@ -1254,7 +1382,7 @@ function LootRow({ row }) {
             <Badge tone="neutral">Direct</Badge>
           ) : (
             <span
-              className="max-w-35 truncate text-xs text-text-muted"
+              className="min-w-0 break-all text-xs text-text-muted"
               title={row.sourcePath.join(" → ")}
             >
               via {row.sourcePath.slice(1).join(" → ")}
@@ -1262,12 +1390,17 @@ function LootRow({ row }) {
           )}
         </span>
       </div>
+      {chanceLabel && (
+        <p className="break-words text-xs leading-relaxed text-text-secondary">
+          Theoretical chance {chanceLabel}: {isReweighted ? `effective weight ~${row.theoreticalWeight.toFixed(2)} (raw ${row.weight})` : `weight ${row.weight}`} out of pool weight {row.poolTotalWeight}. This simplified model is not a full simulation.
+        </p>
+      )}
       {row.conditions.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {row.conditions.map((c, i) => (
             <span
               key={i}
-              className="rounded bg-bg-surface-2 px-1.5 py-0.5 text-xs text-text-secondary"
+              className="min-w-0 break-all rounded bg-bg-surface-2 px-1.5 py-0.5 text-xs text-text-secondary"
             >
               {formatCondition(c)}
             </span>

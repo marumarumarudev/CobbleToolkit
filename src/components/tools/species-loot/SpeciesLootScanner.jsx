@@ -4,7 +4,7 @@ import ScannerErrorNotice from "@/components/ScannerErrorNotice";
 import SpawnParseDiagnostics from "@/components/SpawnParseDiagnostics";
 import { createParseDiagnostics } from "@/utils/parseDiagnostics";
 import { createArchiveSession } from "@/utils/archiveProcessing";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import {
   Search,
@@ -517,7 +517,70 @@ export default function SpeciesLootScanner() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedName, setSelectedName] = useState(null);
   const [activeTab, setActiveTab] = useState("species");
-    const [browseMode, setBrowseMode] = useState("species");
+  const [browseMode, setBrowseMode] = useState("species");
+  const [mobileDetail, setMobileDetail] = useState(false);
+  const resultsRef = useRef(null);
+  const resultsCardRef = useRef(null);
+  const detailHeadingRef = useRef(null);
+  const detailPaneRef = useRef(null);
+  const backButtonRef = useRef(null);
+  const breakpointFocusRef = useRef(null);
+  const itemBrowserRef = useRef(null);
+  const returnRef = useRef(null);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 1023px)");
+    let focused = document.activeElement;
+    const trackFocus = (event) => { focused = event.target; };
+    const reconcile = () => {
+      if (media.matches && resultsCardRef.current?.contains(focused)) {
+        const target = focused;
+        returnRef.current = null;
+        breakpointFocusRef.current = null;
+        setMobileDetail(false);
+        requestAnimationFrame(() => {
+          if (target.isConnected) target.focus({ preventScroll: true });
+        });
+      } else if (media.matches && detailPaneRef.current?.contains(focused)) {
+        returnRef.current ??= { trigger: resultsRef.current?.querySelector('[aria-pressed="true"]'), listTop: resultsRef.current?.scrollTop ?? 0, pageY: window.scrollY };
+        breakpointFocusRef.current = focused === backButtonRef.current ? detailHeadingRef.current : focused;
+        setMobileDetail(true);
+      } else if (!media.matches && focused === backButtonRef.current) {
+        detailHeadingRef.current?.focus({ preventScroll: true });
+      }
+    };
+    document.addEventListener("focusin", trackFocus);
+    media.addEventListener("change", reconcile);
+    return () => {
+      document.removeEventListener("focusin", trackFocus);
+      media.removeEventListener("change", reconcile);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (mobileDetail) {
+      (breakpointFocusRef.current || detailHeadingRef.current)?.focus();
+      breakpointFocusRef.current = null;
+    } else if (returnRef.current) {
+      const { trigger, fromItems, listTop, pageY } = returnRef.current;
+      if (resultsRef.current) resultsRef.current.scrollTop = listTop;
+      const fallback = fromItems ? itemBrowserRef.current?.querySelector('input[type="search"]') : resultsRef.current;
+      (trigger?.isConnected ? trigger : fallback)?.focus({ preventScroll: true });
+      window.scrollTo({ top: pageY, behavior: "instant" });
+      returnRef.current = null;
+    }
+  }, [mobileDetail]);
+
+  const openMobileDetail = (trigger, fromItems = false) => {
+    if (!window.matchMedia("(max-width: 1023px)").matches) return;
+    returnRef.current = { trigger, fromItems, listTop: resultsRef.current?.scrollTop ?? 0, pageY: window.scrollY };
+    setMobileDetail(true);
+  };
+
+  const backToResults = () => {
+    if (returnRef.current?.fromItems) setBrowseMode("items");
+    setMobileDetail(false);
+  };
 
   useEffect(() => {
     document.title = "Species & Loot | CobbleToolkit";
@@ -628,7 +691,7 @@ export default function SpeciesLootScanner() {
           <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent-soft text-accent">
             <Layers size={16} />
           </div>
-          <h1 className="text-xl font-semibold text-text-primary">
+          <h1 data-route-title className="text-xl font-semibold text-text-primary">
             Species & Loot
           </h1>
         </div>
@@ -699,22 +762,24 @@ export default function SpeciesLootScanner() {
                 { id: "items", label: "Item drops", icon: PackageSearch },
               ]}
               active={browseMode}
-              onChange={setBrowseMode}
+              onChange={(mode) => {
+                              if (mobileDetail) backToResults();
+                              setBrowseMode(mode);
+                            }}
             />
             <p className="text-sm leading-relaxed text-text-secondary">
               {browseMode === "items" ? "Find drops across all Pokémon. No species selection needed." : "Browse stats, moves, types, and loot tables."}
             </p>
           </div>
 
-          <div hidden={browseMode !== "items"}>
+          <div ref={itemBrowserRef} hidden={browseMode !== "items"}>
             <ItemDropBrowser
               reports={lootReports}
-              onSelectSpecies={(name) => {
+              onSelectSpecies={(name, trigger) => {
                 setSelectedName(name.toLowerCase().trim());
-                setSearch("");
-                setDebouncedSearch("");
                 setActiveTab("loot");
                 setBrowseMode("species");
+                openMobileDetail(trigger, true);
               }}
             />
           </div>
@@ -722,7 +787,7 @@ export default function SpeciesLootScanner() {
           {browseMode === "species" && (
           <div className="grid gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
             {/* Species selector */}
-            <Card className="flex min-w-0 flex-col overflow-hidden">
+            <Card ref={resultsCardRef} className={`${mobileDetail ? "hidden lg:flex" : "flex"} min-w-0 flex-col overflow-hidden`}>
               <div className="border-b border-border p-3">
                 <label htmlFor="species-search" className="mb-2 block text-xs font-medium text-text-secondary">Search the species archive</label>
                 <div className="relative">
@@ -737,13 +802,13 @@ export default function SpeciesLootScanner() {
                     onChange={(e) => setSearch(e.target.value)}
                     aria-label="Search species, type, or loot item"
                                         placeholder="Search species, type, or loot item…"
-                    className="w-full rounded-md border border-border bg-bg-surface-2 py-1.5 pl-8 pr-7 text-xs text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
+                    className="min-h-11 w-full rounded-md border border-border bg-bg-surface-2 py-1.5 pl-8 pr-12 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none"
                   />
                   {search && (
                     <button
-                      onClick={() => setSearch("")}
+                      onClick={(event) => { setSearch(""); setDebouncedSearch(""); event.currentTarget.parentElement.querySelector("input")?.focus(); }}
                       aria-label="Clear species search"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
+                      className="absolute right-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded text-text-muted hover:text-text-primary focus-visible:outline-2 focus-visible:outline-accent"
                     >
                       <X size={12} />
                     </button>
@@ -751,7 +816,7 @@ export default function SpeciesLootScanner() {
                 </div>
               </div>
 
-              <div className="max-h-[65vh] overflow-y-auto">
+              <div ref={resultsRef} tabIndex={-1} role="region" aria-label="Species results" className="max-h-[65vh] overflow-y-auto">
                 {filtered.length === 0 ? (
                   <p className="break-words px-3 py-6 text-center text-sm leading-relaxed text-text-secondary">
                     No species match &quot;{debouncedSearch}&quot;.
@@ -760,7 +825,7 @@ export default function SpeciesLootScanner() {
                   filtered.map((mon) => (
                     <button
                       key={mon.name}
-                      onClick={() => setSelectedName(mon.name)}
+                      onClick={(event) => { setSelectedName(mon.name); openMobileDetail(event.currentTarget); }}
                                             aria-pressed={mon.name === selectedName}
                       className={[
                         "flex w-full items-center justify-between gap-2 border-b border-border px-3 py-2 text-left transition-colors duration-100",
@@ -802,7 +867,8 @@ export default function SpeciesLootScanner() {
             </Card>
 
             {/* Detail panel */}
-            <div className="min-w-0 flex flex-col gap-3 rounded-lg border border-border bg-bg-surface/50 p-4">
+            <div ref={detailPaneRef} className={`${mobileDetail ? "flex" : "hidden lg:flex"} min-w-0 flex-col gap-3 rounded-lg border border-border bg-bg-surface/50 p-4`}>
+                          <button ref={backButtonRef} type="button" onClick={backToResults} className="min-h-11 self-start rounded-md border border-border px-3 text-sm text-accent hover:bg-accent-soft focus-visible:outline-2 focus-visible:outline-accent lg:hidden">Back to results</button>
               {!selected ? (
                 <EmptyState
                   icon={Search}
@@ -816,7 +882,7 @@ export default function SpeciesLootScanner() {
                       <PokemonSprite name={selected.name} size={56} />
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h2 className="break-words text-base font-semibold capitalize text-text-primary">
+                          <h2 ref={detailHeadingRef} tabIndex={-1} className="break-words text-base font-semibold capitalize text-text-primary focus-visible:outline-2 focus-visible:outline-accent">
                             {formatPokemonName(selected.name)}
                           </h2>
                           {selected.nationalDex && (

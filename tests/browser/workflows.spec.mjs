@@ -78,6 +78,12 @@ async function selectSpecies(page, name) {
   await combo.press('Enter');
   await expect(combo).toHaveAttribute('aria-expanded', 'false');
 }
+async function backToResults(page) {
+  if (page.viewportSize().width < 1024) {
+    await page.getByRole('button', { name: 'Back to results', exact: true }).click();
+  }
+}
+
 async function noOverflow(page) {
   await expect.poll(() => page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - window.innerWidth)).toBeLessThanOrEqual(1);
 }
@@ -126,8 +132,10 @@ test('spawn field terminal preserves full search across column views and resets 
   await closeFiles(page);
   const table = page.getByRole('table');
   await expect(table).toBeVisible();
+  const width = page.viewportSize().width;
+  await expect(page.getByLabel('Column view')).toHaveValue(width < 768 ? 'essentials' : 'all');
+  await page.getByLabel('Column view').selectOption('all');
   const originalCount = await table.getByRole('columnheader').count();
-  await expect(page.getByLabel('Column view')).toHaveValue('all');
   await page.getByLabel('Column view').selectOption('essentials');
   await expect.poll(() => table.getByRole('columnheader').count()).toBeLessThan(originalCount);
   await page.getByRole('textbox', { name: 'Search spawn data' }).fill('fixture-solo');
@@ -165,6 +173,7 @@ test('item drops search spans species and preserves quantities, chances, sources
   await closeFiles(page);
   await page.getByRole('radio', { name: 'Item drops', exact: true }).click();
   const browser = page.getByRole('region', { name: 'Item drop browser' });
+  await browser.getByRole('button', { name: 'Full table', exact: true }).click();
   const table = browser.getByRole('table');
   await expect(browser.getByRole('status')).toContainText('3 of 3 drop entries matched');
   await expect(table).toContainText('Not specified');
@@ -222,6 +231,7 @@ test('species mount stats show additions, custom modes, forms and survive reload
   await expect(page.getByText('Base stats are not included in the loaded data.')).toBeVisible();
   await page.getByText('Mount data sources', { exact: true }).click();
   await expect(page.getByText(/browser-pack.zip · data\/example\/species_additions\/charizard.json/)).toBeVisible();
+  await backToResults(page);
   await page.getByRole('button', { name: 'mega charizard Mega Charizard —', exact: true }).click();
   await expect(air).toContainText('120-140');
   // Simulate pre-mount cached results while keeping the original archive bytes.
@@ -263,6 +273,9 @@ test('archive bytes persist across reload and scan in another tool', async ({ pa
   await page.reload();
   await expect(page.getByRole('table')).toBeVisible();
   await page.goto('species-loot/');
+  if (page.viewportSize().width < 1024) {
+    await page.getByRole('region', { name: 'Species results' }).getByRole('button', { name: /Ditto/ }).click();
+  }
   await expect(page.getByRole('heading', { name: 'Ditto', exact: true })).toBeVisible();
   await expect(page.getByText('browser-pack.zip', { exact: true })).toBeVisible();
   await page.getByRole('radio', { name: 'Loot Table 1', exact: true }).click();
@@ -514,6 +527,7 @@ test('Spawn and Species searches normalize names, typos and loot item separators
     await expect(page.getByRole('button', { name: /Ditto/ })).toHaveCount(0);
     await result.click();
     await expect(page.getByRole('heading', { name: 'Iron Valiant', exact: true })).toBeVisible();
+    await backToResults(page);
   }
 });
 
@@ -558,8 +572,10 @@ test('trainer dossier separates duplicate IDs across packs and filters loot stat
   await page.getByRole('button', { name: /Alternate Trainer/ }).click();
   await expect(page.getByRole('heading', { name: 'Alternate Trainer', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Source pack: alternate-pack.zip' })).toBeVisible();
+  await backToResults(page);
   await page.getByRole('button', { name: /Fixture Trainer/ }).click();
   await expect(page.getByRole('heading', { name: 'Fixture Trainer', exact: true })).toBeVisible();
+  await backToResults(page);
   const source = page.getByRole('combobox', { name: 'Trainer source pack' });
   await source.selectOption({ label: 'alternate-pack.zip' });
   await expect(page.getByRole('status').filter({ hasText: '2 of 3 trainers' })).toBeVisible();
@@ -567,9 +583,17 @@ test('trainer dossier separates duplicate IDs across packs and filters loot stat
   const loot = page.getByRole('combobox', { name: 'Trainer loot status' });
   await loot.selectOption('issues');
   await expect(page.getByRole('status').filter({ hasText: '1 of 3 trainers' })).toBeVisible();
+  if (page.viewportSize().width < 1024) {
+    await page.getByRole('region', { name: 'Trainer results' }).getByRole('button', { name: /Alternate Trainer/ }).click();
+  }
   await expect(page.getByRole('heading', { name: 'Alternate Trainer', exact: true })).toBeVisible();
+  await backToResults(page);
   await loot.selectOption('none');
+  if (page.viewportSize().width < 1024) {
+    await page.getByRole('region', { name: 'Trainer results' }).getByRole('button', { name: /Novice Trainer/ }).click();
+  }
   await expect(page.getByRole('heading', { name: 'Novice Trainer', exact: true })).toBeVisible();
+  await backToResults(page);
   const search = page.getByRole('textbox', { name: 'Search trainer, species, or loot item' });
   await search.fill('zzzznomatch');
   await expect(page.getByRole('status').filter({ hasText: '0 of 3 trainers' })).toBeVisible();

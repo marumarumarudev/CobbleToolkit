@@ -49,6 +49,10 @@ Hosted on GitHub Pages: **https://marumarumarudev.github.io/CobbleToolkit/**
 5. Older entries whose archive blobs are missing still show “Archive unavailable — re-upload to scan in another tool”. Their cached results remain usable. Removing an archive atomically removes its associated reports too.
 6. Changes sync across tabs using BroadcastChannel, with a storage-event fallback and a refresh when the tab regains focus.
 
+On smaller screens, select a species or trainer to open its details, then use **Back to results** to return with your search and list position intact. Item drops starts in **Compact view**, with full values in each drop’s details and **Full table** available for comparison. Spawn Scanner starts with **Essentials** below 768px; you can choose **All fields** without narrowing search coverage.
+
+Biome tags open with click, tap, Enter, or Space. Close the details or press Escape to return to the tag. Tool changes use a brief title/selection cue rather than moving the results; reduced-motion preferences skip those animations.
+
 ## 🧪 Development checks
 
 - `npm test` — run the test suite.

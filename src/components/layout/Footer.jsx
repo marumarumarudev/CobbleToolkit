@@ -26,7 +26,7 @@ const LINKS = [
 export default function Footer() {
   return (
     <footer className="border-t border-border mt-16">
-      <div className="max-w-[100rem] mx-auto px-4 py-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="max-w-[100rem] mx-auto px-4 py-8 sm:px-6 xl:px-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-text-muted">
           Built by{" "}
           <span className="font-mono text-text-secondary">zmoonmaru</span> for

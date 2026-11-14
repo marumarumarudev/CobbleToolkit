@@ -370,6 +370,24 @@ body {
   box-shadow: 0 0 0 2px var(--screen-ring), inset 0 3px 10px var(--screen-shadow);
 }
 
+/* Tool orientation stays compact; the homepage retains its larger casing. */
+header.dex-console {
+  padding: clamp(0.875rem, 2vw, 1.5rem);
+}
+
+header.dex-console h1 {
+  font-size: clamp(1.5rem, 2vw, 1.875rem);
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.dex-support-panel {
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface);
+}
+
 .dex-tool-card {
   min-width: 0;
   border: 1px solid var(--color-border);
@@ -423,22 +441,55 @@ html:is([data-theme="pokedex"], [data-theme="rotom"], [data-theme="dark"], [data
   border-radius: var(--radius-sm);
 }
 
-/* Route transitions — short fade + tiny rise, keyed by pathname in
-   PageTransition.jsx. Kept brief on purpose: this should read as "the page
-   is ready" not as a loading animation. */
-.page-transition {
-  animation: page-enter 180ms ease-out;
+/* Only small navigation cues animate; tables and the shell never fade or move. */
+[data-route-title] {
+  animation: tool-title-enter 160ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes page-enter {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
+@keyframes tool-title-enter {
+  from { opacity: 0.72; }
+  to { opacity: 1; }
+}
+
+.tool-nav-marker {
+  position: absolute;
+  inset-inline: 0.75rem;
+  bottom: 0;
+  height: 2px;
+  background: currentColor;
+  transform-origin: left;
+}
+
+@media (min-width: 1024px) {
+  .tool-nav-link[aria-current="page"] .tool-nav-marker {
+    animation: tool-select 160ms cubic-bezier(0.16, 1, 0.3, 1);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+}
+
+@keyframes tool-select {
+  from { opacity: 0.5; transform: scaleX(0.6); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  transform: translateY(-200%);
+}
+.skip-link:focus {
+  transform: none;
+}
+#main-content {
+  scroll-margin-top: 10rem;
+}
+#main-content:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* Brief entrance for Kitchen seasoning cards; disabled by reduced motion. */
@@ -459,13 +510,24 @@ html:is([data-theme="pokedex"], [data-theme="rotom"], [data-theme="dark"], [data
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  html {
+    scroll-behavior: auto;
+  }
+
+  [data-route-title],
+  .tool-nav-link[aria-current="page"] .tool-nav-marker,
+  .seasoning-swap,
+  .animate-spin,
+  .animate-pulse {
+    animation: none;
+  }
+
+  .dex-tool-card:hover {
+    transform: none;
+  }
+
+  .transition-transform {
+    transition-property: none;
   }
 }
 

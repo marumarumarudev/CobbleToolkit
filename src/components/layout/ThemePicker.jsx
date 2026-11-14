@@ -48,7 +48,7 @@ export default function ThemePicker() {
           try { localStorage.setItem(STORAGE_KEY, theme); }
           catch { /* Theme selection still works when browser storage is blocked. */ }
         }}
-        className="h-full w-11 cursor-pointer appearance-none rounded-lg bg-transparent pl-11 text-sm outline-none sm:w-40 sm:pr-3"
+        className="h-full w-36 cursor-pointer appearance-none rounded-lg bg-transparent pl-10 pr-2 text-sm outline-none sm:w-40 sm:pr-3"
       >
         {THEMES.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
       </select>

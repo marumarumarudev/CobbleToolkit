@@ -40,8 +40,9 @@ export default function RootLayout({ children }) {
         <SharedFilesProvider>
 
           <div className="flex min-h-screen flex-col">
+            <a href="#main-content" className="skip-link">Skip to content</a>
             <ClientNav />
-            <main className="mx-auto w-full max-w-[100rem] flex-1 px-4 py-6 sm:px-6 sm:py-8 xl:px-8">
+            <main id="main-content" tabIndex={-1} className="mx-auto w-full min-w-0 max-w-[100rem] flex-1 px-4 py-6 sm:px-6 sm:py-8 xl:px-8">
               <PageTransition>{children}</PageTransition>
             </main>
             <Footer />

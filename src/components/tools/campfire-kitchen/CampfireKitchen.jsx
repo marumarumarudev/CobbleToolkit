@@ -356,7 +356,7 @@ export default function CampfireKitchen() {
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-accent-soft text-accent">
               <Flame size={16} />
             </div>
-            <h1 className="text-xl font-semibold text-text-primary">
+            <h1 data-route-title className="text-xl font-semibold text-text-primary">
               Campfire Kitchen
             </h1>
           </div>
@@ -432,7 +432,7 @@ export default function CampfireKitchen() {
                 listLoading ? "Loading Pokédex…" : "Search for a Pokémon…"
               }
               disabled={listLoading || Boolean(listError)}
-              className="w-full rounded-md border border-border bg-bg-surface-2 py-2 pl-9 pr-8 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none disabled:opacity-50"
+              className="w-full rounded-md border border-border bg-bg-surface-2 py-3 pl-9 pr-12 text-base sm:text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none disabled:opacity-50"
             />
             {query && (
               <button
@@ -444,7 +444,7 @@ export default function CampfireKitchen() {
                                   setActiveSuggestion(-1);
                                   searchRef.current?.focus();
                                 }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
+                className="absolute right-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-md text-text-muted hover:text-text-primary"
               >
                 <X size={14} />
               </button>
