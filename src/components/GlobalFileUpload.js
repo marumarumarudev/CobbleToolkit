@@ -6,6 +6,7 @@ import { Upload, X, File } from "lucide-react";
 import { useSharedFiles } from "@/contexts/SharedFilesContext";
 import toast from "react-hot-toast";
 import { ARCHIVE_UNAVAILABLE_MESSAGE } from "@/utils/archiveAvailability";
+import OfficialCobblemonPicker from "@/components/OfficialCobblemonPicker";
 
 export default function GlobalFileUpload() {
   const { sharedFiles, addSharedFile, removeSharedFile, clearSharedFiles } =
@@ -99,13 +100,13 @@ export default function GlobalFileUpload() {
             onKeyDown={(event) => {
               if (event.key === "Escape") { event.preventDefault(); setIsOpen(false); }
               if (event.key !== "Tab") return;
-              const controls = Array.from(event.currentTarget.querySelectorAll('button:not(:disabled), input:not(:disabled), [tabindex="0"]')).filter((element) => element.offsetParent !== null);
+              const controls = Array.from(event.currentTarget.querySelectorAll('button:not(:disabled), input:not(:disabled), select:not(:disabled), a[href], [tabindex="0"]')).filter((element) => element.offsetParent !== null);
               const first = controls[0];
               const last = controls[controls.length - 1];
               if (event.shiftKey && (document.activeElement === first || document.activeElement === dialogRef.current)) { event.preventDefault(); last?.focus(); }
               else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
             }}
-            className="fixed z-70 flex max-h-[min(32rem,calc(100vh-2rem))] w-[min(20rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-xl border border-border bg-bg-surface shadow-xl
+            className="fixed z-70 flex max-h-[calc(100dvh-2rem)] md:max-h-[calc(100dvh-6rem)] w-[min(24rem,calc(100vw-2rem))] flex-col overflow-y-auto rounded-xl border border-border bg-bg-surface shadow-xl
               left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
               md:left-auto md:right-4 md:top-16 md:translate-x-0 md:translate-y-0"
           >
@@ -122,6 +123,8 @@ export default function GlobalFileUpload() {
                   <X size={16} />
                 </button>
               </div>
+
+              <OfficialCobblemonPicker />
 
               {/* Upload Area */}
               <div
@@ -181,8 +184,8 @@ export default function GlobalFileUpload() {
               </label>
             </div>
 
-            {/* File List — scrolls inside the panel */}
-            <div className="min-h-0 flex-1 overflow-y-auto">
+            {/* The entire panel scrolls so uploads and files remain reachable. */}
+            <div className="shrink-0">
               {sharedFiles.length === 0 ? (
                 <div className="p-4 text-center text-sm text-text-muted">
                   No shared files uploaded
@@ -200,12 +203,13 @@ export default function GlobalFileUpload() {
                           <p className="truncate text-xs text-text-primary">
                             {file.name}
                           </p>
+                          {file.source === "official-cobblemon" && <p className="text-xs font-medium text-accent">Official · {file.officialVersion}</p>}
                           <p className="text-xs text-text-muted">
                             {formatFileSize(file.size)} · {file.allowRepairs === false ? "Strict JSON" : "Compatibility repairs"}
                           </p>
                           {!file.file && (
                             <p className="mt-1 text-xs text-text-secondary">
-                              {ARCHIVE_UNAVAILABLE_MESSAGE}. Identical content and repair policy reconnect when a fingerprint is available; legacy entries without one stay separate.
+                              {file.source === "official-cobblemon" ? "Archive unavailable — load this official version again using the selector." : `${ARCHIVE_UNAVAILABLE_MESSAGE}. Identical content and repair policy reconnect when a fingerprint is available; legacy entries without one stay separate.`}
                             </p>
                           )}
                         </div>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useSharedFiles } from "@/contexts/SharedFilesContext";
+import { createScannerNotifications } from "@/utils/scannerNotifications";
 import { getUnavailableArchives, storageFailureMessage } from "@/utils/archiveAvailability";
 
 export function useScannerLifecycle(config) {
@@ -17,7 +18,8 @@ export function useScannerLifecycle(config) {
     let active = true;
     if (!filesReady) return () => { active = false; };
     const controller = new AbortController();
-    const unregister = registerCancellation(() => controller.abort());
+    const notices = createScannerNotifications(toast, config.scannerName);
+    const unregister = registerCancellation(() => { controller.abort(); notices.clear(); });
     const generation = getGeneration();
     const isCurrent = () => active && !controller.signal.aborted && generation === getGeneration();
     const run = async () => {
@@ -41,6 +43,10 @@ export function useScannerLifecycle(config) {
           if (!isCurrent()) return;
           if (!sharedFile.file || snapshot.processed.has(sharedFile.id)) continue;
           try {
+            notices.start(sharedFile.name);
+            // Give the progress notification a paint before ZIP parsing starts.
+            await new Promise(resolve => setTimeout(resolve, 0));
+            if (!isCurrent()) return;
             const updates = await config.parse(sharedFile, { signal: controller.signal });
             if (!isCurrent()) return;
             const committed = await enqueueMutation(async () => {
@@ -52,11 +58,11 @@ export function useScannerLifecycle(config) {
             snapshot.processed.add(sharedFile.id);
             notifyCommitted();
             if (updates.some((update) => update.hasWarnings)) {
-              toast(`Processed "${sharedFile.name}" with warnings. Review parse warnings above the results.`, { icon: "⚠️" });
+              notices.warning(`Processed "${sharedFile.name}" with warnings. Review parse warnings above the results.`);
             } else if (updates.length) {
-              toast.success(`Processed "${sharedFile.name}" for ${config.scannerName}`);
+              notices.success(`Processed "${sharedFile.name}" for ${config.scannerName}`);
             } else {
-              toast(`No data for this tool in "${sharedFile.name}". Other scanners can still use it.`, { icon: "ℹ️" });
+              notices.info(`No data for this tool in "${sharedFile.name}". Other scanners can still use it.`);
             }
           } catch (err) {
             if (!isCurrent() || err?.name === "AbortError") return;
@@ -65,7 +71,7 @@ export function useScannerLifecycle(config) {
               ? storageFailureMessage(err, `save scan results for "${sharedFile.name}"`)
               : `Failed to process "${sharedFile.name}": ${err.message || "Unknown error"}`;
             setError(message);
-            toast.error(message);
+            notices.error(message);
           }
         }
       } catch (err) {
@@ -81,6 +87,7 @@ export function useScannerLifecycle(config) {
     return () => {
       active = false;
       controller.abort();
+      notices.clear();
       unregister();
     };
   }, [config, sharedFiles, filesReady, lifecycleVersion, getGeneration, enqueueMutation, registerCancellation, notifyCommitted]);

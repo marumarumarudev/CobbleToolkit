@@ -39,6 +39,38 @@ test("normalization strips wrappers only at an exact data segment", () => {
   assert.equal(normalizeDatapackPath("metadata/example/species/ditto.json"), "metadata/example/species/ditto.json");
 });
 
+test("unrelated embedded data files retain their original paths", () => {
+  for (const path of [
+    "assets/cobblemon/showdown/node_modules/first/data/LICENSE",
+    "assets/cobblemon/showdown/node_modules/second/data/LICENSE",
+    "assets/cobblemon/showdown/data/moves.json",
+    "wrapper/data/package.json",
+    "wrapper/data/Invalid Namespace/species/ditto.json",
+  ]) {
+    assert.equal(normalizeDatapackPath(path), path);
+  }
+});
+
+test("bundled dependency data does not collide or change scanner results", async () => {
+  const entries = {
+    ...fixtures,
+    "assets/cobblemon/showdown/node_modules/first/data/LICENSE": "first license",
+    "assets/cobblemon/showdown/node_modules/second/data/LICENSE": "second license",
+    "assets/cobblemon/showdown/node_modules/first/data/moves.json": { unrelated: true },
+    "assets/cobblemon/showdown/node_modules/second/data/moves.json": { unrelated: false },
+  };
+  for (const transform of [(path) => path, (path) => `release/${path}`.replaceAll("/", "\\")]) {
+    assert.deepEqual(await scanAll(await archive(entries, transform)), await scanAll(await archive(fixtures)));
+  }
+});
+
+test("unrelated entries still count toward archive safety budgets", () => {
+  assert.throws(() => indexDatapackArchive({ files: {
+    "assets/first/data/LICENSE": { dir: false, _data: { uncompressedSize: 300 * 1024 ** 2 } },
+    "assets/second/data/LICENSE": { dir: false, _data: { uncompressedSize: 300 * 1024 ** 2 } },
+  } }), /512 MiB uncompressed/);
+});
+
 test("index retains the original entry and skips directory records", () => {
   const entry = { dir: false, async: () => "content" };
   const zip = { files: { "wrapper/data/": { dir: true }, "wrapper/data/example/species/ditto.json": entry } };

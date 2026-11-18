@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo } from "react";
 import toast from "react-hot-toast";
 import { validateFileStructure } from "@/utils/fileValidation";
 import getStorage from "@/utils/indexedDBStorage";
@@ -8,6 +8,8 @@ import { createScannerCoordinator } from "@/utils/scannerCoordinator";
 import { restoreSharedFiles, storageFailureMessage } from "@/utils/archiveAvailability";
 import { createSharedFilesSync } from "@/utils/sharedFilesSync";
 import { MAX_ARCHIVE_BYTES } from "@/utils/archiveLimits";
+import { createOfficialArchiveController } from "@/utils/officialArchiveController";
+import { downloadOfficialArchive, OFFICIAL_SOURCE } from "@/utils/officialCobblemon";
 
 const SharedFilesContext = createContext(null);
 
@@ -16,6 +18,8 @@ export function SharedFilesProvider({ children }) {
   const [filesReady, setFilesReady] = useState(false);
     const [storageNotice, setStorageNotice] = useState(null);
   const [lifecycleVersion, setLifecycleVersion] = useState(0);
+  const [officialDownload, setOfficialDownload] = useState({ status: "idle" });
+  const pendingOfficialSnapshot = useRef(null);
   const filesRef = useRef([]);
   const hydratedRef = useRef(false);
   const cancellations = useRef(new Set());
@@ -39,11 +43,68 @@ export function SharedFilesProvider({ children }) {
   }, []);
   const notifyCommitted = useCallback(() => syncRef.current?.publish("changed"), []);
 
+  const officialController = useMemo(() => {
+    const snapshots = new WeakMap();
+    return createOfficialArchiveController({
+      onState: setOfficialDownload,
+      download: async (release, options) => {
+        if (!hydratedRef.current) throw new Error("Shared files have not loaded");
+        const snapshot = await getStorage().getOfficialArchiveSnapshot();
+        options.signal.throwIfAborted();
+        pendingOfficialSnapshot.current = snapshot;
+        const file = await downloadOfficialArchive(release, options);
+        snapshots.set(file, snapshot);
+        return file;
+      },
+      prepare: async (file, { signal }) => {
+        signal.throwIfAborted();
+        const validation = await validateFileStructure(file);
+        signal.throwIfAborted();
+        if (!validation.valid || !validation.kinds.includes("spawn") || !validation.kinds.includes("species")) throw new Error(validation.reason || "Official archive is missing spawn or species data");
+        const digest = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
+        signal.throwIfAborted();
+        return { file, snapshot: snapshots.get(file), contentHash: Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, "0")).join("") };
+      },
+      commit: ({ file, contentHash, snapshot }, { isCurrent, release }) => enqueueMutation(async () => {
+        if (!isCurrent()) throw new DOMException("Official load canceled", "AbortError");
+        invalidateScans();
+        syncRef.current?.publish("invalidate");
+        try {
+          await getStorage().replaceOfficialArchive({
+            id: crypto.randomUUID(), name: file.name, size: file.size, uploadedAt: Date.now(),
+            contentHash, allowRepairs: false, source: OFFICIAL_SOURCE,
+            officialVersion: release.version, officialVersionId: release.versionId, sourceUrl: release.sourceUrl,
+          }, file, { expectedOfficialId: snapshot.id, expectedOfficialRevision: snapshot.revision, isCurrent });
+          pendingOfficialSnapshot.current = null;
+          publish(restoreSharedFiles(await getStorage().loadSharedArchives()));
+        } catch (error) {
+          if (error.name === "QuotaExceededError" || error.name === "ArchiveLimitError") throw new Error(storageFailureMessage(error, "load the official archive"));
+          throw error;
+        } finally {
+          setLifecycleVersion(version => version + 1);
+          notifyCommitted();
+        }
+      }),
+    });
+  }, [enqueueMutation, invalidateScans, notifyCommitted, publish]);
+  const cancelOfficialDownload = useCallback(() => {
+    pendingOfficialSnapshot.current = null;
+    officialController.cancel();
+  }, [officialController]);
+  const loadOfficialVersion = useCallback((release) => {
+    const existing = filesRef.current.find(file => file.source === OFFICIAL_SOURCE && file.officialVersionId === release.versionId && file.file);
+    if (existing) { cancelOfficialDownload(); return Promise.resolve(true); }
+    return officialController.load(release);
+  }, [officialController, cancelOfficialDownload]);
+
   useEffect(() => {
     let active = true;
     const refresh = () => enqueueMutation(async () => {
       const files = await getStorage().loadSharedArchives();
+      const snapshot = await getStorage().getOfficialArchiveSnapshot();
       if (!active) return;
+      const pending = pendingOfficialSnapshot.current;
+      if (pending && (pending.id !== snapshot.id || pending.revision !== snapshot.revision)) cancelOfficialDownload();
       publish(restoreSharedFiles(files));
       hydratedRef.current = true;
       setFilesReady(true);
@@ -67,12 +128,13 @@ export function SharedFilesProvider({ children }) {
     refresh();
     return () => {
       active = false;
+      cancelOfficialDownload();
       sync.close();
       syncRef.current = null;
       window.removeEventListener("focus", onRemoteChange);
             window.removeEventListener("cobbletoolkit:storage-blocked", onStorageBlocked);
     };
-  }, [enqueueMutation, invalidateScans, publish]);
+  }, [enqueueMutation, invalidateScans, publish, cancelOfficialDownload]);
 
   const addSharedFile = useCallback((file, { allowRepairs = false } = {}) => {
     if (!file) return Promise.resolve(false);
@@ -89,7 +151,7 @@ export function SharedFilesProvider({ children }) {
         }
         const digest = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
         const contentHash = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
-        const existing = filesRef.current.find((entry) => entry.contentHash === contentHash && entry.allowRepairs === allowRepairs);
+        const existing = filesRef.current.find((entry) => entry.source !== OFFICIAL_SOURCE && entry.contentHash === contentHash && entry.allowRepairs === allowRepairs);
         await getStorage().persistSharedArchive({
           id: crypto.randomUUID(), name: file.name, size: file.size,
           uploadedAt: Date.now(), contentHash, allowRepairs,
@@ -107,6 +169,7 @@ export function SharedFilesProvider({ children }) {
   }, [enqueueMutation, publish, notifyCommitted]);
 
   const purge = useCallback((fileId) => {
+    if (fileId === null || filesRef.current.some(file => file.id === fileId && file.source === OFFICIAL_SOURCE)) cancelOfficialDownload();
     invalidateScans();
     syncRef.current?.publish("invalidate");
     return enqueueMutation(async () => {
@@ -125,7 +188,7 @@ export function SharedFilesProvider({ children }) {
         notifyCommitted();
       }
     });
-  }, [enqueueMutation, invalidateScans, notifyCommitted, publish]);
+  }, [enqueueMutation, invalidateScans, notifyCommitted, publish, cancelOfficialDownload]);
 
   const removeSharedFile = useCallback((fileId) => purge(fileId), [purge]);
   const clearSharedFiles = useCallback(() => purge(null), [purge]);
@@ -134,6 +197,7 @@ export function SharedFilesProvider({ children }) {
     <SharedFilesContext.Provider value={{
       sharedFiles, filesReady, lifecycleVersion, getGeneration, enqueueMutation,
       registerCancellation, notifyCommitted, addSharedFile, removeSharedFile, clearSharedFiles,
+      officialDownload, loadOfficialVersion, cancelOfficialDownload,
     }}>
       {storageNotice && <div role="status" className="border-b border-border bg-bg-surface-2 px-4 py-3 text-sm text-text-primary">{storageNotice}</div>}
       {children}

@@ -23,19 +23,29 @@ const faqs = [
       ".zip or .jar datapacks. Upload from the top bar or any tool’s dropzone. They share the same file list. Cobblemon 1.8.x jars (including herd / alpha spawn data) are supported.",
   },
   {
-    question: "Why is nothing showing up after I upload?",
+    question: "Can I load official Cobblemon data without uploading a JAR?",
+    answer:
+      "Yes. In Shared files, choose an optional Official Cobblemon version and press Load version. The size is shown before downloading directly from Modrinth. No download starts automatically. The picker uses reviewed Fabric builds as a data source, not as a mod installation. If your version is not listed, you can still upload its JAR yourself.",
+  },
+  {
+    question: "What happens when I switch the official version?",
+    answer:
+      "The new JAR is downloaded and verified before replacing the previous managed official archive and its scanner results. Your datapacks and side-mods are kept. Failed downloads or storage writes leave the previous version intact. Remove official version returns to manual-only use. Manually uploaded Cobblemon JARs stay separate and may produce duplicate data; remove those copies yourself if needed. Closing Shared files cancels a pending download.",
+  },
+  {
+    question: "Why is nothing showing up after I upload?", 
     answer:
       "The pack might not contain the folders that tool reads, or you’re on a tool that doesn’t use datapack files (Campfire Kitchen uses the online Pokédex). New uploads use strict JSON by default; check parsing diagnostics for invalid JSON. Shared files offers optional compatibility repair, but its heuristics may alter values. Diagnostics persist and are bounded. Existing legacy entries keep their old compatibility behavior.",
   },
   {
     question: "Where is my data stored?",
     answer:
-      "Datapacks are never uploaded. IndexedDB (v7) stores archives, metadata, parsed results, and bounded diagnostics. Archives are limited to 512 MiB each and 1024 MiB stored total; metadata reports the same limits. The browser may evict storage, and clearing site data removes everything. Removing an archive atomically removes its associated reports too. External species lookups, images, video, and comments still use external services.",
+      "Datapacks are never uploaded. IndexedDB (v7) stores archives, metadata, parsed results, and bounded diagnostics. Archives are limited to 512 MiB each and 1024 MiB stored total; metadata reports the same limits. The browser may evict storage, and clearing site data removes everything. Removing an archive atomically removes its associated reports too. Optional official JAR downloads contact Modrinth. External species lookups, images, video, and comments also use external services.",
   },
   {
     question: "When do I need to upload an archive again?",
     answer:
-      "Saved archives remain available after a refresh. Older entries with missing archive blobs still show a notice asking you to upload again to scan in another tool. Their cached results remain usable. Uploading the same SHA-256 content again with the same repair policy automatically reconnects to the existing ID and results, even if renamed. Different content or repair policy creates a separate entry. Legacy metadata without a fingerprint cannot safely reconnect by filename: a new entry is created and old caches are retained.",
+      "Saved archives remain available after a refresh. If a managed official archive is unavailable, select its version and load it again. Older uploaded entries with missing archive blobs still show a notice asking you to upload again to scan in another tool. Their cached results remain usable. Uploading the same SHA-256 content again with the same repair policy automatically reconnects to the existing ID and results, even if renamed. Different content or repair policy creates a separate entry. Legacy metadata without a fingerprint cannot safely reconnect by filename: a new entry is created and old caches are retained.",
   },
   {
     question: "Do changes sync across browser tabs?",

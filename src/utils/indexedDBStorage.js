@@ -232,7 +232,8 @@ class CobblemonStorage {
           const record = metaRequest.result;
           const existing = record?.data ?? [];
           const matches = (entry) => entry.contentHash === metadata.contentHash &&
-            entry.allowRepairs === metadata.allowRepairs;
+            entry.allowRepairs === metadata.allowRepairs &&
+                        (entry.source === "official-cobblemon") === (metadata.source === "official-cobblemon");
           const selected = metadata.reconnectId == null ? existing.find(matches) :
             existing.find((entry) => entry.id === metadata.reconnectId);
           if (metadata.reconnectId != null && (!selected || !matches(selected))) {
@@ -256,6 +257,77 @@ class CobblemonStorage {
           tx.abort();
         }
       };
+    });
+  }
+
+  async getOfficialArchiveSnapshot() {
+    await this.ensureInitialized();
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction("sharedFiles", "readonly");
+      const request = tx.objectStore("sharedFiles").get("main");
+      tx.oncomplete = () => resolve({
+        id: request.result?.data?.find(file => file.source === "official-cobblemon")?.id ?? null,
+        revision: request.result?.officialRevision ?? 0,
+      });
+      tx.onabort = () => reject(tx.error ?? new DOMException("Transaction aborted", "AbortError"));
+    });
+  }
+
+  async replaceOfficialArchive(metadata, blob, { expectedOfficialId, expectedOfficialRevision, isCurrent = () => true }) {
+    if (!metadata?.id || !metadata.contentHash || metadata.source !== "official-cobblemon" || metadata.allowRepairs !== false || !(blob instanceof Blob)) throw new TypeError("Invalid official archive metadata or blob");
+    const limitError = message => Object.assign(new Error(message), { name: "ArchiveLimitError" });
+    if (blob.size > MAX_ARCHIVE_BYTES) throw limitError("Archive exceeds 512 MiB. Choose a smaller archive.");
+    await this.ensureInitialized();
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction(["sharedFiles", "archiveBlobs", ...TOOL_DATA_STORES.map(({ store }) => store), "processedFilesTracking"], "readwrite");
+      let files;
+      let failure;
+      const abort = error => { failure = error; tx.abort(); };
+      const guard = callback => () => {
+        try {
+          if (!isCurrent()) throw new DOMException("Official load canceled", "AbortError");
+          callback();
+        } catch (error) { abort(error); }
+      };
+      tx.oncomplete = () => resolve(files);
+      tx.onabort = () => reject(failure ?? tx.error ?? new DOMException("Transaction aborted", "AbortError"));
+      const shared = tx.objectStore("sharedFiles");
+      const blobs = tx.objectStore("archiveBlobs");
+      const metaRequest = shared.get("main");
+      const blobRequest = blobs.getAll();
+      blobRequest.onsuccess = guard(() => {
+        const record = metaRequest.result;
+        const existing = record?.data ?? [];
+        const previous = existing.filter(file => file.source === "official-cobblemon");
+        if ((previous[0]?.id ?? null) !== expectedOfficialId || (record?.officialRevision ?? 0) !== expectedOfficialRevision) throw new Error("Official archive changed in another operation. Please load the version again.");
+        if (existing.some(file => file.id === metadata.id)) throw new Error("Replacement requires a new archive ID");
+        const removedIds = new Set(previous.map(file => file.id));
+        const total = blobRequest.result.reduce((sum, entry) => sum + (removedIds.has(entry.id) ? 0 : entry.blob.size), blob.size);
+        if (total > MAX_STORED_ARCHIVE_BYTES) throw limitError("Stored archives would exceed 1024 MiB. Remove unneeded archives and try again.");
+        files = [...existing.filter(file => !removedIds.has(file.id)), { ...metadata, size: blob.size }];
+        for (const id of removedIds) blobs.delete(id);
+        blobs.put({ id: metadata.id, blob });
+        shared.put({ ...record, id: "main", toolType: "sharedFiles", data: files, officialRevision: (record?.officialRevision ?? 0) + 1, timestamp: Date.now() });
+        // Managed archives have always used IDs. Never delete legacy user rows
+        // by a matching filename when replacing the official slot.
+        for (const { store: name } of TOOL_DATA_STORES) {
+          const store = tx.objectStore(name);
+          const request = store.get("main");
+          request.onsuccess = guard(() => {
+            const dataRecord = request.result;
+            if (!Array.isArray(dataRecord?.data)) return;
+            const data = dataRecord.data.filter(item => !removedIds.has(item?.sharedFileId));
+            store.put({ ...dataRecord, data, timestamp: Date.now() });
+          });
+        }
+        const tracking = tx.objectStore("processedFilesTracking");
+        for (const scanner of SCANNER_NAMES) {
+          const request = tracking.get(scanner);
+          request.onsuccess = guard(() => {
+            if (request.result) tracking.put({ ...request.result, processedFiles: (request.result.processedFiles ?? []).filter(id => !removedIds.has(id)), lastUpdated: Date.now() });
+          });
+        }
+      });
     });
   }
 
@@ -345,6 +417,7 @@ class CobblemonStorage {
             ...existing,
             id: "main",
             data: remaining,
+            officialRevision: (existing?.officialRevision ?? 0) + (fileId === null || removed.some(file => file.source === "official-cobblemon") ? 1 : 0),
             timestamp: Date.now(),
           });
 
@@ -361,7 +434,7 @@ class CobblemonStorage {
                 if (!Array.isArray(record?.data)) return;
                 const data = record.data.filter((item) => {
                   if (item?.sharedFileId != null) return item.sharedFileId !== fileId;
-                  return !removed.some((file) => matchesFile(item, file.name));
+                  return !removed.some((file) => file.source !== "official-cobblemon" && matchesFile(item, file.name));
                 });
                 if (data.length !== record.data.length) {
                   store.put({ ...record, data, timestamp: Date.now() });
@@ -650,6 +723,12 @@ class CobblemonStorage {
   // "switch backends."
   static createNoopStorage() {
     return {
+      async getOfficialArchiveSnapshot() {
+        throw new Error("Persistence unavailable: IndexedDB is not supported");
+      },
+      async replaceOfficialArchive() {
+        throw new Error("Persistence unavailable: IndexedDB is not supported");
+      },
       async persistSharedArchive() {
         throw new Error("Persistence unavailable: IndexedDB is not supported");
       },

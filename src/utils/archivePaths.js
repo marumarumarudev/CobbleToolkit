@@ -1,10 +1,16 @@
 import { checkArchiveBudget } from "./archiveProcessing.js";
-// ZIPs may contain a wrapper folder or Windows separators. Only an exact
-// `data` path segment starts a datapack root (not the suffix of `metadata`).
+// ZIPs may contain wrapper folders or Windows separators. A datapack resource
+// needs data/<namespace>/<type>/<file>; embedded dependency data/LICENSE and
+// data/moves.json are not datapack roots and must keep their distinct paths.
 export function normalizeDatapackPath(rawPath) {
   const path = rawPath.replace(/\\/g, "/");
   const segments = path.split("/");
-  const dataIndex = segments.indexOf("data");
+  const dataIndex = segments.findIndex((segment, index) =>
+      segment === "data" && segments.length >= index + 4 &&
+      /^[a-z0-9_.-]+$/.test(segments[index + 1]) &&
+      /^[a-z0-9_.-]+$/.test(segments[index + 2]) &&
+      segments.slice(index + 3).every(Boolean)
+    );
   return dataIndex === -1 ? path : segments.slice(dataIndex).join("/");
 }
 

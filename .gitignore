@@ -60,3 +60,5 @@ next-env.d.ts
 
 # Local approved UI proposal
 /UI_IMPROVEMENT_PROPOSAL.md
+
+docs/

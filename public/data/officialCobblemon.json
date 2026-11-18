@@ -1,0 +1,203 @@
+{
+  "projectId": "MdwFAVRL",
+  "checkedAt": "2026-11-17T00:30:18.418Z",
+  "releases": [
+    {
+      "version": "1.7.0",
+      "versionId": "Ygf8KJFC",
+      "loader": "fabric",
+      "filename": "Cobblemon-fabric-1.7.0+1.21.1.jar",
+      "url": "https://cdn.modrinth.com/data/MdwFAVRL/versions/Ygf8KJFC/Cobblemon-fabric-1.7.0%2B1.21.1.jar",
+      "size": 130736495,
+      "sha512": "2fa4f9e91fdc2511a2b7fa4309a3ca0848599058e86345056c7c771136cf518c6bfab94a6da6b661abd1e675354caedf5cdd6e4f0e39c5c3157116a72c58e878",
+      "sourceUrl": "https://modrinth.com/mod/cobblemon/version/Ygf8KJFC"
+    },
+    {
+      "version": "1.7.1",
+      "versionId": "s64m1opn",
+      "loader": "fabric",
+      "filename": "Cobblemon-fabric-1.7.1+1.21.1.jar",
+      "url": "https://cdn.modrinth.com/data/MdwFAVRL/versions/s64m1opn/Cobblemon-fabric-1.7.1%2B1.21.1.jar",
+      "size": 130797814,
+      "sha512": "221382ccc0aa7ae65935298802ff6272b852f485bf0d03a5ba7b51f88a15aa3110282d6c9b0d6e2993fe72515f1dfffdec236b235d411ac01eb93b7dc9e5d750",
+      "sourceUrl": "https://modrinth.com/mod/cobblemon/version/s64m1opn"
+    },
+    {
+      "version": "1.7.2",
+      "versionId": "FcsopG0e",
+      "loader": "fabric",
+      "filename": "Cobblemon-fabric-1.7.2+1.21.1.jar",
+      "url": "https://cdn.modrinth.com/data/MdwFAVRL/versions/FcsopG0e/Cobblemon-fabric-1.7.2%2B1.21.1.jar",
+      "size": 135794114,
+      "sha512": "bf13dfb6f9325513c2e2db46ab34edd5e0a264775ec5f962cd53a8b06d729a858d780c0f284888c61b2cd0a5f3454f7eef07bc759189805ba7ffa957267d9104",
+      "sourceUrl": "https://modrinth.com/mod/cobblemon/version/FcsopG0e"
+    },
+    {
+      "version": "1.7.3",
+      "versionId": "kF7CvxTo",
+      "loader": "fabric",
+      "filename": "Cobblemon-fabric-1.7.3+1.21.1.jar",
+      "url": "https://cdn.modrinth.com/data/MdwFAVRL/versions/kF7CvxTo/Cobblemon-fabric-1.7.3%2B1.21.1.jar",
+      "size": 135801550,
+      "sha512": "7b5376f5f48177db53790237b6fb25378806972b5d3b756151b4d8f2d3c27238d6b587b77da422bc1780bfd358b4702e74369fd82cef2a35301b4b68a2f13c2e",
+      "sourceUrl": "https://modrinth.com/mod/cobblemon/version/kF7CvxTo"
+    },
+    {
+      "version": "1.8.0",
+      "versionId": "YgmyyFcs",
+      "loader": "fabric",
+      "filename": "Cobblemon-fabric-1.8.0+1.21.1.jar",
+      "url": "https://cdn.modrinth.com/data/MdwFAVRL/versions/YgmyyFcs/Cobblemon-fabric-1.8.0%2B1.21.1.jar",
+      "size": 162358118,
+      "sha512": "6537ff48feb8888d5c9f124eeecd721162bf05ca8e30270753d8f58f08af4e5fbb8d06d2bfb6c9e6514524152709e46c8e7ed9ff38fa2cf759d0b43898d25883",
+      "sourceUrl": "https://modrinth.com/mod/cobblemon/version/YgmyyFcs"
+    },
+    {
+      "version": "1.8.1",
+      "versionId": "gBW3vLC7",
+      "loader": "fabric",
+      "filename": "Cobblemon-fabric-1.8.1+1.21.1.jar",
+      "url": "https://cdn.modrinth.com/data/MdwFAVRL/versions/gBW3vLC7/Cobblemon-fabric-1.8.1%2B1.21.1.jar",
+      "size": 137391338,
+      "sha512": "e9c475c6a8e73bfb378445944812f6e31271cdf50d3227124b44b31c295bf7e9085246ea05d005efff9b7227e7b4e3e34ff1480b1a4b3b97211b5fa127d234ed",
+      "sourceUrl": "https://modrinth.com/mod/cobblemon/version/gBW3vLC7"
+    },
+    {
+      "version": "1.8.2",
+      "versionId": "GJ2a1b8O",
+      "loader": "fabric",
+      "filename": "Cobblemon-fabric-1.8.2+1.21.1.jar",
+      "url": "https://cdn.modrinth.com/data/MdwFAVRL/versions/GJ2a1b8O/Cobblemon-fabric-1.8.2%2B1.21.1.jar",
+      "size": 139317851,
+      "sha512": "fe0090aa00a010a2353b4da43693ef70b675d5255756541cd679d2cf1df077ffedb790e9de66b1bd69cc9f6336d58763aeb15f146d07420d466daaeb3d992386",
+      "sourceUrl": "https://modrinth.com/mod/cobblemon/version/GJ2a1b8O"
+    },
+    {
+      "version": "1.8.3",
+      "versionId": "IgUZQKm8",
+      "loader": "fabric",
+      "filename": "Cobblemon-fabric-1.8.3+1.21.1.jar",
+      "url": "https://cdn.modrinth.com/data/MdwFAVRL/versions/IgUZQKm8/Cobblemon-fabric-1.8.3%2B1.21.1.jar",
+      "size": 139963795,
+      "sha512": "0cfcbc811c0434a6a8cbeda32fae5c39328a699e28b4292de635da99fc283f40166d25055594abf4eff56dd9a7a453313a5aa43f4a9969940d9e1a18dd222166",
+      "sourceUrl": "https://modrinth.com/mod/cobblemon/version/IgUZQKm8"
+    },
+    {
+      "version": "1.8.4",
+      "versionId": "PdOzYHKU",
+      "loader": "fabric",
+      "filename": "Cobblemon-fabric-1.8.4+1.21.1.jar",
+      "url": "https://cdn.modrinth.com/data/MdwFAVRL/versions/PdOzYHKU/Cobblemon-fabric-1.8.4%2B1.21.1.jar",
+      "size": 139966403,
+      "sha512": "8ba3bc7eb0bb6d52309ca339dfc9fb11adcffebe36d183e0a8df7c8e741edbcbc436c60cc877fd2b42aa224670825cf4f55946676b58ecf0e998f9feae2173c2",
+      "sourceUrl": "https://modrinth.com/mod/cobblemon/version/PdOzYHKU"
+    }
+  ],
+  "verification": [
+    {
+      "version": "1.7.0",
+      "spawns": 2828,
+      "species": 1391,
+      "loot": 982,
+      "diagnostics": 0,
+      "diagnosticDetails": []
+    },
+    {
+      "version": "1.7.1",
+      "spawns": 2826,
+      "species": 1391,
+      "loot": 982,
+      "diagnostics": 0,
+      "diagnosticDetails": []
+    },
+    {
+      "version": "1.7.2",
+      "spawns": 2855,
+      "species": 1391,
+      "loot": 982,
+      "diagnostics": 0,
+      "diagnosticDetails": []
+    },
+    {
+      "version": "1.7.3",
+      "spawns": 2855,
+      "species": 1391,
+      "loot": 982,
+      "diagnostics": 0,
+      "diagnosticDetails": []
+    },
+    {
+      "version": "1.8.0",
+      "spawns": 8239,
+      "species": 1392,
+      "loot": 982,
+      "diagnostics": 0,
+      "diagnosticDetails": []
+    },
+    {
+      "version": "1.8.1",
+      "spawns": 8239,
+      "species": 1392,
+      "loot": 982,
+      "diagnostics": 0,
+      "diagnosticDetails": []
+    },
+    {
+      "version": "1.8.2",
+      "spawns": 8458,
+      "species": 1421,
+      "loot": 982,
+      "diagnostics": 2,
+      "diagnosticDetails": [
+        {
+          "path": "data/cobblemon/spawn_pool_world/0000_empty.json",
+          "code": "invalid-entry",
+          "message": "Spawn has no species."
+        },
+        {
+          "path": "data/cobblemon/spawn_pool_world/0000_empty.json",
+          "code": "invalid-entry",
+          "message": "Spawn has no species."
+        }
+      ]
+    },
+    {
+      "version": "1.8.3",
+      "spawns": 8716,
+      "species": 1421,
+      "loot": 1006,
+      "diagnostics": 2,
+      "diagnosticDetails": [
+        {
+          "path": "data/cobblemon/spawn_pool_world/0000_empty.json",
+          "code": "invalid-entry",
+          "message": "Spawn has no species."
+        },
+        {
+          "path": "data/cobblemon/spawn_pool_world/0000_empty.json",
+          "code": "invalid-entry",
+          "message": "Spawn has no species."
+        }
+      ]
+    },
+    {
+      "version": "1.8.4",
+      "spawns": 8716,
+      "species": 1421,
+      "loot": 1006,
+      "diagnostics": 2,
+      "diagnosticDetails": [
+        {
+          "path": "data/cobblemon/spawn_pool_world/0000_empty.json",
+          "code": "invalid-entry",
+          "message": "Spawn has no species."
+        },
+        {
+          "path": "data/cobblemon/spawn_pool_world/0000_empty.json",
+          "code": "invalid-entry",
+          "message": "Spawn has no species."
+        }
+      ]
+    }
+  ]
+}

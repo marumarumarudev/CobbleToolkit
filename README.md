@@ -1,6 +1,6 @@
 # 🧰 CobbleToolkit
 
-Browser-based tools for digging through **Cobblemon** and **Cobbleverse RCT** datapacks so you don't have to open a single `.json` file yourself. Datapack processing runs client-side — your datapacks are never uploaded. External species lookups, images, video, and comments use third-party services.
+Browser-based tools for digging through **Cobblemon** and **Cobbleverse RCT** datapacks so you don't have to open a single `.json` file yourself. Datapack processing runs client-side — your datapacks are never uploaded. Optional official archive downloads, external species lookups, images, video, and comments use third-party services.
 
 ## ⚙️ Tools
 
@@ -52,6 +52,28 @@ Hosted on GitHub Pages: **https://marumarumarudev.github.io/CobbleToolkit/**
 On smaller screens, select a species or trainer to open its details, then use **Back to results** to return with your search and list position intact. Item drops starts in **Compact view**, with full values in each drop’s details and **Full table** available for comparison. Spawn Scanner starts with **Essentials** below 768px; you can choose **All fields** without narrowing search coverage.
 
 Biome tags open with click, tap, Enter, or Space. Close the details or press Escape to return to the tag. Tool changes use a brief title/selection cue rather than moving the results; reduced-motion preferences skip those animations.
+
+## Optional official Cobblemon data
+
+Open **Shared files**, choose an **Official Cobblemon version**, and select **Load version**. Nothing downloads automatically. The picker shows the download size and links to the official release. Downloads go directly from Modrinth to your browser; your uploaded datapacks never leave it. No JAR is executed, hosted by this site, or included in the site's bundle.
+
+Only one managed official archive is kept. A replacement is checked against Modrinth's SHA-512 hash and archive safety limits before a single storage transaction replaces the previous archive and its results. Failed downloads or storage writes leave the previous data intact. Manual uploads, even identical Cobblemon JARs, stay separate; remove duplicate manual copies yourself if desired. **Remove official version** returns to manual-only use. Closing Shared files cancels an in-progress download.
+
+The active archive survives refreshes using IndexedDB, subject to browser eviction. If its bytes are missing, select and load that version again. If Modrinth is unavailable, download from the official release page and upload manually. Switching versions does not resolve Minecraft datapack priority or guarantee that every uploaded side-mod matches your chosen version.
+
+### Catalog maintenance
+
+`public/data/officialCobblemon.json` contains only reviewed metadata. Verified full JARs: **1.7.0–1.7.3 and 1.8.0–1.8.4** (Fabric data source, approximately 125–155 MiB each). Loader selection is hidden; this does not assert that all loader builds contain identical data. Each original SHA-512 hash, parser count, and diagnostic detail is recorded. Versions through 1.8.1 produced zero diagnostics. Versions 1.8.2–1.8.4 each produce two `invalid-entry` warnings for `data/cobblemon/spawn_pool_world/0000_empty.json` (no species); those entries are skipped, while other spawn/species/loot results remain available. Warnings are not suppressed. The archive-path normalizer now distinguishes valid datapack roots from bundled dependency files, retaining collision detection and safety budgets.
+
+To replace the catalog with an explicit set of releases:
+
+```sh
+npm run catalog:official -- 1.7.0 1.7.1 1.7.2 1.7.3 1.8.0 1.8.1 1.8.2 1.8.3 1.8.4
+```
+
+This maintenance command identifies itself to the Modrinth API, downloads each requested original JAR to memory, verifies its hash, and runs the existing strict parsers. It can transfer hundreds of megabytes and take several minutes. Any missing/ambiguous release, network error, empty required dataset, or safety-limit failure leaves the previous catalog unchanged. Review the metadata diff and any recorded parser diagnostics before deploying. New releases never appear automatically. No API key is needed.
+
+Cobblemon lists its binaries and source under [MPL-2.0](https://modrinth.com/mod/cobblemon); source is available at [the Cobblemon repository](https://gitlab.com/cable-mc/cobblemon). CobbleToolkit's MIT license does not relicense Cobblemon. Downloads use [Modrinth's API terms](https://modrinth.com/legal/terms) and [documentation](https://docs.modrinth.com/api/); this fan tool is not endorsed by either project.
 
 ## 🧪 Development checks
 
